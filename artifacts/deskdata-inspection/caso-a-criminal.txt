@@ -1,0 +1,2707 @@
+INSPEÇÃO DE RESULTADO — DESKDATA
+
+Cenário: caso-a-criminal
+Capturado em: 2026-07-14T14:26:53.937Z
+Caminho: /pessoas/resultado/
+
+TÍTULOS
+- Resultado
+- Consulta ao CPF [CPF_REMOVIDO]
+- Processos
+- 1000883-82.2017.8.26.0470
+- Resumo
+- Partes
+- Movimentações
+- Petições
+- 0010652-30.2020.8.26.0502
+- 0009885-21.2022.8.26.0502
+- 1000608-26.2023.8.26.0470
+- Decisões
+- 0011647-15.2024.5.03.0075
+- 0011540-68.2024.5.03.0075
+- 1500107-88.2018.8.26.0470
+- 0013651-87.2019.8.26.0114
+- 0001473-95.2020.8.26.0268
+- 0000697-73.2019.8.26.0125
+- 0001284-33.2019.8.26.0372
+- 0001616-78.2019.8.26.0637
+- 1500052-17.2019.8.26.0628
+- 1500275-90.2018.8.26.0470
+
+LINHAS RELEVANTES
+- Processos
+- 1000883-82.2017.8.26.0470
+- 0010652-30.2020.8.26.0502
+- 0009885-21.2022.8.26.0502
+- 1000608-26.2023.8.26.0470
+- 0011647-15.2024.5.03.0075
+- 0011540-68.2024.5.03.0075
+- 1500107-88.2018.8.26.0470
+- 0013651-87.2019.8.26.0114
+- 0001473-95.2020.8.26.0268
+- 0000697-73.2019.8.26.0125
+- 0001284-33.2019.8.26.0372
+- 0001616-78.2019.8.26.0637
+- 1500052-17.2019.8.26.0628
+- 1500275-90.2018.8.26.0470
+- Consultar processos
+
+TABELA 0
+
+													
+														
+															Número
+															1000883-82.2017.8.26.0470
+														
+														
+															Tipo
+															Despejo por falta de pagamento cumulado com cobranca
+														
+														
+															Assunto
+															Locacao de imovel
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Civel
+														
+															
+																Vara
+																Vara Unica
+															
+														
+															Juiz
+															Fabio Fernandes Lima
+														
+														
+															Status
+															Arquivado
+														
+													
+												
+
+TABELA 1
+
+											
+												
+													1
+													Nome
+													EMERSON FLAVIANO RODRIGUES
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													REQTE
+												
+											
+												
+													2
+													Nome
+													FABRICIO ORPHEU ARAUJO
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+													
+														OAB
+														174662 / SP
+													
+											
+												
+													3
+													Nome
+													ELIAS MACHADO ALVES
+												
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													REQDO
+												
+											
+												
+													4
+													Nome
+													RODRIGO CEREZER
+												
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+											
+												
+													5
+													Nome
+													ANTONIO LEOCADIO FERREIRA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													REQDO
+												
+											
+												
+													6
+													Nome
+													CASSIA CRISTINA FERRARI
+												
+													
+														Identificação
+														00.800.809/0001-06
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+													
+														OAB
+														186529 / SP
+													
+											
+												
+													7
+													Nome
+													FERNANDA APARECIDA PEREIRA VIANA
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													ADVOGADO REQUERENTE
+												
+											
+												
+													8
+													Nome
+													FELIPE RODRIGUES DE OLIVEIRA
+												
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													ADVOGADO (REQTE)
+												
+											
+												
+													9
+													Nome
+													CASSIA CRISTINA FERRARI
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													ADVOGADO (REQDO)
+												
+													
+														OAB
+														186529 / SP
+													
+											
+												
+													10
+													Nome
+													FELIPE RODRIGUES DE OLIVEIRA
+												
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													ADVOGADO (REQTE)
+												
+											
+												
+													11
+													Nome
+													FABIO FERNANDES LIMA
+												
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+											
+												
+													12
+													Nome
+													FELIPE RODRIGUES DE OLIVEIRA
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													ADVOGADO (REQTE)
+												
+													
+														OAB
+														359861 / SP
+													
+											
+												
+													13
+													Nome
+													CASSIA CRISTINA FERRARI
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													ADVOGADA (REQDO)
+												
+													
+														OAB
+														186529 / SP
+													
+
+TABELA 2
+
+												
+													
+														07/10/2022
+														ARQUIVADO DEFINITIVAMENTE
+													
+												
+												
+													
+														07/10/2022
+														CERTIDAO DE HONORARIOS EXPEDIDA CERTIDAO - HONORARIOS - CONVENIO DEFENSORIA-OAB
+													
+												
+												
+													
+														07/10/2022
+														CERTIDAO DE CARTORIO EXPEDIDA CERTIDAO DE CARTORIO - CUSTAS - CERTIDAO DE INEXISTENCIA DE CUSTAS E ARQUIVAMENTO - CIVEL - 61615
+													
+												
+												
+													
+														23/09/2022
+														ATO ORDINATORIO - INTIMACAO - PORTAL ATOS - EMISSAO DE DOCUMENTOS - NAO PUBLICAVEL
+													
+												
+												
+													
+														23/09/2022
+														TRANSITO EM JULGADO AS PARTES - PROC. EM ANDAMENTO CERTIDAO DE TRANSITO EM JULGADO - HONORARIOS
+													
+												
+												
+													
+														Para consultar as 180 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 3
+
+												
+													
+														10/12/2017
+														PETICOES DIVERSAS
+													
+												
+												
+													
+														21/03/2018
+														PETICOES DIVERSAS
+													
+												
+												
+													
+														09/05/2019
+														CONTESTACAO
+													
+												
+												
+													
+														25/03/2021
+														PETICAO DE JUNTADA DOS DOCUMENTOS SOLICITADOS
+													
+												
+												
+													
+														16/06/2021
+														PETICOES DIVERSAS
+													
+												
+												
+													
+														05/07/2021
+														PETICOES DIVERSAS
+													
+												
+												
+													
+														08/10/2021
+														PETICOES DIVERSAS
+													
+												
+												
+													
+														15/02/2022
+														PETICOES DIVERSAS
+													
+												
+											
+
+TABELA 4
+
+													
+														
+															Número
+															0010652-30.2020.8.26.0502
+														
+														
+															Tipo
+															Execucao de pena
+														
+														
+															Assunto
+															Aberto
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Criminal
+														
+															
+																Vara
+																Vara Criminal
+															
+														
+															Juiz
+															Udo Wolff Dick Appolo Do Amaral
+														
+														
+															Status
+															Arquivado
+														
+													
+												
+
+TABELA 5
+
+											
+												
+													1
+													Nome
+													PATRICIA CAYRES MARIOTTI CAPPI
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+											
+												
+													2
+													Nome
+													JUSTICA PUBLICA
+												
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													Autor
+												
+											
+												
+													3
+													Nome
+													ANTONIO LEOCADIO FERREIRA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													EXECTDO
+												
+											
+												
+													4
+													Nome
+													DEFENSORIA PUBLICA DO ESTADO DE SAO PAULO
+												
+													
+														Identificação
+														08.036.157/0001-89
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													DEF. PUB (EXECTDO)
+												
+											
+												
+													5
+													Nome
+													UDO WOLFF DICK APPOLO DO AMARAL
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+
+TABELA 6
+
+												
+													
+														23/04/2024
+														DOCUMENTO JUNTADO
+													
+												
+												
+													
+														09/04/2024
+														REMETIDOS OS AUTOS PARA OUTRO TRIBUNAL ESTADUAL (MOVIMENTACAO EXCLUSIVA DO DISTRIBUIDOR) EM RAZAO DO TJSP NAO ESTAR INTEGRADO AO SEEU, ENCAMINHOU-SE, POR MALOTE DIGITAL, SENHA DE ACESSO A PASTA DIGITAL DA EXECUCAO CRIMINAL N 0010652-30.2020.8.26.0502 E DE SEUS DEPENDENTES N 0007039-50.2019.8.26.0271 E N 0009885-21.2022.8.26.0502 , PARA REDISTRIBUICAO, EM CUMPRIMENTO A DECISAO JUDICIAL DE FLS.257, DO PROCESSO 0010652-30.2020.8.26.0502 A VALIDADE DAS SENHAS E DE 60 DIAS. COMPROVANTE DE REMESSA FLS.258 DOS AUTOS 0010652-30.2020.8.26.0502.
+													
+												
+												
+													
+														09/04/2024
+														REMETIDOS OS AUTOS PARA O CARTORIO DISTRIBUIDOR LOCAL PARA REDISTRIBUICAO
+													
+												
+												
+													
+														09/04/2024
+														DOCUMENTO JUNTADO
+													
+												
+												
+													
+														03/04/2024
+														DETERMINADA A REDISTRIBUICAO DOS AUTOS VISTOS ETC. DIANTE DA INFORMACAO DE QUE O(A) EXECUTADO(A) ANTONIO LEOCADIO FERREIRA JUNIOR MUDOU-SE PARA CIDADE DE ITAPEVA/MG, PERTENCENTE A COMARCA DE CAMANDUCAIA/MG (FL. 256), DETERMINO A REDISTRIBUICAO DESTE PROCESSO DE EXECUCAO CRIMINAL E SEUS DEPENDENTES, SE HOUVER, A VEC COMPETENTE, NOS TERMOS DO ART 530 DAS NSCGJ E ART. 7 DA RESOLUCAO 113 DO CNJ, PARA PROSSEGUIMENTO DA FISCALIZACAO DA PENA ORA EXECUTADA. PROCEDA-SE AS ANOTACOES E DILIGENCIAS PERTINENTES A ESPECIE. APOS, REDISTRIBUA-SE. DILIGENCIAS LEGAIS.
+													
+												
+												
+													
+														Para consultar as 153 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 7
+
+												
+													
+														03/03/2021
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														14/03/2021
+														PETICAO INTERMEDIARIA
+													
+												
+												
+													
+														18/03/2021
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														22/03/2021
+														PETICAO INTERMEDIARIA
+													
+												
+												
+													
+														15/04/2021
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														17/04/2021
+														PETICAO INTERMEDIARIA
+													
+												
+												
+													
+														18/12/2021
+														MANIFESTACAO DA DEFENSORIA PUBLICA
+													
+												
+												
+													
+														19/12/2021
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														12/01/2022
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														23/02/2022
+														SAP - ATESTADO DE FREQUENCIA ESCOLAR
+													
+												
+												
+													
+														25/02/2022
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														02/03/2022
+														SAP - BOLETIM INFORMATIVO ATUALIZADO
+													
+												
+												
+													
+														02/03/2022
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														25/04/2022
+														SAP - LISTA DE PRESOS TRANSFERIDOS
+													
+												
+												
+													
+														24/08/2022
+														SAP - MANDADO DE PRISAO CUMPRIDO
+													
+												
+												
+													
+														24/08/2022
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														27/08/2022
+														MANIFESTACAO DA DEFENSORIA PUBLICA
+													
+												
+												
+													
+														02/09/2022
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														06/09/2022
+														MANIFESTACAO DA DEFENSORIA PUBLICA
+													
+												
+												
+													
+														15/09/2022
+														SAP - ATESTADO DE FREQUENCIA ESCOLAR
+													
+												
+												
+													
+														15/09/2022
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														29/09/2022
+														MANIFESTACAO DA DEFENSORIA PUBLICA
+													
+												
+												
+													
+														30/09/2022
+														MANIFESTACAO DA DEFENSORIA PUBLICA
+													
+												
+												
+													
+														31/08/2023
+														SAP - ATESTADO DE TRABALHO
+													
+												
+												
+													
+														31/08/2023
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														15/09/2023
+														MANIFESTACAO DA DEFENSORIA PUBLICA
+													
+												
+												
+													
+														21/11/2023
+														SAP - BOLETIM INFORMATIVO ATUALIZADO
+													
+												
+												
+													
+														21/11/2023
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														24/11/2023
+														SAP - TERMO DE AUDIENCIA  REGIME ABERTO
+													
+												
+											
+
+TABELA 8
+
+													
+														
+															Número
+															0009885-21.2022.8.26.0502
+														
+														
+															Tipo
+															Execucao de pena
+														
+														
+															Assunto
+															Regime inicial - aberto
+														
+														
+															Esfera
+															Criminal
+														
+															
+																Vara
+																Vara Criminal
+															
+														
+															Status
+															Arquivado
+														
+													
+												
+
+TABELA 9
+
+											
+												
+													1
+													Nome
+													PATRICIA CAYRES MARIOTTI CAPPI
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+											
+												
+													2
+													Nome
+													JUSTICA PUBLICA
+												
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													Autor
+												
+											
+												
+													3
+													Nome
+													ANTONIO LEOCADIO FERREIRA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													EXECTDO
+												
+											
+												
+													4
+													Nome
+													DEFENSORIA PUBLICA DO ESTADO DE SAO PAULO
+												
+													
+														Identificação
+														08.036.157/0001-89
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													DEF. PUB (EXECTDO)
+												
+											
+												
+													5
+													Nome
+													UDO WOLFF DICK APPOLO DO AMARAL
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+
+TABELA 10
+
+												
+													
+														23/04/2024
+														DOCUMENTO JUNTADO
+													
+												
+												
+													
+														09/04/2024
+														DOCUMENTO JUNTADO
+													
+												
+												
+													
+														09/04/2024
+														REMETIDOS OS AUTOS PARA OUTRO TRIBUNAL ESTADUAL (MOVIMENTACAO EXCLUSIVA DO DISTRIBUIDOR) EM RAZAO DO TJSP NAO ESTAR INTEGRADO AO SEEU, ENCAMINHOU-SE, POR MALOTE DIGITAL, SENHA DE ACESSO A PASTA DIGITAL DA EXECUCAO CRIMINAL N 0010652-30.2020.8.26.0502 E DE SEUS DEPENDENTES N 0007039-50.2019.8.26.0271 E N 0009885-21.2022.8.26.0502 , PARA QUE SEJA REDISTRIBUIDO, EM CUMPRIMENTO A DECISAO JUDICIAL DE FLS.257 DOS AUTOS 0010652-30.2020.8.26.0502. A VALIDADE DAS SENHAS E DE 60 DIAS. COMPROVANTE DE REMESSA FLS.258 DOS AUTOS 0010652-30.2020.8.26.0502.
+													
+												
+												
+													
+														09/04/2024
+														REMETIDOS OS AUTOS PARA O CARTORIO DISTRIBUIDOR LOCAL PARA REDISTRIBUICAO
+													
+												
+												
+													
+														13/01/2024
+														RECEBIDOS OS AUTOS DO OUTRO FORO
+													
+												
+												
+													
+														Para consultar as 11 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 11
+
+													
+														
+															Número
+															1000608-26.2023.8.26.0470
+														
+														
+															Tipo
+															Execucao de pena de multa
+														
+														
+															Assunto
+															Pena de multa
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Civel
+														
+															
+																Vara
+																Vara Unica
+															
+														
+															Juiz
+															Liliane Regina Vieira Lucas De Camargo Barros
+														
+														
+															Status
+															Arquivado
+														
+													
+												
+
+TABELA 12
+
+											
+												
+													1
+													Nome
+													JOSIAS MARTINS DE ALMEIDA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+											
+												
+													2
+													Nome
+													MINISTERIO PUBLICO DO ESTADO DE SAO PAULO
+												
+													
+														Identificação
+														01.468.760/0001-90
+													
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													Autor
+												
+											
+												
+													3
+													Nome
+													ANTONIO LEOCADIO FERREIRA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													EXECTDO
+												
+											
+												
+													4
+													Nome
+													LILIANE REGINA VIEIRA LUCAS DE CAMARGO BARROS
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+
+TABELA 13
+
+												
+													
+														18/11/2025
+														CERTIDAO DE CARTORIO EXPEDIDA CERTIDAO - GENERICA
+													
+												
+												
+													
+														18/11/2025
+														ARQUIVADO DEFINITIVAMENTE
+													
+												
+												
+													
+														18/11/2025
+														ARQUIVADO DEFINITIVAMENTE
+													
+												
+												
+													
+														09/11/2025
+														CERTIDAO DE REMESSA DA INTIMACAO PARA O PORTAL ELETRONICO EXPEDIDA CERTIDAO - REMESSA DA INTIMACAO PARA O PORTAL ELETRONICO
+													
+												
+												
+													
+														09/11/2025
+														EXTINTA A PUNIBILIDADE POR ANISTIA, GRACA OU INDULTO VISTOS TRATA-SE DE EXECUCAO DE PENA DE MULTA. MANIFESTACAO DO MINISTERIO PUBLICO AS FLS. 17/22 PELA AUSENCIA DE INTERESSE PROCESSUAL. E O RELATORIO. FUNDAMENTO E DECIDO. A JURISPRUDENCIA DO SUPERIOR TRIBUNAL DE JUSTICA, NO JULGAMENTO DO RECURSO ESPECIAL REPRESENTATIVO DE CONTROVERSIA N 1.785.861-SP, DEFINIU A TESE DE QUE "A COMPROVACAO DA IMPOSSIBILIDADE DE ADIMPLEMENTO DA PENA DE MULTA PELO CONDENADO CONDUZ A EXTINCAO DA PUNIBILIDADE". NO REFERIDO JULGADO, O STJ ESTABELECEU QUE "O INADIMPLEMENTO DA PENA DE MULTA POR CONDENADO QUE NAO POSSUI CAPACIDADE ECONOMICA DE PAGA-LA CONDUZ A EXTINCAO DA PUNIBILIDADE, EM RAZAO DA VEDACAO CONSTITUCIONAL DA PRISAO POR DIVIDA (ART. 5, LXVII, DA CF) E DA IMPOSSIBILIDADE DE CONVERTER A PENA PECUNIARIA EM PRIVATIVA DE LIBERDADE". NO PRESENTE CASO, A HIPOSSUFICIENCIA DO EXECUTADO ESTA EVIDENCIADA PELO FATO DE TER SIDO ASSISTIDO PELA DEFENSORIA PUBLICA, POR MEIO DO CONVENIO OAB/DPE, DEMONSTRANDO SUA CONDICAO DE NECESSITADO, NOS TERMOS DO ART. 98 DO CPC E ART. 5, LXXIV DA CONSTITUICAO FEDERAL. ASSIM, CONSIDERANDO QUE O SENTENCIADO NAO TEM CONDICOES DE PROVER O PAGAMENTO DA MULTA SEM PREJUIZO DE SEU SUSTENTO PROPRIO, HA SITUACAO DE VULNERABILIDADE ECONOMICA QUE IMPOSSIBILITA O ADIMPLEMENTO DA OBRIGACAO. ANTE O EXPOSTO, COM FUNDAMENTO NO PRECEDENTE VINCULANTE DO RESP 1.785.861-SP E NA HIPOSSUFICIENCIA DO EXECUTADO, JULGO EXTINTA A PUNIBILIDADE EM RELACAO A PENA DE MULTA APLICADA A ANTONIO LEOCADIO FERREIRA JUNIOR NO PROCESSO N PROCESSO DE ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >> DA VARA VARA DO PROCESSO ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >> DA FORO DO PROCESSO ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >>. ANOTE-SE. EXPECA-SE O NECESSARIO. COMUNIQUE-SE O JUIZO DO PROCESSO DE CONHECIMENTO E O TRE. SERVIRA O PRESENTE COMO OFICIO. FEITAS AS DEVIDAS ANOTACOES E COMUNICACOES, AO ARQUIVO. P.R.I.C
+													
+												
+												
+													
+														Para consultar as 14 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 14
+
+												
+													
+														13/03/2024
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														07/11/2025
+														MANIFESTACAO DO MP
+													
+												
+											
+
+TABELA 15
+
+												
+													
+														09/11/2025
+														JULGO EXTINTA A PUNIBILIDADE EM RELACAO A PENA DE MULTA APLICADA A ANTONIO LEOCADIO FERREIRA JUNIOR NO PROCESSO N PROCESSO DE ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >> DA VARA VARA DO PROCESSO ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >> DA FORO DO PROCESSO ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >>.
+													
+												
+
+TABELA 16
+
+													
+														
+															Número
+															0011647-15.2024.5.03.0075
+														
+														
+															Tipo
+															Rito sumarissimo
+														
+														
+															Assunto
+															Verbas rescisorias
+														
+														
+															Esfera
+															Trabalhista
+														
+															
+																Vara
+																1 Vara Do Trabalho De Pouso Alegre
+															
+														
+															Status
+															Ativo
+														
+													
+												
+
+TABELA 17
+
+											
+												
+													1
+													Nome
+													ANTONIO LEOCADIO FERREIRA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													Autor
+												
+											
+												
+													2
+													Nome
+													ELAINE APARECIDA FERNANDES
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+											
+												
+													3
+													Nome
+													IMEDIATTA TERCERIZACAO E LOGISTICA LTDA
+												
+													
+														Identificação
+														44.533.752/0001-93
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													Réu
+												
+											
+												
+													4
+													Nome
+													LUCAS MENEZES DOS SANTOS
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+
+TABELA 18
+
+												
+													
+														23/09/2025
+														DECORRIDO O PRAZO DE ANTONIO LEOCADIO FERREIRA JUNIOR EM 22/09/2025
+													
+												
+												
+													
+														17/09/2025
+														DECORRIDO O PRAZO DE ANTONIO LEOCADIO FERREIRA JUNIOR EM 16/09/2025
+													
+												
+												
+													
+														11/09/2025
+														PUBLICADO(A) O(A) INTIMACAO EM 12/09/2025
+													
+												
+												
+													
+														11/09/2025
+														DISPONIBILIZADO (A) O(A) INTIMACAO NO DIARIO DA JUSTICA ELETRONICO DO DIA 11/09/2025
+													
+												
+												
+													
+														11/09/2025
+														PUBLICADO(A) O(A) INTIMACAO EM 12/09/2025
+													
+												
+												
+													
+														Para consultar as 79 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 19
+
+													
+														
+															Número
+															0011540-68.2024.5.03.0075
+														
+														
+															Tipo
+															Rito sumarissimo
+														
+														
+															Assunto
+															Integracao em verbas rescisorias
+														
+														
+															Esfera
+															Trabalhista
+														
+															
+																Vara
+																1 Vara Do Trabalho De Pouso Alegre
+															
+														
+															Status
+															Arquivado
+														
+													
+												
+
+TABELA 20
+
+											
+												
+													1
+													Nome
+													ANTONIO LEOCADIO FERREIRA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													Autor
+												
+											
+												
+													2
+													Nome
+													ELAINE APARECIDA FERNANDES
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+											
+												
+													3
+													Nome
+													IMEDIATTA TERCERIZACAO E LOGISTICA LTDA
+												
+													
+														Identificação
+														44.533.752/0001-93
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													Réu
+												
+											
+												
+													4
+													Nome
+													ARFRIO S A ARMAZENS GERAIS FRIGORIFICOS
+												
+													
+														Identificação
+														61.024.295/0001-20
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													Réu
+												
+											
+												
+													5
+													Nome
+													LUCAS MENEZES DOS SANTOS
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+											
+												
+													6
+													Nome
+													GUILHERME MIGUEL GANTUS
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+
+TABELA 21
+
+												
+													
+														20/12/2024
+														DECISAO DE PREVENCAO|PODER JUDICIARIO JUSTICA DO TRABALHO TRIBUNAL REGIONAL DO TRABALHO DA 3 REGIAO 1 VARA DO TRABALHO DE POUSO ALEGRE ATSUM 0011647-15.2024.5.03.0075 AUTOR: ANTONIO LEOCADIO FERREIRA JUNIOR REU: IMEDIATTA TERCERIZACAO E LOGISTICA LTDA E OUTROS (1) DECISAO RECONHECO A DEPENDENCIA EM FACE DO PROCESSO 0011540-68.2024.5.03.0075, QUE FOI EXTINTO SEM RESOLUCAO DO MERITO, UMA VEZ QUE A PRESENTE ACAO REITERA PEDIDO FORMULADO NAQUELA DEMANDA, NOS TERMOS DO ART. 286, II, DO CODIGO DE PROCESSO CIVIL. POUSO ALEGRE/MG, 20 DE DEZEMBRO DE 2024. TATIANA DUARTE ALCANTARA DIRETOR DE SECRETARIA
+													
+												
+												
+													
+														17/12/2024
+														JUNTADA A PETICAO DE MANIFESTACAO
+													
+												
+												
+													
+														13/12/2024
+														ARQUIVADOS OS AUTOS DEFINITIVAMENTE
+													
+												
+												
+													
+														12/12/2024
+														ARBITRADAS E DISPENSADAS AS CUSTAS PROCESSUAIS NO VALOR DE R$ 191,92
+													
+												
+												
+													
+														12/12/2024
+														CONCEDIDA A GRATUIDADE DA JUSTICA A ANTONIO LEOCADIO FERREIRA JUNIOR
+													
+												
+												
+													
+														Para consultar as 18 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 22
+
+													
+														
+															Número
+															1500107-88.2018.8.26.0470
+														
+														
+															Tipo
+															Acao penal
+														
+														
+															Assunto
+															Decorrente de violencia domestica
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Criminal
+														
+															
+																Vara
+																Vara Unica
+															
+														
+															Juiz
+															Josias Martins De Almeida Junior
+														
+														
+															Status
+															Arquivado
+														
+													
+												
+
+TABELA 23
+
+											
+												
+													1
+													Nome
+													JUSTICA PUBLICA
+												
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													Autor
+												
+											
+												
+													2
+													Nome
+													ANTONIO LEOCADIO FERREIRA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													Réu
+												
+											
+												
+													3
+													Nome
+													LEANDRO FIGUEIRA CERANTO
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													ADVOGADO (REU)
+												
+													
+														OAB
+														232240 / SP
+													
+											
+												
+													4
+													Nome
+													FABIO FERNANDES LIMA
+												
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+											
+												
+													5
+													Nome
+													JOSIAS MARTINS DE ALMEIDA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+
+TABELA 24
+
+												
+													
+														09/08/2023
+														CERTIDAO DE HONORARIOS EXPEDIDA CERTIDAO - HONORARIOS - CONVENIO DEFENSORIA-OAB - CRIME
+													
+												
+												
+													
+														08/08/2023
+														ARQUIVADO DEFINITIVAMENTE - PROCESSO FINDO COM CONDENACAO
+													
+												
+												
+													
+														08/08/2023
+														PETICAO JUNTADA N PROTOCOLO: WPON.23.70010002-7 TIPO DA PETICAO: PEDIDO DE CERTIDAO DE HONORARIOS DATA: 08/08/2023 11:22
+													
+												
+												
+													
+														01/06/2023
+														CERTIDAO DE PUBLICACAO EXPEDIDA RELACAO: 0371/2023 DATA DA PUBLICACAO: 02/06/2023 NUMERO DO DIARIO: 3749
+													
+												
+												
+													
+														31/05/2023
+														REMETIDO AO DJE RELACAO: 0371/2023 TEOR DO ATO: VISTOS. EXPEDIDA A CERTIDAO DE SENTENCA PARA EXECUCAO DA MULTA PENAL ISOLADAMENTE APLICADA E ABERTA VISTA AO MINISTERIO PUBLICO, NOS TERMOS DO ARTIGO 479-A,  1, 2, 3 E 4 DAS NS/CGJ, ANOTE-SE A MOVIMENTACAO COD. 62050-AUTOS NO PRAZO-EXECUCAO DA MULTA PENAL E AGUARDE-SE A COMUNICACAO DO AJUIZAMENTO DA EXECUCAO DA MULTA PENAL, PROCEDENDO-SE CONFORME OS ARTIGOS RETRO MENCIONADOS, DAS NS/CGJ. NA HIPOTESE DE MULTA CUMULATIVAMENTE APLICADA, PROCEDA-SE CONFORME ARTIGO 480,  1, E SEGUINTES DAS NS/CGJ: "EXPEDIDA E CADASTRADA A GUIA DE RECOLHIMENTO, OU REALIZADO, SE FOR O CASO, SEU ADITAMENTO, EXPEDIDOS A CERTIDAO DA SENTENCA PARA EXECUCAO DA PENA DE MULTA E DEMAIS OFICIOS PORVENTURA NECESSARIOS, O CARTORIO DO JUIZO DE CONHECIMENTO LANCARA A MOVIMENTACAO 61619 - DEFINITIVO - PROCESSO FINDO COM CONDENACAO, REMETENDO OS AUTOS AO ARQUIVO. A EXTINCAO DAS SANCOES APLICADAS - MESMO A PENA DE MULTA - INCUMBIRA AO JUIZO DAS EXECUCOES CRIMINAIS." OUTROSSIM, PROCEDER AO CADASTRAMENTO DO EVENTO RESPECTIVO A SITUACAO DA MULTA PENAL NO HISTORICO DA PARTE. INT. CIENCIA AO MP ADVOGADOS(S): LEANDRO FIGUEIRA CERANTO (OAB 232240/SP)
+													
+												
+												
+													
+														Para consultar as 387 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 25
+
+												
+													
+														28/06/2018
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														29/06/2018
+														RELATORIO FINAL
+													
+												
+												
+													
+														08/07/2018
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														10/08/2018
+														DETERMINACAO JUDICIAL CUMPRIDA (DELPOL)
+													
+												
+												
+													
+														30/08/2018
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														05/10/2018
+														DETERMINACAO JUDICIAL CUMPRIDA (DELPOL)
+													
+												
+												
+													
+														21/10/2018
+														DENUNCIA
+													
+												
+												
+													
+														29/10/2018
+														DEFESA PREVIA
+													
+												
+												
+													
+														11/12/2018
+														PEDIDO DE DESIGNACAO/REDESIGNACAO DE AUDIENCIA
+													
+												
+												
+													
+														08/04/2019
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														09/04/2019
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														15/04/2019
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														02/05/2019
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														01/08/2019
+														MANIFESTACAO DO MP
+													
+												
+												
+													
+														19/06/2021
+														PETICOES DIVERSAS
+													
+												
+												
+													
+														20/07/2021
+														PETICOES DIVERSAS
+													
+												
+												
+													
+														07/06/2022
+														RAZOES DE APELACAO
+													
+												
+												
+													
+														24/08/2022
+														SAP - MANDADO DE PRISAO CUMPRIDO
+													
+												
+												
+													
+														29/05/2023
+														PEDIDO DE ARQUIVAMENTO
+													
+												
+												
+													
+														08/08/2023
+														PEDIDO DE CERTIDAO DE HONORARIOS
+													
+												
+											
+
+TABELA 26
+
+													
+														
+															Número
+															0013651-87.2019.8.26.0114
+														
+														
+															Tipo
+															Carta precatoria criminal
+														
+														
+															Assunto
+															Citacao
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Criminal
+														
+															
+																Vara
+																3 Vara Criminal
+															
+														
+															Juiz
+															Nelson Augusto Bernardes De Souza
+														
+														
+															Status
+															Extinto
+														
+													
+												
+
+TABELA 27
+
+											
+												
+													1
+													Nome
+													JUSTICA PUBLICA
+												
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													Autor
+												
+											
+												
+													2
+													Nome
+													ANTONIO LEOCADIO FERREIRA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													Réu
+												
+											
+												
+													3
+													Nome
+													NELSON AUGUSTO BERNARDES DE SOUZA
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+
+TABELA 28
+
+												
+													
+														18/07/2019
+														REMETIDA A CARTA PRECATORIA AO CARTORIO DE ORIGEM CUMPRIDA POSITIVA |
+													
+												
+												
+													
+														18/07/2019
+														MENSAGEM ELETRONICA (E-MAIL) JUNTADA |
+													
+												
+												
+													
+														18/07/2019
+														MENSAGEM ELETRONICA (E-MAIL) JUNTADA
+													
+												
+												
+													
+														18/07/2019
+														REMETIDA A CARTA PRECATORIA AO CARTORIO DE ORIGEM CUMPRIDA POSITIVA
+													
+												
+												
+													
+														17/07/2019
+														MANDADO DEVOLVIDO CUMPRIDO POSITIVO | CERTIDAO - OFICIAL DE JUSTICA - MANDADO CUMPRIDO POSITIVO
+													
+												
+												
+													
+														Para consultar as 5 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 29
+
+													
+														
+															Número
+															0001473-95.2020.8.26.0268
+														
+														
+															Tipo
+															Carta precatoria criminal
+														
+														
+															Assunto
+															Citacao
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Criminal
+														
+															
+																Vara
+																1 Vara
+															
+														
+															Juiz
+															Mariam Joaquim
+														
+														
+															Status
+															Extinto
+														
+													
+												
+
+ELEMENTO 0
+Tag: 
+ID: post-618
+Classe: post-618 page type-page status-publish hentry
+Resultado
+Consulta ao CPF [CPF_REMOVIDO]
+Processos
+  1000883-82.2017.8.26.0470
+  0010652-30.2020.8.26.0502
+  0009885-21.2022.8.26.0502
+  1000608-26.2023.8.26.0470
+  0011647-15.2024.5.03.0075
+  0011540-68.2024.5.03.0075
+  1500107-88.2018.8.26.0470
+  0013651-87.2019.8.26.0114
+  0001473-95.2020.8.26.0268
+  0000697-73.2019.8.26.0125
+  0001284-33.2019.8.26.0372
+  0001616-78.2019.8.26.0637
+  1500052-17.2019.8.26.0628
+  1500275-90.2018.8.26.0470
+Remover
+Voltar
+
+ELEMENTO 1
+Tag: 
+ID: processes
+Classe: [sem classe]
+Processos
+  1000883-82.2017.8.26.0470
+  0010652-30.2020.8.26.0502
+  0009885-21.2022.8.26.0502
+  1000608-26.2023.8.26.0470
+  0011647-15.2024.5.03.0075
+  0011540-68.2024.5.03.0075
+  1500107-88.2018.8.26.0470
+  0013651-87.2019.8.26.0114
+  0001473-95.2020.8.26.0268
+  0000697-73.2019.8.26.0125
+  0001284-33.2019.8.26.0372
+  0001616-78.2019.8.26.0637
+  1500052-17.2019.8.26.0628
+  1500275-90.2018.8.26.0470
+
+ELEMENTO 2
+Tag: 
+ID: [sem id]
+Classe: card
+  1000883-82.2017.8.26.0470
+
+ELEMENTO 3
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															1000883-82.2017.8.26.0470
+														
+														
+															Tipo
+															Despejo por falta de pagamento cumulado com cobranca
+														
+														
+															Assunto
+															Locacao de imovel
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Civel
+														
+															
+																Vara
+																Vara Unica
+															
+														
+															Juiz
+															Fabio Fernandes Lima
+														
+														
+															Status
+															Arquivado
+														
+													
+												
+
+ELEMENTO 5
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														07/10/2022
+														ARQUIVADO DEFINITIVAMENTE
+													
+												
+												
+													
+														07/10/2022
+														CERTIDAO DE HONORARIOS EXPEDIDA CERTIDAO - HONORARIOS - CONVENIO DEFENSORIA-OAB
+													
+												
+												
+													
+														07/10/2022
+														CERTIDAO DE CARTORIO EXPEDIDA CERTIDAO DE CARTORIO - CUSTAS - CERTIDAO DE INEXISTENCIA DE CUSTAS E ARQUIVAMENTO - CIVEL - 61615
+													
+												
+												
+													
+														23/09/2022
+														ATO ORDINATORIO - INTIMACAO - PORTAL ATOS - EMISSAO DE DOCUMENTOS - NAO PUBLICAVEL
+													
+												
+												
+													
+														23/09/2022
+														TRANSITO EM JULGADO AS PARTES - PROC. EM ANDAMENTO CERTIDAO DE TRANSITO EM JULGADO - HONORARIOS
+													
+												
+												
+													
+														Para consultar as 180 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 7
+Tag: 
+ID: [sem id]
+Classe: card
+  0010652-30.2020.8.26.0502
+
+ELEMENTO 8
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															0010652-30.2020.8.26.0502
+														
+														
+															Tipo
+															Execucao de pena
+														
+														
+															Assunto
+															Aberto
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Criminal
+														
+															
+																Vara
+																Vara Criminal
+															
+														
+															Juiz
+															Udo Wolff Dick Appolo Do Amaral
+														
+														
+															Status
+															Arquivado
+														
+													
+												
+
+ELEMENTO 10
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														23/04/2024
+														DOCUMENTO JUNTADO
+													
+												
+												
+													
+														09/04/2024
+														REMETIDOS OS AUTOS PARA OUTRO TRIBUNAL ESTADUAL (MOVIMENTACAO EXCLUSIVA DO DISTRIBUIDOR) EM RAZAO DO TJSP NAO ESTAR INTEGRADO AO SEEU, ENCAMINHOU-SE, POR MALOTE DIGITAL, SENHA DE ACESSO A PASTA DIGITAL DA EXECUCAO CRIMINAL N 0010652-30.2020.8.26.0502 E DE SEUS DEPENDENTES N 0007039-50.2019.8.26.0271 E N 0009885-21.2022.8.26.0502 , PARA REDISTRIBUICAO, EM CUMPRIMENTO A DECISAO JUDICIAL DE FLS.257, DO PROCESSO 0010652-30.2020.8.26.0502 A VALIDADE DAS SENHAS E DE 60 DIAS. COMPROVANTE DE REMESSA FLS.258 DOS AUTOS 0010652-30.2020.8.26.0502.
+													
+												
+												
+													
+														09/04/2024
+														REMETIDOS OS AUTOS PARA O CARTORIO DISTRIBUIDOR LOCAL PARA REDISTRIBUICAO
+													
+												
+												
+													
+														09/04/2024
+														DOCUMENTO JUNTADO
+													
+												
+												
+													
+														03/04/2024
+														DETERMINADA A REDISTRIBUICAO DOS AUTOS VISTOS ETC. DIANTE DA INFORMACAO DE QUE O(A) EXECUTADO(A) ANTONIO LEOCADIO FERREIRA JUNIOR MUDOU-SE PARA CIDADE DE ITAPEVA/MG, PERTENCENTE A COMARCA DE CAMANDUCAIA/MG (FL. 256), DETERMINO A REDISTRIBUICAO DESTE PROCESSO DE EXECUCAO CRIMINAL E SEUS DEPENDENTES, SE HOUVER, A VEC COMPETENTE, NOS TERMOS DO ART 530 DAS NSCGJ E ART. 7 DA RESOLUCAO 113 DO CNJ, PARA PROSSEGUIMENTO DA FISCALIZACAO DA PENA ORA EXECUTADA. PROCEDA-SE AS ANOTACOES E DILIGENCIAS PERTINENTES A ESPECIE. APOS, REDISTRIBUA-SE. DILIGENCIAS LEGAIS.
+													
+												
+												
+													
+														Para consultar as 153 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 12
+Tag: 
+ID: [sem id]
+Classe: card
+  0009885-21.2022.8.26.0502
+
+ELEMENTO 13
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															0009885-21.2022.8.26.0502
+														
+														
+															Tipo
+															Execucao de pena
+														
+														
+															Assunto
+															Regime inicial - aberto
+														
+														
+															Esfera
+															Criminal
+														
+															
+																Vara
+																Vara Criminal
+															
+														
+															Status
+															Arquivado
+														
+													
+												
+
+ELEMENTO 15
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														23/04/2024
+														DOCUMENTO JUNTADO
+													
+												
+												
+													
+														09/04/2024
+														DOCUMENTO JUNTADO
+													
+												
+												
+													
+														09/04/2024
+														REMETIDOS OS AUTOS PARA OUTRO TRIBUNAL ESTADUAL (MOVIMENTACAO EXCLUSIVA DO DISTRIBUIDOR) EM RAZAO DO TJSP NAO ESTAR INTEGRADO AO SEEU, ENCAMINHOU-SE, POR MALOTE DIGITAL, SENHA DE ACESSO A PASTA DIGITAL DA EXECUCAO CRIMINAL N 0010652-30.2020.8.26.0502 E DE SEUS DEPENDENTES N 0007039-50.2019.8.26.0271 E N 0009885-21.2022.8.26.0502 , PARA QUE SEJA REDISTRIBUIDO, EM CUMPRIMENTO A DECISAO JUDICIAL DE FLS.257 DOS AUTOS 0010652-30.2020.8.26.0502. A VALIDADE DAS SENHAS E DE 60 DIAS. COMPROVANTE DE REMESSA FLS.258 DOS AUTOS 0010652-30.2020.8.26.0502.
+													
+												
+												
+													
+														09/04/2024
+														REMETIDOS OS AUTOS PARA O CARTORIO DISTRIBUIDOR LOCAL PARA REDISTRIBUICAO
+													
+												
+												
+													
+														13/01/2024
+														RECEBIDOS OS AUTOS DO OUTRO FORO
+													
+												
+												
+													
+														Para consultar as 11 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 16
+Tag: 
+ID: [sem id]
+Classe: card
+  1000608-26.2023.8.26.0470
+
+ELEMENTO 17
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															1000608-26.2023.8.26.0470
+														
+														
+															Tipo
+															Execucao de pena de multa
+														
+														
+															Assunto
+															Pena de multa
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Civel
+														
+															
+																Vara
+																Vara Unica
+															
+														
+															Juiz
+															Liliane Regina Vieira Lucas De Camargo Barros
+														
+														
+															Status
+															Arquivado
+														
+													
+												
+
+ELEMENTO 19
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														18/11/2025
+														CERTIDAO DE CARTORIO EXPEDIDA CERTIDAO - GENERICA
+													
+												
+												
+													
+														18/11/2025
+														ARQUIVADO DEFINITIVAMENTE
+													
+												
+												
+													
+														18/11/2025
+														ARQUIVADO DEFINITIVAMENTE
+													
+												
+												
+													
+														09/11/2025
+														CERTIDAO DE REMESSA DA INTIMACAO PARA O PORTAL ELETRONICO EXPEDIDA CERTIDAO - REMESSA DA INTIMACAO PARA O PORTAL ELETRONICO
+													
+												
+												
+													
+														09/11/2025
+														EXTINTA A PUNIBILIDADE POR ANISTIA, GRACA OU INDULTO VISTOS TRATA-SE DE EXECUCAO DE PENA DE MULTA. MANIFESTACAO DO MINISTERIO PUBLICO AS FLS. 17/22 PELA AUSENCIA DE INTERESSE PROCESSUAL. E O RELATORIO. FUNDAMENTO E DECIDO. A JURISPRUDENCIA DO SUPERIOR TRIBUNAL DE JUSTICA, NO JULGAMENTO DO RECURSO ESPECIAL REPRESENTATIVO DE CONTROVERSIA N 1.785.861-SP, DEFINIU A TESE DE QUE "A COMPROVACAO DA IMPOSSIBILIDADE DE ADIMPLEMENTO DA PENA DE MULTA PELO CONDENADO CONDUZ A EXTINCAO DA PUNIBILIDADE". NO REFERIDO JULGADO, O STJ ESTABELECEU QUE "O INADIMPLEMENTO DA PENA DE MULTA POR CONDENADO QUE NAO POSSUI CAPACIDADE ECONOMICA DE PAGA-LA CONDUZ A EXTINCAO DA PUNIBILIDADE, EM RAZAO DA VEDACAO CONSTITUCIONAL DA PRISAO POR DIVIDA (ART. 5, LXVII, DA CF) E DA IMPOSSIBILIDADE DE CONVERTER A PENA PECUNIARIA EM PRIVATIVA DE LIBERDADE". NO PRESENTE CASO, A HIPOSSUFICIENCIA DO EXECUTADO ESTA EVIDENCIADA PELO FATO DE TER SIDO ASSISTIDO PELA DEFENSORIA PUBLICA, POR MEIO DO CONVENIO OAB/DPE, DEMONSTRANDO SUA CONDICAO DE NECESSITADO, NOS TERMOS DO ART. 98 DO CPC E ART. 5, LXXIV DA CONSTITUICAO FEDERAL. ASSIM, CONSIDERANDO QUE O SENTENCIADO NAO TEM CONDICOES DE PROVER O PAGAMENTO DA MULTA SEM PREJUIZO DE SEU SUSTENTO PROPRIO, HA SITUACAO DE VULNERABILIDADE ECONOMICA QUE IMPOSSIBILITA O ADIMPLEMENTO DA OBRIGACAO. ANTE O EXPOSTO, COM FUNDAMENTO NO PRECEDENTE VINCULANTE DO RESP 1.785.861-SP E NA HIPOSSUFICIENCIA DO EXECUTADO, JULGO EXTINTA A PUNIBILIDADE EM RELACAO A PENA DE MULTA APLICADA A ANTONIO LEOCADIO FERREIRA JUNIOR NO PROCESSO N PROCESSO DE ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >> DA VARA VARA DO PROCESSO ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >> DA FORO DO PROCESSO ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >>. ANOTE-SE. EXPECA-SE O NECESSARIO. COMUNIQUE-SE O JUIZO DO PROCESSO DE CONHECIMENTO E O TRE. SERVIRA O PRESENTE COMO OFICIO. FEITAS AS DEVIDAS ANOTACOES E COMUNICACOES, AO ARQUIVO. P.R.I.C
+													
+												
+												
+													
+														Para consultar as 14 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 21
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														09/11/2025
+														JULGO EXTINTA A PUNIBILIDADE EM RELACAO A PENA DE MULTA APLICADA A ANTONIO LEOCADIO FERREIRA JUNIOR NO PROCESSO N PROCESSO DE ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >> DA VARA VARA DO PROCESSO ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >> DA FORO DO PROCESSO ORIGEM DO PEC/PEMSE SELECIONADO << INFORMACAO INDISPONIVEL >>.
+													
+												
+
+ELEMENTO 22
+Tag: 
+ID: [sem id]
+Classe: card
+  0011647-15.2024.5.03.0075
+
+ELEMENTO 23
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															0011647-15.2024.5.03.0075
+														
+														
+															Tipo
+															Rito sumarissimo
+														
+														
+															Assunto
+															Verbas rescisorias
+														
+														
+															Esfera
+															Trabalhista
+														
+															
+																Vara
+																1 Vara Do Trabalho De Pouso Alegre
+															
+														
+															Status
+															Ativo
+														
+													
+												
+
+ELEMENTO 25
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														23/09/2025
+														DECORRIDO O PRAZO DE ANTONIO LEOCADIO FERREIRA JUNIOR EM 22/09/2025
+													
+												
+												
+													
+														17/09/2025
+														DECORRIDO O PRAZO DE ANTONIO LEOCADIO FERREIRA JUNIOR EM 16/09/2025
+													
+												
+												
+													
+														11/09/2025
+														PUBLICADO(A) O(A) INTIMACAO EM 12/09/2025
+													
+												
+												
+													
+														11/09/2025
+														DISPONIBILIZADO (A) O(A) INTIMACAO NO DIARIO DA JUSTICA ELETRONICO DO DIA 11/09/2025
+													
+												
+												
+													
+														11/09/2025
+														PUBLICADO(A) O(A) INTIMACAO EM 12/09/2025
+													
+												
+												
+													
+														Para consultar as 79 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 26
+Tag: 
+ID: [sem id]
+Classe: card
+  0011540-68.2024.5.03.0075
+
+ELEMENTO 27
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															0011540-68.2024.5.03.0075
+														
+														
+															Tipo
+															Rito sumarissimo
+														
+														
+															Assunto
+															Integracao em verbas rescisorias
+														
+														
+															Esfera
+															Trabalhista
+														
+															
+																Vara
+																1 Vara Do Trabalho De Pouso Alegre
+															
+														
+															Status
+															Arquivado
+														
+													
+												
+
+ELEMENTO 29
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														20/12/2024
+														DECISAO DE PREVENCAO|PODER JUDICIARIO JUSTICA DO TRABALHO TRIBUNAL REGIONAL DO TRABALHO DA 3 REGIAO 1 VARA DO TRABALHO DE POUSO ALEGRE ATSUM 0011647-15.2024.5.03.0075 AUTOR: ANTONIO LEOCADIO FERREIRA JUNIOR REU: IMEDIATTA TERCERIZACAO E LOGISTICA LTDA E OUTROS (1) DECISAO RECONHECO A DEPENDENCIA EM FACE DO PROCESSO 0011540-68.2024.5.03.0075, QUE FOI EXTINTO SEM RESOLUCAO DO MERITO, UMA VEZ QUE A PRESENTE ACAO REITERA PEDIDO FORMULADO NAQUELA DEMANDA, NOS TERMOS DO ART. 286, II, DO CODIGO DE PROCESSO CIVIL. POUSO ALEGRE/MG, 20 DE DEZEMBRO DE 2024. TATIANA DUARTE ALCANTARA DIRETOR DE SECRETARIA
+													
+												
+												
+													
+														17/12/2024
+														JUNTADA A PETICAO DE MANIFESTACAO
+													
+												
+												
+													
+														13/12/2024
+														ARQUIVADOS OS AUTOS DEFINITIVAMENTE
+													
+												
+												
+													
+														12/12/2024
+														ARBITRADAS E DISPENSADAS AS CUSTAS PROCESSUAIS NO VALOR DE R$ 191,92
+													
+												
+												
+													
+														12/12/2024
+														CONCEDIDA A GRATUIDADE DA JUSTICA A ANTONIO LEOCADIO FERREIRA JUNIOR
+													
+												
+												
+													
+														Para consultar as 18 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 30
+Tag: 
+ID: [sem id]
+Classe: card
+  1500107-88.2018.8.26.0470
+
+ELEMENTO 31
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															1500107-88.2018.8.26.0470
+														
+														
+															Tipo
+															Acao penal
+														
+														
+															Assunto
+															Decorrente de violencia domestica
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Criminal
+														
+															
+																Vara
+																Vara Unica
+															
+														
+															Juiz
+															Josias Martins De Almeida Junior
+														
+														
+															Status
+															Arquivado
+														
+													
+												
+
+ELEMENTO 33
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														09/08/2023
+														CERTIDAO DE HONORARIOS EXPEDIDA CERTIDAO - HONORARIOS - CONVENIO DEFENSORIA-OAB - CRIME
+													
+												
+												
+													
+														08/08/2023
+														ARQUIVADO DEFINITIVAMENTE - PROCESSO FINDO COM CONDENACAO
+													
+												
+												
+													
+														08/08/2023
+														PETICAO JUNTADA N PROTOCOLO: WPON.23.70010002-7 TIPO DA PETICAO: PEDIDO DE CERTIDAO DE HONORARIOS DATA: 08/08/2023 11:22
+													
+												
+												
+													
+														01/06/2023
+														CERTIDAO DE PUBLICACAO EXPEDIDA RELACAO: 0371/2023 DATA DA PUBLICACAO: 02/06/2023 NUMERO DO DIARIO: 3749
+													
+												
+												
+													
+														31/05/2023
+														REMETIDO AO DJE RELACAO: 0371/2023 TEOR DO ATO: VISTOS. EXPEDIDA A CERTIDAO DE SENTENCA PARA EXECUCAO DA MULTA PENAL ISOLADAMENTE APLICADA E ABERTA VISTA AO MINISTERIO PUBLICO, NOS TERMOS DO ARTIGO 479-A,  1, 2, 3 E 4 DAS NS/CGJ, ANOTE-SE A MOVIMENTACAO COD. 62050-AUTOS NO PRAZO-EXECUCAO DA MULTA PENAL E AGUARDE-SE A COMUNICACAO DO AJUIZAMENTO DA EXECUCAO DA MULTA PENAL, PROCEDENDO-SE CONFORME OS ARTIGOS RETRO MENCIONADOS, DAS NS/CGJ. NA HIPOTESE DE MULTA CUMULATIVAMENTE APLICADA, PROCEDA-SE CONFORME ARTIGO 480,  1, E SEGUINTES DAS NS/CGJ: "EXPEDIDA E CADASTRADA A GUIA DE RECOLHIMENTO, OU REALIZADO, SE FOR O CASO, SEU ADITAMENTO, EXPEDIDOS A CERTIDAO DA SENTENCA PARA EXECUCAO DA PENA DE MULTA E DEMAIS OFICIOS PORVENTURA NECESSARIOS, O CARTORIO DO JUIZO DE CONHECIMENTO LANCARA A MOVIMENTACAO 61619 - DEFINITIVO - PROCESSO FINDO COM CONDENACAO, REMETENDO OS AUTOS AO ARQUIVO. A EXTINCAO DAS SANCOES APLICADAS - MESMO A PENA DE MULTA - INCUMBIRA AO JUIZO DAS EXECUCOES CRIMINAIS." OUTROSSIM, PROCEDER AO CADASTRAMENTO DO EVENTO RESPECTIVO A SITUACAO DA MULTA PENAL NO HISTORICO DA PARTE. INT. CIENCIA AO MP ADVOGADOS(S): LEANDRO FIGUEIRA CERANTO (OAB 232240/SP)
+													
+												
+												
+													
+														Para consultar as 387 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 35
+Tag: 
+ID: [sem id]
+Classe: card
+  0013651-87.2019.8.26.0114
+
+ELEMENTO 36
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															0013651-87.2019.8.26.0114
+														
+														
+															Tipo
+															Carta precatoria criminal
+														
+														
+															Assunto
+															Citacao
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Criminal
+														
+															
+																Vara
+																3 Vara Criminal
+															
+														
+															Juiz
+															Nelson Augusto Bernardes De Souza
+														
+														
+															Status
+															Extinto
+														
+													
+												
+
+ELEMENTO 38
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														18/07/2019
+														REMETIDA A CARTA PRECATORIA AO CARTORIO DE ORIGEM CUMPRIDA POSITIVA |
+													
+												
+												
+													
+														18/07/2019
+														MENSAGEM ELETRONICA (E-MAIL) JUNTADA |
+													
+												
+												
+													
+														18/07/2019
+														MENSAGEM ELETRONICA (E-MAIL) JUNTADA
+													
+												
+												
+													
+														18/07/2019
+														REMETIDA A CARTA PRECATORIA AO CARTORIO DE ORIGEM CUMPRIDA POSITIVA
+													
+												
+												
+													
+														17/07/2019
+														MANDADO DEVOLVIDO CUMPRIDO POSITIVO | CERTIDAO - OFICIAL DE JUSTICA - MANDADO CUMPRIDO POSITIVO
+													
+												
+												
+													
+														Para consultar as 5 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 39
+Tag: 
+ID: [sem id]
+Classe: card
+  0001473-95.2020.8.26.0268
+
+ELEMENTO 40
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															0001473-95.2020.8.26.0268
+														
+														
+															Tipo
+															Carta precatoria criminal
+														
+														
+															Assunto
+															Citacao
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Criminal
+														
+															
+																Vara
+																1 Vara
+															
+														
+															Juiz
+															Mariam Joaquim
+														
+														
+															Status
+															Extinto
+														
+													
+												
+
+ELEMENTO 42
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														01/06/2020
+														MENSAGEM ELETRONICA (E-MAIL) JUNTADA
+													
+												
+												
+													
+														01/06/2020
+														REMETIDA A CARTA PRECATORIA AO CARTORIO DE ORIGEM CUMPRIDA NEGATIVA
+													
+												
+												
+													
+														04/05/2020
+														MANDADO DEVOLVIDO CUMPRIDO NEGATIVO CERTIDAO - OFICIAL DE JUSTICA - MANDADO CUMPRIDO NEGATIVO
+													
+												
+												
+													
+														13/04/2020
+														MANDADO EXPEDIDO | MANDADO N: 268.2020/004907-8 SITUACAO: DISTRIBUIDO EM 13/04/2020 LOCAL: OFICIAL DE JUSTICA - CEZAR BUSNELLO DOS SANTOS
+													
+												
+												
+													
+														13/04/2020
+														ATO ORDINATORIO - NAO PUBLICAVEL | ATO ORDINATORIO - GENERICO - COM ATOS E NAO PUBLICAVEL
+													
+												
+												
+													
+														Para consultar as 4 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											

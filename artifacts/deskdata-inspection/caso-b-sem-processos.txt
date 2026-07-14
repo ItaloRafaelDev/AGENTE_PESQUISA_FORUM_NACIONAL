@@ -1,0 +1,36 @@
+INSPEÇÃO DE RESULTADO — DESKDATA
+
+Cenário: caso-b-sem-processos
+Capturado em: 2026-07-14T14:33:05.704Z
+Caminho: /pessoas/resultado/
+
+TÍTULOS
+- Resultado
+- Consulta ao CPF [CPF_REMOVIDO]
+- Processos
+
+LINHAS RELEVANTES
+- Processos
+- Não foram encontrados processos.
+- Consultar processos
+
+ELEMENTO 0
+Tag: 
+ID: post-618
+Classe: post-618 page type-page status-publish hentry
+Resultado
+Consulta ao CPF [CPF_REMOVIDO]
+Processos
+
+Não foram encontrados processos.
+
+Remover
+Voltar
+
+ELEMENTO 1
+Tag: 
+ID: processes
+Classe: [sem classe]
+Processos
+
+Não foram encontrados processos.

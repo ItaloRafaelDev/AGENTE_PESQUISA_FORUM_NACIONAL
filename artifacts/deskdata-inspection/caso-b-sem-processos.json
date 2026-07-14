@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "scenario": "caso-b-sem-processos",
+  "capturedAt": "2026-07-14T14:33:05.704Z",
+  "sourcePath": "/pessoas/resultado/",
+  "pageTitle": "Resultado – Desk Data",
+  "relevantBodyLines": [
+    "Processos",
+    "Não foram encontrados processos.",
+    "Consultar processos"
+  ],
+  "headings": [
+    "Resultado",
+    "Consulta ao CPF [CPF_REMOVIDO]",
+    "Processos"
+  ],
+  "tables": [],
+  "candidates": [
+    {
+      "index": 0,
+      "tagName": "",
+      "id": "post-618",
+      "className": "post-618 page type-page status-publish hentry",
+      "text": "Resultado\nConsulta ao CPF [CPF_REMOVIDO]\nProcessos\n\nNão foram encontrados processos.\n\nRemover\nVoltar",
+      "html": ""
+    },
+    {
+      "index": 1,
+      "tagName": "",
+      "id": "processes",
+      "className": "",
+      "text": "Processos\n\nNão foram encontrados processos.",
+      "html": ""
+    }
+  ]
+}

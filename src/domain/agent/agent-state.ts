@@ -1,0 +1,15 @@
+export const AGENT_STATES = [
+  'PARADO',
+  'INICIALIZANDO',
+  'AGUARDANDO_LOGIN',
+  'PRONTO',
+  'PROCESSANDO',
+  'PAUSANDO',
+  'PAUSADO',
+  'AGUARDANDO_NOVA_PESQUISA',
+  'ERRO_TEMPORARIO',
+  'PAUSADO_POR_SEGURANCA',
+  'ENCERRANDO'
+] as const
+
+export type AgentState = (typeof AGENT_STATES)[number]

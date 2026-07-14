@@ -1,0 +1,1290 @@
+INSPEÇÃO DE RESULTADO — DESKDATA
+
+Cenário: caso-c-nao-criminal
+Capturado em: 2026-07-14T14:48:23.093Z
+Caminho: /pessoas/resultado/
+
+TÍTULOS
+- Resultado
+- Consulta ao CPF [CPF_REMOVIDO]
+- Processos
+- 1000878-26.2017.5.02.0067
+- Resumo
+- Partes
+- Movimentações
+- Decisões
+- 1011052-97.2015.8.26.0309
+- Petições
+- 0010362-21.2022.5.15.0140
+- 0011974-26.2022.5.15.0097
+
+LINHAS RELEVANTES
+- Processos
+- 1000878-26.2017.5.02.0067
+- 1011052-97.2015.8.26.0309
+- 0010362-21.2022.5.15.0140
+- 0011974-26.2022.5.15.0097
+- Consultar processos
+
+TABELA 0
+
+													
+														
+															Número
+															1000878-26.2017.5.02.0067
+														
+														
+															Tipo
+															Rito ordinario
+														
+														
+															Assunto
+															Desconfiguracao de justa causa
+														
+														
+															Esfera
+															Trabalhista
+														
+															
+																Vara
+																67 Vara Do Trabalho De Sao Paulo
+															
+														
+															Status
+															Arquivado
+														
+													
+												
+
+TABELA 1
+
+											
+												
+													1
+													Nome
+													LUCAS ALBUQUERQUE DE CASTRO
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													RECLAMANTE
+												
+											
+												
+													2
+													Nome
+													ELIANE GALDINO DOS SANTOS
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+											
+												
+													3
+													Nome
+													G I S
+												
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													RECLAMADO
+												
+											
+												
+													4
+													Nome
+													JOSE GUILHERME CARNEIRO QUEIROZ
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+
+TABELA 2
+
+												
+													
+														15/01/2018
+														ARQUIVADOS OS AUTOS DEFINITIVAMENTE
+													
+												
+												
+													
+														23/10/2017
+														ATA DA AUDIENCIA ATA DE AUDIENCIA PROCESSO: 1000878-26.2017.5.02.0067 RECLAMANTE LUCAS ALBUQUERQUE DE CASTRO RECLAMADO(A)(S) G4S INTERATIVA SERVICE LTDA. E OUTRO EM 23 DE OUTUBRO DE 2017, NA SALA DE AUDIENCIAS DA MM. 67 VARA DO TRABALHO DE SAO PAULO/SP, SOB A PRESIDENCIA DA EXMO(A). JUIZA ANDREA DAVINI BISCARDI, REALIZOU-SE AUDIENCIA RELATIVA AO PROCESSO IDENTIFICADO EM EPIGRAFE. AS 09H37MIN, ABERTA A AUDIENCIA, FORAM, DE ORDEM DA EXMO(A). JUIZA DO TRABALHO, APREGOADAS AS PARTES. PRESENTE O(A) RECLAMANTE, ACOMPANHADO(A) DO(A) ADVOGADO(A), DR(A). ROBERTA DE OLIVEIRA AZEVEDO, OAB N 368737/SP. PRESENTE O PREPOSTO DO(A) RECLAMADO(A) G4S INTERATIVA SERVICE LTDA., SR(A). SHIRLEY SANDRA FERREIRA SILVA, ACOMPANHADO(A) DO(A) ADVOGADO(A), DR(A). FERNANDA ALINE SILVA MAIA, OAB N 330117/SP. PRESENTE O PREPOSTO DO(A) RECLAMADO(A) BRF S.A., SR(A). KLEBER DE MORAES CARVALHO, ACOMPANHADO(A) DO(A) ADVOGADO(A), DR(A). MARIA RITHA BICO BORTOLOTTO, OAB N 396809/SP. CONCILIACAO: AS PARTES CONCORDAM COM A EXCLUSAO DA LIDE DO(A) 2 RECLAMADO(A). O(A) 1 RECLAMADO(A) PAGARA AO(A) RECLAMANTE A IMPORTANCIA LIQUIDA DE R$ 3.000,00 NO DIA 13/11/2017. O(A) RECLAMANTE CONCORDA EXPRESSAMENTE QUE OS PAGAMENTOS DAS PARCELAS DO ACORDO SEJAM EFETUADOS MEDIANTE DEPOSITO BANCARIO NA CONTA DO SEU PATRONO, DR(A). ELIANE GALDINO DOS SANTOS, NO BANCO SANTANDER, AGENCIA 3178, CONTA CORRENTE N 01084959-9, VALENDO OS COMPROVANTES DE DEPOSITO COMO RECIBOS DE PAGAMENTO DO ACORDO. DESNECESSARIA A JUNTADA DE PETICAO OU RECIBO, NO CASO DE QUITACAO DAS PARCELAS, TENDO-SE COMO QUITADO O ACORDO SE NAO DENUNCIADO O INADIMPLEMENTO PELA PARTE RECLAMANTE NO PRAZO DE 10(DEZ) DIAS A CONTAR DO VENCIMENTO DA ULTIMA PARCELA. AS PARTES CONVENCIONAM QUE OS DEPOSITOS BANCARIOS NAS DATAS ESTABELECIDAS PODERAO SER EFETUADOS EM CHEQUE OU EM DINHEIRO. MULTA DE 50% SOBRE O VALOR EM ABERTO, EM CASO DE INADIMPLEMENTO, SEM PREJUIZO DE JUROS E CORRECAO MONETARIA. CUMPRIDO O ACORDO, O(A) RECLAMANTE DARA PLENA QUITACAO DA PRESENTE ACAO E DO EXTINTO CONTRATO DE TRABALHO, PARA NADA MAIS RECLAMAR, SEJA A QUE TITULO FOR. AS PARTES DECLARAM QUE A TRANSACAO E COMPOSTA DE 100% DE PARCELAS DE NATUREZA INDENIZATORIA, CORRESPONDENTES A DANOS MORAIS(R$ 3.000,00). EVENTUAL ERRO QUANTO AOS DADOS PARA DEPOSITO BANCARIO ISENTA O(A) RECLAMADA(O) DE RESPONSABILIDADE PELO ATRASO DO PAGAMENTO. FICAM AS PARTES CIENTES DE QUE O ATRASO DE UMA PARCELA IMPLICARA NO VENCIMENTO ANTECIPADO DAS DEMAIS. OS JUROS E A CORRECAO MONETARIA INCIDIRAO A PARTIR DO INADIMPLEMENTO SOBRE O TOTAL DEVIDO. DESNECESSARIA A INTIMACAO DO INSS TENDO EM VISTA A PORTARIA DO MF N 582 DE 2013. EVENTUAIS RECOLHIMENTOS PREVIDENCIARIOS FICARAO A CARGO EXCLUSIVO DA(O) RECLAMADA(O). A(O) RECLAMADA(O) CONSIDERA-SE CITADA QUANTO AO PAGAMENTO DO ACORDO NA(S) DATA(S) COMBINADA(S). NA HIPOTESE DE INADIMPLEMENTO, SERA INICIADA IMEDIATAMENTE A EXECUCAO, COM PENHORA SEM PREVIA CITACAO. AS PARTES PACTUAM TAMBEM A LIBERACAO DAS GUIAS DO FGTS E DAS GUIAS PARA HABILITACAO AO SEGURO DESEMPREGO, SENDO QUE DIANTE DOS PRINCIPIOS DE ECONOMIA E CELERIDADES PROCESSUAIS, A VARA EXPEDE A PRESENTE ATA COM FORCA DE ALVARA. ALVARA (FGTS): A PRESENTE ATA TEM FORCA DE ALVARA PERANTE A CAIXA ECONOMICA FEDERAL PARA LIBERACAO DO FGTS, SUPRINDO A INEXISTENCIA DO TERMO DE RESCISAO CONTRATO DE TRABALHO, DOS RECOLHIMENTOS RESCISORIOS DO FGTS E DO CARIMBO DE BAIXA NA CTPS. RECLAMANTE: LUCAS ALBUQUERQUE DE CASTRO CPF: [CPF_REMOVIDO] PIS: [CPF_REMOVIDO] ADMISSAO: 05/01/2016 DEMISSAO: 06/03/2017 EMPREGADOR: G4S INTERATIVA SERVICE LTDA CNPJ: 02.812.740/0001-58 O ACORDO ESTA SENDO FEITO PELO VALOR DO FGTS DEPOSITADO. A PATRONA DO RECLAMANTE, DRA.. ELIANE GALDINO DOS SANTOS - OAB: SP182901, TAMBEM FICA AUTORIZADA A PROCEDER AO LEVANTAMENTO DOS VALORES DEPOSITADOS NA CONTA VINCULADA DO FGTS. ALVARA (SEGURO DESEMPREGO): A PRESENTE ATA POSSUI FORCA DE ALVARA PERANTE A CAIXA ECONOMICA FEDERAL, SINE E DEMAIS ORGAOS COMPETENTES PARA LIBERACAO DO SEGURO DESEMPREGO, SUPRINDO, INCLUSIVE, A INEXISTENCIA DO TERMO DE RESCISAO CONTRATO DE TRABALHO, DAS GUIAS SD/CD E DO CARIMBO DE BAIXA NA CTPS. BAIXA EM CTPS: NESTE ATO A(O) RECLAMADA(O) EFETUA A BAIXA NA CTPS DO(A) RECLAMANTE COM DATA DE 06/03/2017, APONDO O CARIMBO. HOMOLOGO O ACORDO NOS TERMOS AVENCADOS PELAS PARTES, VALENDO COMO DECISAO IRRECORRIVEL, SALVO PARA A PREVIDENCIA SOCIAL QUANTO AS CONTRIBUICOES QUE LHE FOREM DEVIDAS. CUSTAS PELO(A) RECLAMANTE NO IMPORTE DE R$ 60,00, CALCULADAS SOBRE R$ 3.000,00, DISPENSADAS NA FORMA DA LEI. AUDIENCIA ENCERRADA AS 09H56MIN. NADA MAIS. ANDREA DAVINI BISCARDI JUIZA DO TRABALHO RECLAMANTE RECLAMADO(A) ADVOGADO(A) DO RECLAMANTE ADVOGADO(A) DO RECLAMADO(A) ADRIANA MARTINS P/ DIRETOR(A) DE SECRETARIA
+													
+												
+												
+													
+														23/10/2017
+														ARBITRADAS E DISPENSADAS AS CUSTAS PROCESSUAIS NO VALOR DE 60.00
+													
+												
+												
+													
+														23/10/2017
+														CONCEDIDA A ASSISTENCIA JUDICIARIA GRATUITA A LUCAS ALBUQUERQUE DE CASTRO
+													
+												
+												
+													
+														23/10/2017
+														HOMOLOGADA A TRANSACAO
+													
+												
+												
+													
+														Para consultar as 21 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 3
+
+												
+													
+														23/10/2017
+														HOMOLOGO O ACORDO NOS TERMOS AVENCADOS PELAS PARTES, VALENDO COMO DECISAO IRRECORRIVEL, SALVO PARA A PREVIDENCIA SOCIAL QUANTO AS CONTRIBUICOES QUE LHE FOREM DEVIDAS.
+													
+												
+
+TABELA 4
+
+													
+														
+															Número
+															1011052-97.2015.8.26.0309
+														
+														
+															Tipo
+															Execucao de titulo extrajudicial
+														
+														
+															Assunto
+															Contratos bancarios
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Civel
+														
+															
+																Vara
+																5 Vara Civel
+															
+														
+															Juiz
+															Maria Claudia Moutinho Ribeiro
+														
+														
+															Status
+															Suspenso
+														
+													
+												
+
+TABELA 5
+
+											
+												
+													1
+													Nome
+													LUCAS ALBUQUERQUE DE CASTRO
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													EXECTDO
+												
+											
+												
+													2
+													Nome
+													ELIANE DE OLIVEIRA
+												
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+											
+												
+													3
+													Nome
+													BANCO ITAUCARD S A
+												
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													EXEQTE
+												
+											
+												
+													4
+													Nome
+													BANCO ITAUCARD S A
+												
+													
+														Identificação
+														17.192.451/0001-70
+													
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													EXEQTE
+												
+											
+												
+													5
+													Nome
+													ANDRE ALEXANDRE JORGE GUAPO
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													ADVOGADO (EXEQTE)
+												
+													
+														OAB
+														252736 / SP
+													
+											
+												
+													6
+													Nome
+													JOSE ANTONIO FRANZZOLA JUNIOR
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													ADVOGADO (EXEQTE)
+												
+													
+														OAB
+														208109 / SP
+													
+											
+												
+													7
+													Nome
+													FABIO EVANGELISTA DE MOURA
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+													
+														OAB
+														129922 / SP
+													
+											
+												
+													8
+													Nome
+													FILIPE ANTONIO MARCHI LEVADA
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+													
+														OAB
+														248977 / SP
+													
+											
+												
+													9
+													Nome
+													BRUNA CARRAFA BESSA LEVIS
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+											
+												
+													10
+													Nome
+													DANIELA MARTINS FILIPPINI
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+											
+												
+													11
+													Nome
+													MARIA CLAUDIA MOUTINHO RIBEIRO
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													JUIZ
+												
+
+TABELA 6
+
+												
+													
+														27/03/2025
+														CERTIDAO DE CARTORIO EXPEDIDA CERTIDAO DE CARTORIO - CUSTAS - CERTIDAO DE PAGAMENTO DE CUSTAS E ARQUIVAMENTO - CIVEL- 61614
+													
+												
+												
+													
+														27/03/2025
+														ARQUIVADO PROVISORIAMENTE
+													
+												
+												
+													
+														26/03/2025
+														PROCESSO DESARQUIVADO COM REABERTURA
+													
+												
+												
+													
+														05/08/2024
+														ARQUIVADO PROVISORIAMENTE - EXECUCAO FRUSTRADA
+													
+												
+												
+													
+														30/07/2021
+														ARQUIVADO PROVISORIAMENTE - EXECUCAO FRUSTRADA
+													
+												
+												
+													
+														Para consultar as 57 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 7
+
+												
+													
+														12/08/2015
+														PETICOES DIVERSAS
+													
+												
+												
+													
+														02/03/2016
+														PETICOES DIVERSAS
+													
+												
+												
+													
+														22/01/2021
+														PETICAO INTERMEDIARIA
+													
+												
+											
+
+TABELA 8
+
+													
+														
+															Número
+															0010362-21.2022.5.15.0140
+														
+														
+															Tipo
+															Rito sumarissimo
+														
+														
+															Assunto
+															Adicional de insalubridade
+														
+														
+															Esfera
+															Trabalhista
+														
+															
+																Vara
+																Vara Do Trabalho De Atibaia
+															
+														
+															Status
+															Arquivado
+														
+													
+												
+
+TABELA 9
+
+											
+												
+													1
+													Nome
+													LUCAS ALBUQUERQUE DE CASTRO
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													Autor
+												
+											
+												
+													2
+													Nome
+													ELISABETE CRISTINA AMARAL PEREIRA
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+											
+												
+													3
+													Nome
+													FRANCINE FREITAS TEIXEIRA
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+											
+												
+													4
+													Nome
+													AGROAMBIENTAL JARDINAGEM E PAISAGISMO EIRELI EPP
+												
+													
+														Identificação
+														11.201.155/0001-02
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													Réu
+												
+											
+												
+													5
+													Nome
+													BBP REAL ESTATE INVESTIMENTOS LTDA
+												
+													
+														Identificação
+														11.090.896/0001-63
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													Réu
+												
+											
+												
+													6
+													Nome
+													PERCIVAL NOGUEIRA DE MATOS
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+											
+												
+													7
+													Nome
+													ANDRE MENEZES BIO
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+
+TABELA 10
+
+												
+													
+														12/07/2022
+														JUNTADA A PETICAO DE MANIFESTACAO (CARTA DE PREPOSICAO)
+													
+												
+												
+													
+														12/07/2022
+														JUNTADA A PETICAO DE MANIFESTACAO (CARTA DE PREPOSICAO)
+													
+												
+												
+													
+														12/07/2022
+														JUNTADA A PETICAO DE MANIFESTACAO (CARTA DE PREPOSICAO)
+													
+												
+												
+													
+														11/07/2022
+														ARQUIVADOS OS AUTOS DEFINITIVAMENTE
+													
+												
+												
+													
+														11/07/2022
+														ARQUIVADOS OS AUTOS DEFINITIVAMENTE
+													
+												
+												
+													
+														Para consultar as 127 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+TABELA 11
+
+													
+														
+															Número
+															0011974-26.2022.5.15.0097
+														
+														
+															Tipo
+															Rito ordinario
+														
+														
+															Assunto
+															Adicional de horas extras
+														
+														
+															Esfera
+															Trabalhista
+														
+															
+																Vara
+																5 Vara Do Trabalho De Jundiai
+															
+														
+															Status
+															Arquivado
+														
+													
+												
+
+TABELA 12
+
+											
+												
+													1
+													Nome
+													L A C
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													Autor
+												
+											
+												
+													2
+													Nome
+													FRANCINE FREITAS TEIXEIRA
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+											
+												
+													3
+													Nome
+													A J P E E
+												
+													
+														Identificação
+														11.201.155/0001-02
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													Réu
+												
+											
+												
+													4
+													Nome
+													A I D L G J I
+												
+													
+														Identificação
+														26.420.863/0001-01
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													Réu
+												
+											
+												
+													5
+													Nome
+													PERCIVAL NOGUEIRA DE MATOS
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+											
+												
+													6
+													Nome
+													J B O
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													PERITO
+												
+											
+												
+													7
+													Nome
+													LUCAS ALBUQUERQUE DE CASTRO
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Ativo
+												
+												
+													Parte
+													Autor
+												
+											
+												
+													8
+													Nome
+													AGROAMBIENTAL JARDINAGEM E PAISAGISMO EIRELI EPP
+												
+													
+														Identificação
+														11.201.155/0001-02
+													
+												
+													Polo
+													Passivo
+												
+												
+													Parte
+													Réu
+												
+											
+												
+													9
+													Nome
+													FABIANA DE SOUZA DIAS
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+											
+												
+													10
+													Nome
+													MIRIAN SOARES DE PAULA
+												
+													
+														Identificação
+														[CPF_REMOVIDO]
+													
+												
+													Polo
+													Neutro
+												
+												
+													Parte
+													Advogado
+												
+
+TABELA 13
+
+												
+													
+														04/10/2024
+														ARQUIVADOS OS AUTOS DEFINITIVAMENTE
+													
+												
+												
+													
+														04/10/2024
+														REMETIDOS OS AUTOS PARA VARA DO TRABALHO PARA CUMPRIR DETERMINACAO JUDICIAL
+													
+												
+												
+													
+														04/10/2024
+														EXTINTA A EXECUCAO OU O CUMPRIMENTO DA SENTENCA POR CUMPRIMENTO INTEGRAL DO ACORDO
+													
+												
+												
+													
+														04/10/2024
+														SENTENCA|PODER JUDICIARIO JUSTICA DO TRABALHO TRIBUNAL REGIONAL DO TRABALHO DA 15 REGIAO DIVISAO DE LIQUIDACAO DE JUNDIAI ATORD 0011974-26.2022.5.15.0097 AUTOR: LUCAS ALBUQUERQUE DE CASTRO REU: AGROAMBIENTAL JARDINAGEM E PAISAGISMO EIRELI - EPP E OUTROS (1) ORGAO JULGADOR DE ORIGEM: 5 VARA DO TRABALHO DE JUNDIAI SATISFEITA INTEGRALMENTE A OBRIGACAO, UMA VEZ QUE JA FORAM REGISTRADOS OS PAGAMENTOS, VERIFICADO AINDA QUE NAO HA CONTAS COM SALDO OU QUALQUER OUTRA PENDENCIA NO FEITO, ARQUIVE-SE. JUNDIAI/SP, 04 DE OUTUBRO DE 2024. OLGA REGIANE PILEGIS JUIZA DO TRABALHO SUBSTITUTA
+													
+												
+												
+													
+														04/10/2024
+														CONCLUSOS OS AUTOS PARA JULGAMENTO PROFERIR SENTENCA A OLGA REGIANE PILEGIS
+													
+												
+												
+													
+														Para consultar as 51 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 0
+Tag: 
+ID: post-618
+Classe: post-618 page type-page status-publish hentry
+Resultado
+Consulta ao CPF [CPF_REMOVIDO]
+Processos
+  1000878-26.2017.5.02.0067
+  1011052-97.2015.8.26.0309
+  0010362-21.2022.5.15.0140
+  0011974-26.2022.5.15.0097
+Remover
+Voltar
+
+ELEMENTO 1
+Tag: 
+ID: processes
+Classe: [sem classe]
+Processos
+  1000878-26.2017.5.02.0067
+  1011052-97.2015.8.26.0309
+  0010362-21.2022.5.15.0140
+  0011974-26.2022.5.15.0097
+
+ELEMENTO 2
+Tag: 
+ID: [sem id]
+Classe: card
+  1000878-26.2017.5.02.0067
+
+ELEMENTO 3
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															1000878-26.2017.5.02.0067
+														
+														
+															Tipo
+															Rito ordinario
+														
+														
+															Assunto
+															Desconfiguracao de justa causa
+														
+														
+															Esfera
+															Trabalhista
+														
+															
+																Vara
+																67 Vara Do Trabalho De Sao Paulo
+															
+														
+															Status
+															Arquivado
+														
+													
+												
+
+ELEMENTO 5
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														15/01/2018
+														ARQUIVADOS OS AUTOS DEFINITIVAMENTE
+													
+												
+												
+													
+														23/10/2017
+														ATA DA AUDIENCIA ATA DE AUDIENCIA PROCESSO: 1000878-26.2017.5.02.0067 RECLAMANTE LUCAS ALBUQUERQUE DE CASTRO RECLAMADO(A)(S) G4S INTERATIVA SERVICE LTDA. E OUTRO EM 23 DE OUTUBRO DE 2017, NA SALA DE AUDIENCIAS DA MM. 67 VARA DO TRABALHO DE SAO PAULO/SP, SOB A PRESIDENCIA DA EXMO(A). JUIZA ANDREA DAVINI BISCARDI, REALIZOU-SE AUDIENCIA RELATIVA AO PROCESSO IDENTIFICADO EM EPIGRAFE. AS 09H37MIN, ABERTA A AUDIENCIA, FORAM, DE ORDEM DA EXMO(A). JUIZA DO TRABALHO, APREGOADAS AS PARTES. PRESENTE O(A) RECLAMANTE, ACOMPANHADO(A) DO(A) ADVOGADO(A), DR(A). ROBERTA DE OLIVEIRA AZEVEDO, OAB N 368737/SP. PRESENTE O PREPOSTO DO(A) RECLAMADO(A) G4S INTERATIVA SERVICE LTDA., SR(A). SHIRLEY SANDRA FERREIRA SILVA, ACOMPANHADO(A) DO(A) ADVOGADO(A), DR(A). FERNANDA ALINE SILVA MAIA, OAB N 330117/SP. PRESENTE O PREPOSTO DO(A) RECLAMADO(A) BRF S.A., SR(A). KLEBER DE MORAES CARVALHO, ACOMPANHADO(A) DO(A) ADVOGADO(A), DR(A). MARIA RITHA BICO BORTOLOTTO, OAB N 396809/SP. CONCILIACAO: AS PARTES CONCORDAM COM A EXCLUSAO DA LIDE DO(A) 2 RECLAMADO(A). O(A) 1 RECLAMADO(A) PAGARA AO(A) RECLAMANTE A IMPORTANCIA LIQUIDA DE R$ 3.000,00 NO DIA 13/11/2017. O(A) RECLAMANTE CONCORDA EXPRESSAMENTE QUE OS PAGAMENTOS DAS PARCELAS DO ACORDO SEJAM EFETUADOS MEDIANTE DEPOSITO BANCARIO NA CONTA DO SEU PATRONO, DR(A). ELIANE GALDINO DOS SANTOS, NO BANCO SANTANDER, AGENCIA 3178, CONTA CORRENTE N 01084959-9, VALENDO OS COMPROVANTES DE DEPOSITO COMO RECIBOS DE PAGAMENTO DO ACORDO. DESNECESSARIA A JUNTADA DE PETICAO OU RECIBO, NO CASO DE QUITACAO DAS PARCELAS, TENDO-SE COMO QUITADO O ACORDO SE NAO DENUNCIADO O INADIMPLEMENTO PELA PARTE RECLAMANTE NO PRAZO DE 10(DEZ) DIAS A CONTAR DO VENCIMENTO DA ULTIMA PARCELA. AS PARTES CONVENCIONAM QUE OS DEPOSITOS BANCARIOS NAS DATAS ESTABELECIDAS PODERAO SER EFETUADOS EM CHEQUE OU EM DINHEIRO. MULTA DE 50% SOBRE O VALOR EM ABERTO, EM CASO DE INADIMPLEMENTO, SEM PREJUIZO DE JUROS E CORRECAO MONETARIA. CUMPRIDO O ACORDO, O(A) RECLAMANTE DARA PLENA QUITACAO DA PRESENTE ACAO E DO EXTINTO CONTRATO DE TRABALHO, PARA NADA MAIS RECLAMAR, SEJA A QUE TITULO FOR. AS PARTES DECLARAM QUE A TRANSACAO E COMPOSTA DE 100% DE PARCELAS DE NATUREZA INDENIZATORIA, CORRESPONDENTES A DANOS MORAIS(R$ 3.000,00). EVENTUAL ERRO QUANTO AOS DADOS PARA DEPOSITO BANCARIO ISENTA O(A) RECLAMADA(O) DE RESPONSABILIDADE PELO ATRASO DO PAGAMENTO. FICAM AS PARTES CIENTES DE QUE O ATRASO DE UMA PARCELA IMPLICARA NO VENCIMENTO ANTECIPADO DAS DEMAIS. OS JUROS E A CORRECAO MONETARIA INCIDIRAO A PARTIR DO INADIMPLEMENTO SOBRE O TOTAL DEVIDO. DESNECESSARIA A INTIMACAO DO INSS TENDO EM VISTA A PORTARIA DO MF N 582 DE 2013. EVENTUAIS RECOLHIMENTOS PREVIDENCIARIOS FICARAO A CARGO EXCLUSIVO DA(O) RECLAMADA(O). A(O) RECLAMADA(O) CONSIDERA-SE CITADA QUANTO AO PAGAMENTO DO ACORDO NA(S) DATA(S) COMBINADA(S). NA HIPOTESE DE INADIMPLEMENTO, SERA INICIADA IMEDIATAMENTE A EXECUCAO, COM PENHORA SEM PREVIA CITACAO. AS PARTES PACTUAM TAMBEM A LIBERACAO DAS GUIAS DO FGTS E DAS GUIAS PARA HABILITACAO AO SEGURO DESEMPREGO, SENDO QUE DIANTE DOS PRINCIPIOS DE ECONOMIA E CELERIDADES PROCESSUAIS, A VARA EXPEDE A PRESENTE ATA COM FORCA DE ALVARA. ALVARA (FGTS): A PRESENTE ATA TEM FORCA DE ALVARA PERANTE A CAIXA ECONOMICA FEDERAL PARA LIBERACAO DO FGTS, SUPRINDO A INEXISTENCIA DO TERMO DE RESCISAO CONTRATO DE TRABALHO, DOS RECOLHIMENTOS RESCISORIOS DO FGTS E DO CARIMBO DE BAIXA NA CTPS. RECLAMANTE: LUCAS ALBUQUERQUE DE CASTRO CPF: [CPF_REMOVIDO] PIS: [CPF_REMOVIDO] ADMISSAO: 05/01/2016 DEMISSAO: 06/03/2017 EMPREGADOR: G4S INTERATIVA SERVICE LTDA CNPJ: 02.812.740/0001-58 O ACORDO ESTA SENDO FEITO PELO VALOR DO FGTS DEPOSITADO. A PATRONA DO RECLAMANTE, DRA.. ELIANE GALDINO DOS SANTOS - OAB: SP182901, TAMBEM FICA AUTORIZADA A PROCEDER AO LEVANTAMENTO DOS VALORES DEPOSITADOS NA CONTA VINCULADA DO FGTS. ALVARA (SEGURO DESEMPREGO): A PRESENTE ATA POSSUI FORCA DE ALVARA PERANTE A CAIXA ECONOMICA FEDERAL, SINE E DEMAIS ORGAOS COMPETENTES PARA LIBERACAO DO SEGURO DESEMPREGO, SUPRINDO, INCLUSIVE, A INEXISTENCIA DO TERMO DE RESCISAO CONTRATO DE TRABALHO, DAS GUIAS SD/CD E DO CARIMBO DE BAIXA NA CTPS. BAIXA EM CTPS: NESTE ATO A(O) RECLAMADA(O) EFETUA A BAIXA NA CTPS DO(A) RECLAMANTE COM DATA DE 06/03/2017, APONDO O CARIMBO. HOMOLOGO O ACORDO NOS TERMOS AVENCADOS PELAS PARTES, VALENDO COMO DECISAO IRRECORRIVEL, SALVO PARA A PREVIDENCIA SOCIAL QUANTO AS CONTRIBUICOES QUE LHE FOREM DEVIDAS. CUSTAS PELO(A) RECLAMANTE NO IMPORTE DE R$ 60,00, CALCULADAS SOBRE R$ 3.000,00, DISPENSADAS NA FORMA DA LEI. AUDIENCIA ENCERRADA AS 09H56MIN. NADA MAIS. ANDREA DAVINI BISCARDI JUIZA DO TRABALHO RECLAMANTE RECLAMADO(A) ADVOGADO(A) DO RECLAMANTE ADVOGADO(A) DO RECLAMADO(A) ADRIANA MARTINS P/ DIRETOR(A) DE SECRETARIA
+													
+												
+												
+													
+														23/10/2017
+														ARBITRADAS E DISPENSADAS AS CUSTAS PROCESSUAIS NO VALOR DE 60.00
+													
+												
+												
+													
+														23/10/2017
+														CONCEDIDA A ASSISTENCIA JUDICIARIA GRATUITA A LUCAS ALBUQUERQUE DE CASTRO
+													
+												
+												
+													
+														23/10/2017
+														HOMOLOGADA A TRANSACAO
+													
+												
+												
+													
+														Para consultar as 21 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 7
+Tag: 
+ID: [sem id]
+Classe: card
+  1011052-97.2015.8.26.0309
+
+ELEMENTO 8
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															1011052-97.2015.8.26.0309
+														
+														
+															Tipo
+															Execucao de titulo extrajudicial
+														
+														
+															Assunto
+															Contratos bancarios
+														
+														
+															Tribunal
+															TJSP
+														
+														
+															Esfera
+															Civel
+														
+															
+																Vara
+																5 Vara Civel
+															
+														
+															Juiz
+															Maria Claudia Moutinho Ribeiro
+														
+														
+															Status
+															Suspenso
+														
+													
+												
+
+ELEMENTO 10
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														27/03/2025
+														CERTIDAO DE CARTORIO EXPEDIDA CERTIDAO DE CARTORIO - CUSTAS - CERTIDAO DE PAGAMENTO DE CUSTAS E ARQUIVAMENTO - CIVEL- 61614
+													
+												
+												
+													
+														27/03/2025
+														ARQUIVADO PROVISORIAMENTE
+													
+												
+												
+													
+														26/03/2025
+														PROCESSO DESARQUIVADO COM REABERTURA
+													
+												
+												
+													
+														05/08/2024
+														ARQUIVADO PROVISORIAMENTE - EXECUCAO FRUSTRADA
+													
+												
+												
+													
+														30/07/2021
+														ARQUIVADO PROVISORIAMENTE - EXECUCAO FRUSTRADA
+													
+												
+												
+													
+														Para consultar as 57 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 12
+Tag: 
+ID: [sem id]
+Classe: card
+  0010362-21.2022.5.15.0140
+
+ELEMENTO 13
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															0010362-21.2022.5.15.0140
+														
+														
+															Tipo
+															Rito sumarissimo
+														
+														
+															Assunto
+															Adicional de insalubridade
+														
+														
+															Esfera
+															Trabalhista
+														
+															
+																Vara
+																Vara Do Trabalho De Atibaia
+															
+														
+															Status
+															Arquivado
+														
+													
+												
+
+ELEMENTO 15
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														12/07/2022
+														JUNTADA A PETICAO DE MANIFESTACAO (CARTA DE PREPOSICAO)
+													
+												
+												
+													
+														12/07/2022
+														JUNTADA A PETICAO DE MANIFESTACAO (CARTA DE PREPOSICAO)
+													
+												
+												
+													
+														12/07/2022
+														JUNTADA A PETICAO DE MANIFESTACAO (CARTA DE PREPOSICAO)
+													
+												
+												
+													
+														11/07/2022
+														ARQUIVADOS OS AUTOS DEFINITIVAMENTE
+													
+												
+												
+													
+														11/07/2022
+														ARQUIVADOS OS AUTOS DEFINITIVAMENTE
+													
+												
+												
+													
+														Para consultar as 127 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											
+
+ELEMENTO 16
+Tag: 
+ID: [sem id]
+Classe: card
+  0011974-26.2022.5.15.0097
+
+ELEMENTO 17
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+													
+														
+															Número
+															0011974-26.2022.5.15.0097
+														
+														
+															Tipo
+															Rito ordinario
+														
+														
+															Assunto
+															Adicional de horas extras
+														
+														
+															Esfera
+															Trabalhista
+														
+															
+																Vara
+																5 Vara Do Trabalho De Jundiai
+															
+														
+															Status
+															Arquivado
+														
+													
+												
+
+ELEMENTO 19
+Tag: 
+ID: [sem id]
+Classe: table custom-table-hover table-sm
+
+												
+													
+														04/10/2024
+														ARQUIVADOS OS AUTOS DEFINITIVAMENTE
+													
+												
+												
+													
+														04/10/2024
+														REMETIDOS OS AUTOS PARA VARA DO TRABALHO PARA CUMPRIR DETERMINACAO JUDICIAL
+													
+												
+												
+													
+														04/10/2024
+														EXTINTA A EXECUCAO OU O CUMPRIMENTO DA SENTENCA POR CUMPRIMENTO INTEGRAL DO ACORDO
+													
+												
+												
+													
+														04/10/2024
+														SENTENCA|PODER JUDICIARIO JUSTICA DO TRABALHO TRIBUNAL REGIONAL DO TRABALHO DA 15 REGIAO DIVISAO DE LIQUIDACAO DE JUNDIAI ATORD 0011974-26.2022.5.15.0097 AUTOR: LUCAS ALBUQUERQUE DE CASTRO REU: AGROAMBIENTAL JARDINAGEM E PAISAGISMO EIRELI - EPP E OUTROS (1) ORGAO JULGADOR DE ORIGEM: 5 VARA DO TRABALHO DE JUNDIAI SATISFEITA INTEGRALMENTE A OBRIGACAO, UMA VEZ QUE JA FORAM REGISTRADOS OS PAGAMENTOS, VERIFICADO AINDA QUE NAO HA CONTAS COM SALDO OU QUALQUER OUTRA PENDENCIA NO FEITO, ARQUIVE-SE. JUNDIAI/SP, 04 DE OUTUBRO DE 2024. OLGA REGIANE PILEGIS JUIZA DO TRABALHO SUBSTITUTA
+													
+												
+												
+													
+														04/10/2024
+														CONCLUSOS OS AUTOS PARA JULGAMENTO PROFERIR SENTENCA A OLGA REGIANE PILEGIS
+													
+												
+												
+													
+														Para consultar as 51 movimentações anteriores, consulte o conjunto "detalhes do processo" clicando aqui.
+													
+												
+											

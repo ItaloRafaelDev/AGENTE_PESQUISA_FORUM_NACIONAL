@@ -29,11 +29,20 @@ import {
 
 const CPI_QUEUE_PATH = '/zpersespecial/pesquisas/aguardando/mod_t_aguardando.aspx'
 
+const MASKED_CPF_PATTERN = /^\*{3}\.\*{3}\.\*{3}-\d{2}$/
+
+export interface SingleResearchCycleHooks {
+  onStage?(stage: ContinuousResearchStage): void
+
+  onIdentity?(maskedCpf: string): void
+}
+
 export interface SingleResearchCycleInput {
   context: BrowserContext
   cpiPage: Page
   deskDataPage: Page
   signal?: AbortSignal
+  hooks?: SingleResearchCycleHooks
 }
 
 export interface SingleResearchCycleResult {
@@ -122,35 +131,52 @@ export class SingleResearchCycle {
   async run(input: SingleResearchCycleInput): Promise<SingleResearchCycleResult> {
     this.assertCanStart(input.signal)
 
-    await this.runStage('OPENING_CPI_RESEARCH', async () => {
-      await this.dependencies.opener.openFirst(input.cpiPage)
-    })
-
-    const identity = await this.runStage('READING_CPI_IDENTITY', () =>
-      this.dependencies.identityReader.read(input.cpiPage)
+    await this.runStage(
+      'OPENING_CPI_RESEARCH',
+      async () => {
+        await this.dependencies.opener.openFirst(input.cpiPage)
+      },
+      input.hooks
     )
 
-    const detailFrame = await this.runStage('READING_CPI_IDENTITY', async () =>
-      this.findDetailFrame(input.cpiPage, identity.detailFramePath)
+    const identity = await this.runStage(
+      'READING_CPI_IDENTITY',
+      () => this.dependencies.identityReader.read(input.cpiPage),
+      input.hooks
     )
 
-    await this.runStage('PREPARING_DESKDATA', () =>
-      this.dependencies.nextSearchController.prepare(input.deskDataPage)
+    const detailFrame = await this.runStage(
+      'READING_CPI_IDENTITY',
+      async () => this.findDetailFrame(input.cpiPage, identity.detailFramePath),
+      input.hooks
     )
 
-    const preparation = await this.runStage('PREPARING_CPI_RESULT', () =>
-      this.dependencies.preparationWorkflow.prepare(
-        input.context,
-        input.deskDataPage,
-        detailFrame,
-        identity
-      )
+    await this.runStage(
+      'PREPARING_DESKDATA',
+      () => this.dependencies.nextSearchController.prepare(input.deskDataPage),
+      input.hooks
+    )
+
+    const preparation = await this.runStage(
+      'PREPARING_CPI_RESULT',
+      () =>
+        this.dependencies.preparationWorkflow.prepare(
+          input.context,
+          input.deskDataPage,
+          detailFrame,
+          identity
+        ),
+      input.hooks
     )
 
     this.validatePreparation(preparation)
 
-    const saveResult = await this.runStage('SAVING_CPI', () =>
-      this.dependencies.saveController.saveOnce(input.cpiPage, preparation.detailFrame)
+    this.notifyMaskedIdentity(preparation.maskedCpf, input.hooks)
+
+    const saveResult = await this.runStage(
+      'SAVING_CPI',
+      () => this.dependencies.saveController.saveOnce(input.cpiPage, preparation.detailFrame),
+      input.hooks
     )
 
     if (!saveResult.saved) {
@@ -160,12 +186,16 @@ export class SingleResearchCycle {
       )
     }
 
-    await this.runStage('PREPARING_NEXT_SEARCH', () =>
-      this.dependencies.nextSearchController.prepare(input.deskDataPage)
+    await this.runStage(
+      'PREPARING_NEXT_SEARCH',
+      () => this.dependencies.nextSearchController.prepare(input.deskDataPage),
+      input.hooks
     )
 
-    await this.runStage('RETURNING_TO_QUEUE', () =>
-      this.dependencies.queueReturnController.returnToQueue(input.cpiPage)
+    await this.runStage(
+      'RETURNING_TO_QUEUE',
+      () => this.dependencies.queueReturnController.returnToQueue(input.cpiPage),
+      input.hooks
     )
 
     return {
@@ -238,11 +268,28 @@ export class SingleResearchCycle {
     }
   }
 
+  private notifyMaskedIdentity(
+    maskedCpf: string,
+    hooks: SingleResearchCycleHooks | undefined
+  ): void {
+    if (!MASKED_CPF_PATTERN.test(maskedCpf)) {
+      throw new ContinuousResearchStageError(
+        'PREPARING_CPI_RESULT',
+        new Error('O CPF produzido pelo fluxo não está mascarado.')
+      )
+    }
+
+    hooks?.onIdentity?.(maskedCpf)
+  }
+
   private async runStage<T>(
     stage: ContinuousResearchStage,
-    operation: () => Promise<T>
+    operation: () => Promise<T>,
+    hooks: SingleResearchCycleHooks | undefined
   ): Promise<T> {
     try {
+      hooks?.onStage?.(stage)
+
       return await operation()
     } catch (error: unknown) {
       if (error instanceof ContinuousResearchStageError) {

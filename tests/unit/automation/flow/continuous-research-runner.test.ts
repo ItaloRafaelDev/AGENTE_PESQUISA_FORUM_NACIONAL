@@ -149,10 +149,12 @@ describe('ContinuousResearchRunner', () => {
       checks: 2
     })
 
-    expect(states).toContainEqual({
-      type: 'CYCLE_COMPLETED',
-      cycle: 1
-    })
+    expect(states).toContainEqual(
+      expect.objectContaining({
+        type: 'CYCLE_COMPLETED',
+        cycle: 1
+      })
+    )
 
     expect(result.completedCycles).toBe(1)
   })

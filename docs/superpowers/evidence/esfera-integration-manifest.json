@@ -1,0 +1,23 @@
+{
+  "capturedAt": "2026-07-15T16:32:43.8889290-03:00",
+  "productionClassifierCallSite": "E:\\agente-cpi\\src\\automation\\deskdata\\deskdata-inspection-classifier.ts",
+  "productionClassifierLine": 22,
+  "candidateWorkflowTests": [
+    "E:\\agente-cpi\\tests\\integration\\automation\\deskdata\\deskdata-inspection-classifier.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\cpi\\cpi-research-classification-parser.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\cpi\\cpi-research-pdf-preparation-workflow.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\cpi\\cpi-research-result-controller.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\cpi\\cpi-research-result-mapper.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\flow\\continuous-research-runner-boundary.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\flow\\continuous-research-runner.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\flow\\continuous-safety-guard.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\flow\\single-research-cycle-hooks.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\flow\\single-research-cycle.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\history\\research-history-service.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\automation\\workflow\\continuous-agent-runtime-service.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\domain\\research\\classify-deskdata-result.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\domain\\research\\get-cpi-classification-label.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\domain\\research\\research-classification.test.ts",
+    "E:\\agente-cpi\\tests\\unit\\main\\ipc\\register-history-ipc-handlers.test.ts"
+  ]
+}

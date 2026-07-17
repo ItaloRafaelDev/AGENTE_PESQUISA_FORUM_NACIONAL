@@ -1,0 +1,70 @@
+CapturedAt=2026-07-15T16:50:16.7136271-03:00
+Test=tests/unit/automation/deskdata/deskdata-process-collector.test.ts
+ExitCode=1
+
+
+> agente-cpi@1.0.0 test E:\agente-cpi
+> tsx scripts/run-vitest-electron.ts run "tests/unit/automation/deskdata/deskdata-process-collector.test.ts"
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90mE:/agente-cpi[39m
+
+ [31mÔØ»[39m tests/unit/automation/deskdata/deskdata-process-collector.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 15[2mms[22m[39m
+     [32mÔ£ô[39m retorna lista vazia para aus├¬ncia expl├¡cita[32m 3[2mms[22m[39m
+[31m     [31m├ù[31m coleta e deduplica processos em todas as p├íginas[39m[32m 6[2mms[22m[39m
+     [32mÔ£ô[39m preserva null quando Esfera n├úo existe[32m 0[2mms[22m[39m
+     [32mÔ£ô[39m falha quando a assinatura da p├ígina se repete[32m 1[2mms[22m[39m
+     [32mÔ£ô[39m falha quando a quantidade final diverge[32m 0[2mms[22m[39m
+     [32mÔ£ô[39m falha sem mensagem vazia e sem cart├Áes[32m 0[2mms[22m[39m
+     [32mÔ£ô[39m falha quando p├íginas informam totais incompat├¡veis[32m 0[2mms[22m[39m
+     [32mÔ£ô[39m falha quando processo duplicado possui Esfera conflitante[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m propaga falha de expans├úo do cart├úo[39m[32m 2[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m[1m[41m Failed Tests 2 [49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m tests/unit/automation/deskdata/deskdata-process-collector.test.ts[2m > [22mDeskDataProcessCollector[2m > [22mcoleta e deduplica processos em todas as p├íginas
+[31m[1mAssertionError[22m: promise rejected "DeskDataProcessCollectionError: Um procesÔÇª { code: 'ÔÇª' }" instead of resolving[39m
+[36m [2mÔØ»[22m tests/unit/automation/deskdata/deskdata-process-collector.test.ts:[2m122:37[22m[39m
+    [90m120|[39m     )
+    [90m121|[39m
+    [90m122|[39m     [35mawait[39m [34mexpect[39m(collector[33m.[39m[34mcollect[39m())[33m.[39mresolves[33m.[39m[34mtoEqual[39m([
+    [90m   |[39m                                     [31m^[39m
+    [90m123|[39m       {
+    [90m124|[39m         processKey[33m:[39m [32m'proc-1'[39m[33m,[39m
+
+[31m[1mCaused by: DeskDataProcessCollectionError[22m: Um processo duplicado apresentou dados conflitantes.[39m
+[36m [2mÔØ»[22m DeskDataProcessCollector.collect src/automation/deskdata/deskdata-process-collector.ts:[2m126:19[22m[39m
+[90m [2mÔØ»[22m tests/unit/automation/deskdata/deskdata-process-collector.test.ts:[2m122:5[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[22m[39m
+[31m[1mSerialized Error:[22m[39m [90m{ code: 'PROCESS_CARD_STRUCTURE_INVALID' }[39m
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/2]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/automation/deskdata/deskdata-process-collector.test.ts[2m > [22mDeskDataProcessCollector[2m > [22mpropaga falha de expans├úo do cart├úo
+[31m[1mAssertionError[22m: promise resolved "[]" instead of rejecting[39m
+
+[32m- Expected:[39m
+Error {
+  "message": "rejected promise",
+}
+
+[31m+ Received:[39m
+[]
+
+[36m [2mÔØ»[22m tests/unit/automation/deskdata/deskdata-process-collector.test.ts:[2m353:37[22m[39m
+    [90m351|[39m     )
+    [90m352|[39m
+    [90m353|[39m     [35mawait[39m [34mexpect[39m(collector[33m.[39m[34mcollect[39m())[33m.[39mrejects[33m.[39m[34mtoMatchObject[39m({
+    [90m   |[39m                                     [31m^[39m
+    [90m354|[39m       code[33m:[39m [32m'PROCESS_CARD_EXPANSION_FAILED'[39m
+    [90m355|[39m     })
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/2]ÔÄ»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m7 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 16:50:15
+[2m   Duration [22m 462ms[2m (transform 68ms, setup 0ms, import 119ms, tests 15ms, environment 0ms)[22m
+
+ÔÇëELIFECYCLEÔÇë Test failed. See above for more details.

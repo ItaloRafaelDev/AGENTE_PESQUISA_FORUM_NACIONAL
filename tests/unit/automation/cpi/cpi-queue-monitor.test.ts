@@ -90,16 +90,28 @@ describe('CpiQueueMonitor', () => {
     expect(refresher.calls).toBe(0)
   })
 
-  it('deve interromper em estado indeterminado', async () => {
-    const monitor = new CpiQueueMonitor(
-      new FakeRefresher(),
-      new FakeAvailabilitySource(['INDETERMINATE']),
-      new FakeDelay()
-    )
+  it('deve continuar monitorando quando o estado estiver temporariamente indeterminado', async () => {
+    const refresher = new FakeRefresher()
+    const source = new FakeAvailabilitySource(['INDETERMINATE', 'EMPTY', 'HAS_RESEARCH'])
+    const delay = new FakeDelay()
+    const reportedStates: string[] = []
 
-    await expect(monitor.waitForResearch({} as Page)).rejects.toThrow(
-      'Não foi possível determinar o estado da fila da CPI'
-    )
+    const monitor = new CpiQueueMonitor(refresher, source, delay)
+
+    await expect(
+      monitor.waitForResearch({} as Page, {
+        onState: (state) => {
+          reportedStates.push(state)
+        }
+      })
+    ).resolves.toEqual({
+      status: 'RESEARCH_AVAILABLE',
+      checks: 3
+    })
+
+    expect(refresher.calls).toBe(3)
+    expect(delay.waits).toEqual([60_000, 60_000])
+    expect(reportedStates).toEqual(['INDETERMINATE', 'EMPTY', 'HAS_RESEARCH'])
   })
 
   it('deve impedir intervalo agressivo', () => {

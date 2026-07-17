@@ -1,0 +1,170 @@
+
+> agente-cpi@1.0.0 test E:\agente-cpi
+> tsx scripts/run-vitest-electron.ts run ".\\tests\\unit\\domain\\research\\normalize-process-sphere.test.ts" ".\\tests\\unit\\domain\\research\\classify-deskdata-result.test.ts"
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90mE:/agente-cpi[39m
+
+ [31mÔØ»[39m tests/unit/domain/research/normalize-process-sphere.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31mÔØ»[39m tests/unit/domain/research/classify-deskdata-result.test.ts [2m([22m[2m19 tests[22m[2m | [22m[31m19 failed[39m[2m)[22m[32m 30[2mms[22m[39m
+[31m     [31m├ù[31m retorna H├í Informa├º├Áes sem processos[39m[32m 19[2mms[22m[39m
+[31m     [31m├ù[31m retorna H├í Informa├º├Áes para Esfera "Civil"[39m[32m 1[2mms[22m[39m
+[31m     [31m├ù[31m retorna H├í Informa├º├Áes para Esfera "C├¡vel"[39m[32m 1[2mms[22m[39m
+[31m     [31m├ù[31m retorna H├í Informa├º├Áes para Esfera "Trabalhista"[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna H├í Informa├º├Áes para Esfera "Eleitoral"[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna H├í Informa├º├Áes para Esfera "Administrativa"[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna H├í Informa├º├Áes para Esfera "Valor desconhecido"[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna H├í Informa├º├Áes para Esfera ""[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna H├í Informa├º├Áes para Esfera null[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna restri├º├úo para Esfera Criminal[39m[32m 1[2mms[22m[39m
+[31m     [31m├ù[31m retorna restri├º├úo para Esfera Penal[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna restri├º├úo para Esfera Criminal Militar[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna restri├º├úo para Esfera Especial Criminal[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna restri├º├úo para Esfera Juizado Especial Criminal[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna restri├º├úo para Esfera Civil/Criminal[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna restri├º├úo para Esfera C├¡vel e Criminal[39m[32m 0[2mms[22m[39m
+[31m     [31m├ù[31m retorna restri├º├úo para Esfera Criminal e Civil[39m[32m 1[2mms[22m[39m
+[31m     [31m├ù[31m faz prevalecer uma Esfera criminal em qualquer p├ígina[39m[32m 1[2mms[22m[39m
+[31m     [31m├ù[31m ignora status porque ele n├úo faz parte do contrato[39m[32m 1[2mms[22m[39m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Suites 1 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  tests/unit/domain/research/normalize-process-sphere.test.ts [ tests/unit/domain/research/normalize-process-sphere.test.ts ]
+Error: Cannot find module '../../../../src/domain/research/normalize-process-sphere' imported from E:/agente-cpi/tests/unit/domain/research/normalize-process-sphere.test.ts
+ ÔØ» tests/unit/domain/research/normalize-process-sphere.test.ts:2:1
+      1| import { describe, expect, it } from 'vitest'
+      2| import {
+       | ^
+      3|   isCriminalSphere,
+      4|   normalizeProcessSphere
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/20]ÔÄ»
+
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 19 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna H├í Informa├º├Áes sem processos
+AssertionError: expected 'INDEFINIDO' to deeply equal { result: 'HA_INFORMACOES', ÔÇª(3) }
+
+- Expected:
+{
+  "normalizedSpheres": [],
+  "reason": "NO_CRIMINAL_SPHERE",
+  "result": "HA_INFORMACOES",
+  "totalProcesses": 0,
+}
+
++ Received:
+"INDEFINIDO"
+
+ ÔØ» tests/unit/domain/research/classify-deskdata-result.test.ts:23:40
+     21| describe('classifyDeskDataResult', () => {
+     22|   it('retorna H├í Informa├º├Áes sem processos', () => {
+     23|     expect(classifyDeskDataResult([])).toEqual({
+       |                                        ^
+     24|       result: 'HA_INFORMACOES',
+     25|       reason: 'NO_CRIMINAL_SPHERE',
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/20]ÔÄ»
+
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna H├í Informa├º├Áes para Esfera "Civil"
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna H├í Informa├º├Áes para Esfera "C├¡vel"
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna H├í Informa├º├Áes para Esfera "Trabalhista"
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna H├í Informa├º├Áes para Esfera "Eleitoral"
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna H├í Informa├º├Áes para Esfera "Administrativa"
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna H├í Informa├º├Áes para Esfera "Valor desconhecido"
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna H├í Informa├º├Áes para Esfera ""
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna H├í Informa├º├Áes para Esfera null
+AssertionError: expected undefined to be 'HA_INFORMACOES' // Object.is equality
+
+- Expected:
+"HA_INFORMACOES"
+
++ Received:
+undefined
+
+ ÔØ» tests/unit/domain/research/classify-deskdata-result.test.ts:41:62
+     39|     null
+     40|   ])('retorna H├í Informa├º├Áes para Esfera %j', (sphere) => {
+     41|     expect(classifyDeskDataResult([process(sphere)]).result).toBe('HA_ÔÇª
+       |                                                              ^
+     42|   })
+     43|
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/20]ÔÄ»
+
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna restri├º├úo para Esfera Criminal
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna restri├º├úo para Esfera Penal
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna restri├º├úo para Esfera Criminal Militar
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna restri├º├úo para Esfera Especial Criminal
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna restri├º├úo para Esfera Juizado Especial Criminal
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna restri├º├úo para Esfera Civil/Criminal
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna restri├º├úo para Esfera C├¡vel e Criminal
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > retorna restri├º├úo para Esfera Criminal e Civil
+AssertionError: expected 'INDEFINIDO' to match object { Object (result, reason, ...) }
+
+- Expected:
+{
+  "reason": "CRIMINAL_SPHERE_FOUND",
+  "result": "SIM_CONSTA_RESTRICAO",
+  "totalProcesses": 1,
+}
+
++ Received:
+"INDEFINIDO"
+
+ ÔØ» tests/unit/domain/research/classify-deskdata-result.test.ts:54:55
+     52|     'Criminal e Civil'
+     53|   ])('retorna restri├º├úo para Esfera %s', (sphere) => {
+     54|     expect(classifyDeskDataResult([process(sphere)])).toMatchObject({
+       |                                                       ^
+     55|       result: 'SIM_CONSTA_RESTRICAO',
+     56|       reason: 'CRIMINAL_SPHERE_FOUND',
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[4/20]ÔÄ»
+
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > faz prevalecer uma Esfera criminal em qualquer p├ígina
+AssertionError: expected undefined to be 'SIM_CONSTA_RESTRICAO' // Object.is equality
+
+- Expected:
+"SIM_CONSTA_RESTRICAO"
+
++ Received:
+undefined
+
+ ÔØ» tests/unit/domain/research/classify-deskdata-result.test.ts:77:27
+     75|     ])
+     76|
+     77|     expect(result.result).toBe('SIM_CONSTA_RESTRICAO')
+       |                           ^
+     78|
+     79|     expect(result.normalizedSpheres).toEqual(['civil', 'trabalhista', ÔÇª
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[5/20]ÔÄ»
+
+ FAIL  tests/unit/domain/research/classify-deskdata-result.test.ts > classifyDeskDataResult > ignora status porque ele n├úo faz parte do contrato
+AssertionError: expected undefined to be 'SIM_CONSTA_RESTRICAO' // Object.is equality
+
+- Expected:
+"SIM_CONSTA_RESTRICAO"
+
++ Received:
+undefined
+
+ ÔØ» tests/unit/domain/research/classify-deskdata-result.test.ts:97:53
+     95|     ])
+     96|
+     97|     expect(classifyDeskDataResult([record]).result).toBe('SIM_CONSTA_RÔÇª
+       |                                                     ^
+     98|   })
+     99| })
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[6/20]ÔÄ»
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m19 failed[39m[22m[90m (19)[39m
+[2m   Start at [22m 16:35:45
+[2m   Duration [22m 1.55s[2m (transform 389ms, setup 0ms, import 282ms, tests 30ms, environment 0ms)[22m
+
+ÔÇëELIFECYCLEÔÇë Test failed. See above for more details.

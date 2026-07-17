@@ -1,0 +1,10 @@
+CapturedAt=2026-07-15T16:55:03.3403032-03:00
+RootCause=Previous correction used formatting-sensitive literal replacement.
+Fix=Structural regular-expression replacement with exact match counts.
+ProductionCollectorChanged=false
+CollectorTest=PASS
+ExtractorRegression=PASS
+SphereClassifierRegression=PASS
+Typecheck=PASS
+PortalOpened=false
+CpiResultSaved=false

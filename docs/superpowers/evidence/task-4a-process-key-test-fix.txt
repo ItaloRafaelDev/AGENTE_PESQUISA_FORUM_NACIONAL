@@ -1,0 +1,11 @@
+CapturedAt=2026-07-15T17:09:06.6894728-03:00
+RootCause=The test expected one extra zero in the separator-free process number.
+InputProcessNumber=0000001-00.2024.0.00.0001
+ExpectedNormalizedKey=00000010020240000001
+ProductionAdapterChanged=false
+AdapterTest=PASS
+CollectorRegression=PASS
+ExtractorRegression=PASS
+Typecheck=PASS
+RealPortalOpened=false
+CpiResultSaved=false

@@ -1,0 +1,7 @@
+CapturedAt=2026-07-15T16:46:28.1926769-03:00
+Typecheck=PASS
+ExtractorTest=PASS
+NormalizerRegression=PASS
+SphereClassifierRegression=PASS
+PortalOpened=false
+CpiResultSaved=false

@@ -74,10 +74,6 @@ export class CpiQueueMonitor {
         }
       }
 
-      if (state === 'INDETERMINATE') {
-        throw new Error('Não foi possível determinar o estado da fila da CPI')
-      }
-
       if (options.signal?.aborted || options.isPauseRequested?.()) {
         return {
           status: 'PAUSED',

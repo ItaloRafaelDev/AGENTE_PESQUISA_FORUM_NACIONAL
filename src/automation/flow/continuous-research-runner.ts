@@ -7,6 +7,7 @@ import {
   type CpiQueueMonitorOptions,
   type CpiQueueMonitorResult
 } from '../cpi/cpi-queue-monitor'
+import type { ContinuousResearchStage } from './continuous-research-stage'
 import {
   SingleResearchCycle,
   type SingleResearchCycleInput,
@@ -20,7 +21,14 @@ export interface ContinuousResearchRunnerInput {
   cpiPage: Page
   deskDataPage: Page
   signal: AbortSignal
-  onState?: (state: ContinuousResearchRunnerState) => void
+
+  onState?(state: ContinuousResearchRunnerState): void
+
+  shouldStopBeforeNextCycle?(): boolean
+
+  onCycleStage?(cycle: number, stage: ContinuousResearchStage): void
+
+  onCycleIdentity?(cycle: number, maskedCpf: string): void
 }
 
 export type ContinuousResearchRunnerState =
@@ -40,6 +48,7 @@ export type ContinuousResearchRunnerState =
   | {
       type: 'CYCLE_COMPLETED'
       cycle: number
+      result: SingleResearchCycleResult
     }
   | {
       type: 'STOPPED'
@@ -47,7 +56,7 @@ export type ContinuousResearchRunnerState =
     }
 
 export interface ContinuousResearchRunResult {
-  status: 'STOPPED_BY_SIGNAL'
+  status: 'STOPPED_BY_SIGNAL' | 'STOPPED_BY_REQUEST'
   completedCycles: number
 }
 
@@ -71,6 +80,7 @@ function createDefaultDependencies(): ContinuousResearchRunnerDependencies {
 
   return {
     queueMonitor: new CpiQueueMonitor(filterController, new CpiQueueAvailabilityReader()),
+
     cycleFactory: () => new SingleResearchCycle()
   }
 }
@@ -82,8 +92,15 @@ export class ContinuousResearchRunner {
 
   async run(input: ContinuousResearchRunnerInput): Promise<ContinuousResearchRunResult> {
     let completedCycles = 0
+    let stoppedByRequest = false
 
     while (!input.signal.aborted) {
+      if (input.shouldStopBeforeNextCycle?.() === true) {
+        stoppedByRequest = true
+
+        break
+      }
+
       input.onState?.({
         type: 'WAITING_QUEUE',
         checks: 0
@@ -91,12 +108,19 @@ export class ContinuousResearchRunner {
 
       const queueResult = await this.dependencies.queueMonitor.waitForResearch(input.cpiPage, {
         signal: input.signal,
+
         onState: (state, checks) => {
           this.reportQueueState(input, state, checks)
         }
       })
 
       if (queueResult.status === 'PAUSED') {
+        break
+      }
+
+      if (input.shouldStopBeforeNextCycle?.() === true) {
+        stoppedByRequest = true
+
         break
       }
 
@@ -110,19 +134,36 @@ export class ContinuousResearchRunner {
 
       const cycle = this.dependencies.cycleFactory()
 
-      await cycle.run({
+      const result = await cycle.run({
         context: input.context,
         cpiPage: input.cpiPage,
         deskDataPage: input.deskDataPage,
-        signal: input.signal
+        signal: input.signal,
+
+        hooks: {
+          onStage: (stage) => {
+            input.onCycleStage?.(cycleNumber, stage)
+          },
+
+          onIdentity: (maskedCpf) => {
+            input.onCycleIdentity?.(cycleNumber, maskedCpf)
+          }
+        }
       })
 
       completedCycles = cycleNumber
 
       input.onState?.({
         type: 'CYCLE_COMPLETED',
-        cycle: completedCycles
+        cycle: completedCycles,
+        result
       })
+
+      if (input.shouldStopBeforeNextCycle?.() === true) {
+        stoppedByRequest = true
+
+        break
+      }
     }
 
     input.onState?.({
@@ -131,7 +172,8 @@ export class ContinuousResearchRunner {
     })
 
     return {
-      status: 'STOPPED_BY_SIGNAL',
+      status: stoppedByRequest ? 'STOPPED_BY_REQUEST' : 'STOPPED_BY_SIGNAL',
+
       completedCycles
     }
   }

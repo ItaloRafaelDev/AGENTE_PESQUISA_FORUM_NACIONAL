@@ -1,0 +1,440 @@
+CapturedAt=2026-07-15T17:20:27.8881095-03:00
+File=.\scripts\inspect-deskdata-process-result.ts
+SHA256=4710B3F1F50213EC602114CF9644129ED059E16EC32AC1CEE5F04C0AF67CDC74
+SizeBytes=6284
+TotalLines=208
+
+=== CORRESPONDÊNCIAS ===
+   5: [Page declaration] import { chromium, type Page } from 'playwright'
+   6: [Page declaration] import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
+  12: [DeskDataProcessResultInspector]   DeskDataProcessResultInspector,
+  18: [scenario] import { parseDeskDataInspectionScenario } from '../src/automation/deskdata/deskdata-inspection-scenario-parser'
+  19: [Page declaration] import { findDeskDataPeoplePage } from '../src/automation/deskdata/deskdata-page-finder'
+  37: [captureRawInspection] async function captureRawInspection(
+  38: [Page declaration]   page: Page,
+  39: [scenario]   scenario: DeskDataInspectionScenario
+  42: [Page declaration]   const bodyText = await page.locator('body').innerText({
+  46: [Page declaration]   const headings = await page.locator(HEADING_SELECTOR).allTextContents()
+  49: [scenario]     scenario,
+  51: [Page declaration]     sourceUrl: page.url(),
+  52: [Page declaration]     pageTitle: await page.title(),
+  55: [Page declaration]     tables: await domCapture.captureTables(page),
+  56: [Page declaration]     candidates: await domCapture.captureCandidates(page)
+  60: [main declaration] async function main(): Promise<void> {
+  60: [main invocation] async function main(): Promise<void> {
+  61: [scenario]   const scenario = parseDeskDataInspectionScenario(process.argv.slice(2))
+ 116: [scenario]     const rawCpf = (await terminal.question(`Informe o CPF para ${scenario}: `)).trim()
+ 132: [console.log]     console.log(`CPF preparado: ${maskCpfForLog(cpf)}`)
+ 134: [console.log]     console.log(`Conjuntos selecionados: ${datasetResult.selectedIds.join(', ')}`)
+ 136: [console.log]     console.log('A consulta ainda NÃO foi enviada.')
+ 145: [console.log]       console.log('Captura cancelada sem realizar consulta.')
+ 166: [DeskDataProcessResultInspector]     const inspector = new DeskDataProcessResultInspector()
+ 168: [build call]     const snapshot = inspector.build(await captureRawInspection(deskDataPage, scenario))
+ 168: [captureRawInspection]     const snapshot = inspector.build(await captureRawInspection(deskDataPage, scenario))
+ 168: [scenario]     const snapshot = inspector.build(await captureRawInspection(deskDataPage, scenario))
+ 170: [build call]     const safeReportLines = new DeskDataSafeClassificationReportBuilder().build(snapshot)
+ 178: [scenario]     const jsonPath = join(outputDirectory, `${scenario}.json`)
+ 180: [scenario]     const textPath = join(outputDirectory, `${scenario}.txt`)
+ 182: [writeFile]     await writeFile(jsonPath, JSON.stringify(snapshot, null, 2), 'utf8')
+ 184: [toText call]     await writeFile(textPath, inspector.toText(snapshot), 'utf8')
+ 184: [writeFile]     await writeFile(textPath, inspector.toText(snapshot), 'utf8')
+ 186: [console.log]     console.log('Captura concluída.')
+ 187: [console.log]     console.log(`JSON: ${jsonPath}`)
+ 188: [console.log]     console.log(`TXT: ${textPath}`)
+ 189: [console.log]     console.log('O CPF não foi gravado nos arquivos.')
+ 191: [console.log]     safeReportLines.forEach((line) => console.log(line))
+ 204: [console.log]     console.log('Navegador encerrado com segurança.')
+ 208: [main invocation] void main()
+
+=== CONTEXTOS RELEVANTES ===
+
+--- linhas 1 a 85 ---
+   1: import { createInterface } from 'node:readline/promises'
+   2: import { stdin, stdout } from 'node:process'
+   3: import { join, resolve } from 'node:path'
+   4: import { mkdir, writeFile } from 'node:fs/promises'
+   5: import { chromium, type Page } from 'playwright'
+   6: import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
+   7: import { isValidCpf, maskCpfForLog } from '../src/shared/utils/cpf'
+   8: import { DeskDataCpfFormController } from '../src/automation/deskdata/deskdata-cpf-form-controller'
+   9: import { DeskDataDatasetController } from '../src/automation/deskdata/deskdata-dataset-controller'
+  10: import { DeskDataSearchSubmitController } from '../src/automation/deskdata/deskdata-search-submit-controller'
+  11: import {
+  12:   DeskDataProcessResultInspector,
+  13:   type DeskDataInspectionScenario,
+  14:   type RawDeskDataProcessInspection
+  15: } from '../src/automation/deskdata/deskdata-process-result-inspector'
+  16: 
+  17: import { DeskDataProcessDomCapture } from '../src/automation/deskdata/deskdata-process-dom-capture'
+  18: import { parseDeskDataInspectionScenario } from '../src/automation/deskdata/deskdata-inspection-scenario-parser'
+  19: import { findDeskDataPeoplePage } from '../src/automation/deskdata/deskdata-page-finder'
+  20: import { DeskDataSafeClassificationReportBuilder } from '../src/automation/deskdata/deskdata-safe-classification-report-builder'
+  21: const DESKDATA_PEOPLE_URL = 'https://deskdata.com.br/pessoas/'
+  22: 
+  23: const HEADING_SELECTOR = [
+  24:   'h1',
+  25:   'h2',
+  26:   'h3',
+  27:   'h4',
+  28:   'h5',
+  29:   'h6',
+  30:   'legend',
+  31:   '[role="heading"]',
+  32:   '.card-header',
+  33:   '.panel-heading',
+  34:   '.accordion-button'
+  35: ].join(', ')
+  36: 
+  37: async function captureRawInspection(
+  38:   page: Page,
+  39:   scenario: DeskDataInspectionScenario
+  40: ): Promise<RawDeskDataProcessInspection> {
+  41:   const domCapture = new DeskDataProcessDomCapture()
+  42:   const bodyText = await page.locator('body').innerText({
+  43:     timeout: 10_000
+  44:   })
+  45: 
+  46:   const headings = await page.locator(HEADING_SELECTOR).allTextContents()
+  47: 
+  48:   return {
+  49:     scenario,
+  50:     capturedAt: new Date().toISOString(),
+  51:     sourceUrl: page.url(),
+  52:     pageTitle: await page.title(),
+  53:     bodyText,
+  54:     headings,
+  55:     tables: await domCapture.captureTables(page),
+  56:     candidates: await domCapture.captureCandidates(page)
+  57:   }
+  58: }
+  59: 
+  60: async function main(): Promise<void> {
+  61:   const scenario = parseDeskDataInspectionScenario(process.argv.slice(2))
+  62:   const appData = process.env.APPDATA
+  63: 
+  64:   if (!appData) {
+  65:     throw new Error('Variável APPDATA não encontrada.')
+  66:   }
+  67: 
+  68:   const terminal = createInterface({
+  69:     input: stdin,
+  70:     output: stdout
+  71:   })
+  72: 
+  73:   const context = await chromium.launchPersistentContext(
+  74:     join(appData, 'AgenteCPI', 'browser-profile'),
+  75:     {
+  76:       headless: false,
+  77:       viewport: null,
+  78:       acceptDownloads: true,
+  79:       args: ['--start-maximized']
+  80:     }
+  81:   )
+  82: 
+  83:   try {
+  84:     const pageManager = new PlatformPageManager()
+  85: 
+
+--- linhas 117 a 208 ---
+ 117: 
+ 118:     const cpf = rawCpf.replace(/\D/g, '')
+ 119: 
+ 120:     if (!isValidCpf(cpf)) {
+ 121:       throw new Error('O CPF informado é inválido.')
+ 122:     }
+ 123: 
+ 124:     await new DeskDataCpfFormController().fillCpf(deskDataPage, cpf)
+ 125: 
+ 126:     const datasetResult = await new DeskDataDatasetController().applyDatasetIds(deskDataPage, [
+ 127:       'processes'
+ 128:     ])
+ 129: 
+ 130:     await deskDataPage.bringToFront()
+ 131: 
+ 132:     console.log(`CPF preparado: ${maskCpfForLog(cpf)}`)
+ 133: 
+ 134:     console.log(`Conjuntos selecionados: ${datasetResult.selectedIds.join(', ')}`)
+ 135: 
+ 136:     console.log('A consulta ainda NÃO foi enviada.')
+ 137: 
+ 138:     const confirmation = (
+ 139:       await terminal.question('Digite CONFIRMAR para consumir uma consulta somente de Processos: ')
+ 140:     )
+ 141:       .trim()
+ 142:       .toUpperCase()
+ 143: 
+ 144:     if (confirmation !== 'CONFIRMAR') {
+ 145:       console.log('Captura cancelada sem realizar consulta.')
+ 146: 
+ 147:       return
+ 148:     }
+ 149: 
+ 150:     await new DeskDataSearchSubmitController().submitOnce(deskDataPage)
+ 151: 
+ 152:     await deskDataPage
+ 153:       .waitForLoadState('networkidle', {
+ 154:         timeout: 30_000
+ 155:       })
+ 156:       .catch(() => undefined)
+ 157: 
+ 158:     await deskDataPage.waitForTimeout(3_000)
+ 159: 
+ 160:     await deskDataPage.bringToFront()
+ 161: 
+ 162:     await terminal.question(
+ 163:       'Quando o resultado estiver totalmente carregado, pressione ENTER para capturar...'
+ 164:     )
+ 165: 
+ 166:     const inspector = new DeskDataProcessResultInspector()
+ 167: 
+ 168:     const snapshot = inspector.build(await captureRawInspection(deskDataPage, scenario))
+ 169: 
+ 170:     const safeReportLines = new DeskDataSafeClassificationReportBuilder().build(snapshot)
+ 171: 
+ 172:     const outputDirectory = resolve('artifacts', 'deskdata-inspection')
+ 173: 
+ 174:     await mkdir(outputDirectory, {
+ 175:       recursive: true
+ 176:     })
+ 177: 
+ 178:     const jsonPath = join(outputDirectory, `${scenario}.json`)
+ 179: 
+ 180:     const textPath = join(outputDirectory, `${scenario}.txt`)
+ 181: 
+ 182:     await writeFile(jsonPath, JSON.stringify(snapshot, null, 2), 'utf8')
+ 183: 
+ 184:     await writeFile(textPath, inspector.toText(snapshot), 'utf8')
+ 185: 
+ 186:     console.log('Captura concluída.')
+ 187:     console.log(`JSON: ${jsonPath}`)
+ 188:     console.log(`TXT: ${textPath}`)
+ 189:     console.log('O CPF não foi gravado nos arquivos.')
+ 190: 
+ 191:     safeReportLines.forEach((line) => console.log(line))
+ 192: 
+ 193:     await terminal.question('Pressione ENTER para fechar o navegador...')
+ 194:   } catch (error: unknown) {
+ 195:     console.error('Falha na inspeção da DeskData:', error)
+ 196: 
+ 197:     await terminal.question('O navegador permanecerá aberto. Pressione ENTER para encerrar...')
+ 198: 
+ 199:     process.exitCode = 1
+ 200:   } finally {
+ 201:     terminal.close()
+ 202:     await context.close()
+ 203: 
+ 204:     console.log('Navegador encerrado com segurança.')
+ 205:   }
+ 206: }
+ 207: 
+ 208: void main()
+
+=== FONTE COMPLETA NUMERADA ===
+   1: import { createInterface } from 'node:readline/promises'
+   2: import { stdin, stdout } from 'node:process'
+   3: import { join, resolve } from 'node:path'
+   4: import { mkdir, writeFile } from 'node:fs/promises'
+   5: import { chromium, type Page } from 'playwright'
+   6: import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
+   7: import { isValidCpf, maskCpfForLog } from '../src/shared/utils/cpf'
+   8: import { DeskDataCpfFormController } from '../src/automation/deskdata/deskdata-cpf-form-controller'
+   9: import { DeskDataDatasetController } from '../src/automation/deskdata/deskdata-dataset-controller'
+  10: import { DeskDataSearchSubmitController } from '../src/automation/deskdata/deskdata-search-submit-controller'
+  11: import {
+  12:   DeskDataProcessResultInspector,
+  13:   type DeskDataInspectionScenario,
+  14:   type RawDeskDataProcessInspection
+  15: } from '../src/automation/deskdata/deskdata-process-result-inspector'
+  16: 
+  17: import { DeskDataProcessDomCapture } from '../src/automation/deskdata/deskdata-process-dom-capture'
+  18: import { parseDeskDataInspectionScenario } from '../src/automation/deskdata/deskdata-inspection-scenario-parser'
+  19: import { findDeskDataPeoplePage } from '../src/automation/deskdata/deskdata-page-finder'
+  20: import { DeskDataSafeClassificationReportBuilder } from '../src/automation/deskdata/deskdata-safe-classification-report-builder'
+  21: const DESKDATA_PEOPLE_URL = 'https://deskdata.com.br/pessoas/'
+  22: 
+  23: const HEADING_SELECTOR = [
+  24:   'h1',
+  25:   'h2',
+  26:   'h3',
+  27:   'h4',
+  28:   'h5',
+  29:   'h6',
+  30:   'legend',
+  31:   '[role="heading"]',
+  32:   '.card-header',
+  33:   '.panel-heading',
+  34:   '.accordion-button'
+  35: ].join(', ')
+  36: 
+  37: async function captureRawInspection(
+  38:   page: Page,
+  39:   scenario: DeskDataInspectionScenario
+  40: ): Promise<RawDeskDataProcessInspection> {
+  41:   const domCapture = new DeskDataProcessDomCapture()
+  42:   const bodyText = await page.locator('body').innerText({
+  43:     timeout: 10_000
+  44:   })
+  45: 
+  46:   const headings = await page.locator(HEADING_SELECTOR).allTextContents()
+  47: 
+  48:   return {
+  49:     scenario,
+  50:     capturedAt: new Date().toISOString(),
+  51:     sourceUrl: page.url(),
+  52:     pageTitle: await page.title(),
+  53:     bodyText,
+  54:     headings,
+  55:     tables: await domCapture.captureTables(page),
+  56:     candidates: await domCapture.captureCandidates(page)
+  57:   }
+  58: }
+  59: 
+  60: async function main(): Promise<void> {
+  61:   const scenario = parseDeskDataInspectionScenario(process.argv.slice(2))
+  62:   const appData = process.env.APPDATA
+  63: 
+  64:   if (!appData) {
+  65:     throw new Error('Variável APPDATA não encontrada.')
+  66:   }
+  67: 
+  68:   const terminal = createInterface({
+  69:     input: stdin,
+  70:     output: stdout
+  71:   })
+  72: 
+  73:   const context = await chromium.launchPersistentContext(
+  74:     join(appData, 'AgenteCPI', 'browser-profile'),
+  75:     {
+  76:       headless: false,
+  77:       viewport: null,
+  78:       acceptDownloads: true,
+  79:       args: ['--start-maximized']
+  80:     }
+  81:   )
+  82: 
+  83:   try {
+  84:     const pageManager = new PlatformPageManager()
+  85: 
+  86:     await pageManager.ensurePages(context)
+  87: 
+  88:     let deskDataPage = findDeskDataPeoplePage(context.pages())
+  89: 
+  90:     if (!deskDataPage) {
+  91:       throw new Error('A aba da DeskData não foi localizada.')
+  92:     }
+  93: 
+  94:     await deskDataPage.goto(DESKDATA_PEOPLE_URL, {
+  95:       waitUntil: 'domcontentloaded'
+  96:     })
+  97: 
+  98:     if ((await deskDataPage.locator('input[type="password"]:visible').count()) > 0) {
+  99:       await terminal.question(
+ 100:         'Faça o login manual na DeskData, abra Consultar pessoas e pressione ENTER...'
+ 101:       )
+ 102: 
+ 103:       deskDataPage = findDeskDataPeoplePage(context.pages())
+ 104:     }
+ 105: 
+ 106:     if (!deskDataPage) {
+ 107:       throw new Error('A página da DeskData não foi confirmada.')
+ 108:     }
+ 109: 
+ 110:     if (!deskDataPage.url().includes('/pessoas')) {
+ 111:       await deskDataPage.goto(DESKDATA_PEOPLE_URL, {
+ 112:         waitUntil: 'domcontentloaded'
+ 113:       })
+ 114:     }
+ 115: 
+ 116:     const rawCpf = (await terminal.question(`Informe o CPF para ${scenario}: `)).trim()
+ 117: 
+ 118:     const cpf = rawCpf.replace(/\D/g, '')
+ 119: 
+ 120:     if (!isValidCpf(cpf)) {
+ 121:       throw new Error('O CPF informado é inválido.')
+ 122:     }
+ 123: 
+ 124:     await new DeskDataCpfFormController().fillCpf(deskDataPage, cpf)
+ 125: 
+ 126:     const datasetResult = await new DeskDataDatasetController().applyDatasetIds(deskDataPage, [
+ 127:       'processes'
+ 128:     ])
+ 129: 
+ 130:     await deskDataPage.bringToFront()
+ 131: 
+ 132:     console.log(`CPF preparado: ${maskCpfForLog(cpf)}`)
+ 133: 
+ 134:     console.log(`Conjuntos selecionados: ${datasetResult.selectedIds.join(', ')}`)
+ 135: 
+ 136:     console.log('A consulta ainda NÃO foi enviada.')
+ 137: 
+ 138:     const confirmation = (
+ 139:       await terminal.question('Digite CONFIRMAR para consumir uma consulta somente de Processos: ')
+ 140:     )
+ 141:       .trim()
+ 142:       .toUpperCase()
+ 143: 
+ 144:     if (confirmation !== 'CONFIRMAR') {
+ 145:       console.log('Captura cancelada sem realizar consulta.')
+ 146: 
+ 147:       return
+ 148:     }
+ 149: 
+ 150:     await new DeskDataSearchSubmitController().submitOnce(deskDataPage)
+ 151: 
+ 152:     await deskDataPage
+ 153:       .waitForLoadState('networkidle', {
+ 154:         timeout: 30_000
+ 155:       })
+ 156:       .catch(() => undefined)
+ 157: 
+ 158:     await deskDataPage.waitForTimeout(3_000)
+ 159: 
+ 160:     await deskDataPage.bringToFront()
+ 161: 
+ 162:     await terminal.question(
+ 163:       'Quando o resultado estiver totalmente carregado, pressione ENTER para capturar...'
+ 164:     )
+ 165: 
+ 166:     const inspector = new DeskDataProcessResultInspector()
+ 167: 
+ 168:     const snapshot = inspector.build(await captureRawInspection(deskDataPage, scenario))
+ 169: 
+ 170:     const safeReportLines = new DeskDataSafeClassificationReportBuilder().build(snapshot)
+ 171: 
+ 172:     const outputDirectory = resolve('artifacts', 'deskdata-inspection')
+ 173: 
+ 174:     await mkdir(outputDirectory, {
+ 175:       recursive: true
+ 176:     })
+ 177: 
+ 178:     const jsonPath = join(outputDirectory, `${scenario}.json`)
+ 179: 
+ 180:     const textPath = join(outputDirectory, `${scenario}.txt`)
+ 181: 
+ 182:     await writeFile(jsonPath, JSON.stringify(snapshot, null, 2), 'utf8')
+ 183: 
+ 184:     await writeFile(textPath, inspector.toText(snapshot), 'utf8')
+ 185: 
+ 186:     console.log('Captura concluída.')
+ 187:     console.log(`JSON: ${jsonPath}`)
+ 188:     console.log(`TXT: ${textPath}`)
+ 189:     console.log('O CPF não foi gravado nos arquivos.')
+ 190: 
+ 191:     safeReportLines.forEach((line) => console.log(line))
+ 192: 
+ 193:     await terminal.question('Pressione ENTER para fechar o navegador...')
+ 194:   } catch (error: unknown) {
+ 195:     console.error('Falha na inspeção da DeskData:', error)
+ 196: 
+ 197:     await terminal.question('O navegador permanecerá aberto. Pressione ENTER para encerrar...')
+ 198: 
+ 199:     process.exitCode = 1
+ 200:   } finally {
+ 201:     terminal.close()
+ 202:     await context.close()
+ 203: 
+ 204:     console.log('Navegador encerrado com segurança.')
+ 205:   }
+ 206: }
+ 207: 
+ 208: void main()

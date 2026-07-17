@@ -1,0 +1,282 @@
+CapturedAt=2026-07-15T17:13:32.4000205-03:00
+Test=tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts
+ExitCode=1
+
+
+> agente-cpi@1.0.0 test E:\agente-cpi
+> tsx scripts/run-vitest-electron.ts run "tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts"
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90mE:/agente-cpi[39m
+
+ [31mÔØ»[39m tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 17[2mms[22m[39m
+[31m     [31m├ù[31m usa adaptador, coletor e classificador novos[39m[32m 12[2mms[22m[39m
+[31m     [31m├ù[31m usa o modo estruturado por padr├úo[39m[32m 2[2mms[22m[39m
+[31m     [31m├ù[31m emite somente evid├¬ncia operacional segura[39m[32m 2[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m[1m[41m Failed Tests 3 [49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts[2m > [22minspe├º├úo segura por Esfera[2m > [22musa adaptador, coletor e classificador novos
+[31m[1mAssertionError[22m: expected 'import { createInterface } from \'nodÔÇª' to contain 'PlaywrightDeskDataProcessPageAdapter'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- PlaywrightDeskDataProcessPageAdapter[39m
+[31m+ import { createInterface } from 'node:readline/promises'[39m
+[31m+ import { stdin, stdout } from 'node:process'[39m
+[31m+ import { join, resolve } from 'node:path'[39m
+[31m+ import { mkdir, writeFile } from 'node:fs/promises'[39m
+[31m+ import { chromium, type Page } from 'playwright'[39m
+[31m+ import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'[39m
+[31m+ import { isValidCpf, maskCpfForLog } from '../src/shared/utils/cpf'[39m
+[31m+ import { DeskDataCpfFormController } from '../src/automation/deskdata/deskdata-cpf-form-controller'[39m
+[31m+ import { DeskDataDatasetController } from '../src/automation/deskdata/deskdata-dataset-controller'[39m
+[31m+ import { DeskDataSearchSubmitController } from '../src/automation/deskdata/deskdata-search-submit-controller'[39m
+[31m+ import {[39m
+[31m+   DeskDataProcessResultInspector,[39m
+[31m+   type DeskDataInspectionScenario,[39m
+[31m+   type RawDeskDataProcessInspection[39m
+[31m+ } from '../src/automation/deskdata/deskdata-process-result-inspector'[39m
+[31m+[39m
+[31m+ import { DeskDataProcessDomCapture } from '../src/automation/deskdata/deskdata-process-dom-capture'[39m
+[31m+ import { parseDeskDataInspectionScenario } from '../src/automation/deskdata/deskdata-inspection-scenario-parser'[39m
+[31m+ import { findDeskDataPeoplePage } from '../src/automation/deskdata/deskdata-page-finder'[39m
+[31m+ import { DeskDataSafeClassificationReportBuilder } from '../src/automation/deskdata/deskdata-safe-classification-report-builder'[39m
+[31m+ const DESKDATA_PEOPLE_URL = 'https://deskdata.com.br/pessoas/'[39m
+[31m+[39m
+[31m+ const HEADING_SELECTOR = [[39m
+[31m+   'h1',[39m
+[31m+   'h2',[39m
+[31m+   'h3',[39m
+[31m+   'h4',[39m
+[31m+   'h5',[39m
+[31m+   'h6',[39m
+[31m+   'legend',[39m
+[31m+   '[role="heading"]',[39m
+[31m+   '.card-header',[39m
+[31m+   '.panel-heading',[39m
+[31m+   '.accordion-button'[39m
+[31m+ ].join(', ')[39m
+[31m+[39m
+[31m+ async function captureRawInspection([39m
+[31m+   page: Page,[39m
+[31m+   scenario: DeskDataInspectionScenario[39m
+[31m+ ): Promise<RawDeskDataProcessInspection> {[39m
+[31m+   const domCapture = new DeskDataProcessDomCapture()[39m
+[31m+   const bodyText = await page.locator('body').innerText({[39m
+[31m+     timeout: 10_000[39m
+[31m+   })[39m
+[31m+[39m
+[31m+   const headings = await page.locator(HEADING_SELECTOR).allTextContents()[39m
+[31m+[39m
+[31m+   return {[39m
+[31m+     scenario,[39m
+[31m+     capturedAt: new Date().toISOString(),[39m
+[31m+     sourceUrl: page.url(),[39m
+[31m+     pageTitle: await page.title(),[39m
+[31m+     bodyText,[39m
+[31m+     headings,[39m
+[31m+     tables: await domCapture.captureTables(page),[39m
+[31m+     candidates: await domCapture.captureCandidates(page)[39m
+[31m+   }[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ async function main(): Promise<void> {[39m
+[31m+   const scenario = parseDeskDataInspectionScenario(process.argv.slice(2))[39m
+[31m+   const appData = process.env.APPDATA[39m
+[31m+[39m
+[31m+   if (!appData) {[39m
+[31m+     throw new Error('Vari├ível APPDATA n├úo encontrada.')[39m
+[31m+   }[39m
+[31m+[39m
+[31m+   const terminal = createInterface({[39m
+[31m+     input: stdin,[39m
+[31m+     output: stdout[39m
+[31m+   })[39m
+[31m+[39m
+[31m+   const context = await chromium.launchPersistentContext([39m
+[31m+     join(appData, 'AgenteCPI', 'browser-profile'),[39m
+[31m+     {[39m
+[31m+       headless: false,[39m
+[31m+       viewport: null,[39m
+[31m+       acceptDownloads: true,[39m
+[31m+       args: ['--start-maximized'][39m
+[31m+     }[39m
+[31m+   )[39m
+[31m+[39m
+[31m+   try {[39m
+[31m+     const pageManager = new PlatformPageManager()[39m
+[31m+[39m
+[31m+     await pageManager.ensurePages(context)[39m
+[31m+[39m
+[31m+     let deskDataPage = findDeskDataPeoplePage(context.pages())[39m
+[31m+[39m
+[31m+     if (!deskDataPage) {[39m
+[31m+       throw new Error('A aba da DeskData n├úo foi localizada.')[39m
+[31m+     }[39m
+[31m+[39m
+[31m+     await deskDataPage.goto(DESKDATA_PEOPLE_URL, {[39m
+[31m+       waitUntil: 'domcontentloaded'[39m
+[31m+     })[39m
+[31m+[39m
+[31m+     if ((await deskDataPage.locator('input[type="password"]:visible').count()) > 0) {[39m
+[31m+       await terminal.question([39m
+[31m+         'Fa├ºa o login manual na DeskData, abra Consultar pessoas e pressione ENTER...'[39m
+[31m+       )[39m
+[31m+[39m
+[31m+       deskDataPage = findDeskDataPeoplePage(context.pages())[39m
+[31m+     }[39m
+[31m+[39m
+[31m+     if (!deskDataPage) {[39m
+[31m+       throw new Error('A p├ígina da DeskData n├úo foi confirmada.')[39m
+[31m+     }[39m
+[31m+[39m
+[31m+     if (!deskDataPage.url().includes('/pessoas')) {[39m
+[31m+       await deskDataPage.goto(DESKDATA_PEOPLE_URL, {[39m
+[31m+         waitUntil: 'domcontentloaded'[39m
+[31m+       })[39m
+[31m+     }[39m
+[31m+[39m
+[31m+     const rawCpf = (await terminal.question(`Informe o CPF para ${scenario}: `)).trim()[39m
+[31m+[39m
+[31m+     const cpf = rawCpf.replace(/\D/g, '')[39m
+[31m+[39m
+[31m+     if (!isValidCpf(cpf)) {[39m
+[31m+       throw new Error('O CPF informado ├® inv├ílido.')[39m
+[31m+     }[39m
+[31m+[39m
+[31m+     await new DeskDataCpfFormController().fillCpf(deskDataPage, cpf)[39m
+[31m+[39m
+[31m+     const datasetResult = await new DeskDataDatasetController().applyDatasetIds(deskDataPage, [[39m
+[31m+       'processes'[39m
+[31m+     ])[39m
+[31m+[39m
+[31m+     await deskDataPage.bringToFront()[39m
+[31m+[39m
+[31m+     console.log(`CPF preparado: ${maskCpfForLog(cpf)}`)[39m
+[31m+[39m
+[31m+     console.log(`Conjuntos selecionados: ${datasetResult.selectedIds.join(', ')}`)[39m
+[31m+[39m
+[31m+     console.log('A consulta ainda N├âO foi enviada.')[39m
+[31m+[39m
+[31m+     const confirmation = ([39m
+[31m+       await terminal.question('Digite CONFIRMAR para consumir uma consulta somente de Processos: ')[39m
+[31m+     )[39m
+[31m+       .trim()[39m
+[31m+       .toUpperCase()[39m
+[31m+[39m
+[31m+     if (confirmation !== 'CONFIRMAR') {[39m
+[31m+       console.log('Captura cancelada sem realizar consulta.')[39m
+[31m+[39m
+[31m+       return[39m
+[31m+     }[39m
+[31m+[39m
+[31m+     await new DeskDataSearchSubmitController().submitOnce(deskDataPage)[39m
+[31m+[39m
+[31m+     await deskDataPage[39m
+[31m+       .waitForLoadState('networkidle', {[39m
+[31m+         timeout: 30_000[39m
+[31m+       })[39m
+[31m+       .catch(() => undefined)[39m
+[31m+[39m
+[31m+     await deskDataPage.waitForTimeout(3_000)[39m
+[31m+[39m
+[31m+     await deskDataPage.bringToFront()[39m
+[31m+[39m
+[31m+     await terminal.question([39m
+[31m+       'Quando o resultado estiver totalmente carregado, pressione ENTER para capturar...'[39m
+[31m+     )[39m
+[31m+[39m
+[31m+     const inspector = new DeskDataProcessResultInspector()[39m
+[31m+[39m
+[31m+     const snapshot = inspector.build(await captureRawInspection(deskDataPage, scenario))[39m
+[31m+[39m
+[31m+     const safeReportLines = new DeskDataSafeClassificationReportBuilder().build(snapshot)[39m
+[31m+[39m
+[31m+     const outputDirectory = resolve('artifacts', 'deskdata-inspection')[39m
+[31m+[39m
+[31m+     await mkdir(outputDirectory, {[39m
+[31m+       recursive: true[39m
+[31m+     })[39m
+[31m+[39m
+[31m+     const jsonPath = join(outputDirectory, `${scenario}.json`)[39m
+[31m+[39m
+[31m+     const textPath = join(outputDirectory, `${scenario}.txt`)[39m
+[31m+[39m
+[31m+     await writeFile(jsonPath, JSON.stringify(snapshot, null, 2), 'utf8')[39m
+[31m+[39m
+[31m+     await writeFile(textPath, inspector.toText(snapshot), 'utf8')[39m
+[31m+[39m
+[31m+     console.log('Captura conclu├¡da.')[39m
+[31m+     console.log(`JSON: ${jsonPath}`)[39m
+[31m+     console.log(`TXT: ${textPath}`)[39m
+[31m+     console.log('O CPF n├úo foi gravado nos arquivos.')[39m
+[31m+[39m
+[31m+     safeReportLines.forEach((line) => console.log(line))[39m
+[31m+[39m
+[31m+     await terminal.question('Pressione ENTER para fechar o navegador...')[39m
+[31m+   } catch (error: unknown) {[39m
+[31m+     console.error('Falha na inspe├º├úo da DeskData:', error)[39m
+[31m+[39m
+[31m+     await terminal.question('O navegador permanecer├í aberto. Pressione ENTER para encerrar...')[39m
+[31m+[39m
+[31m+     process.exitCode = 1[39m
+[31m+   } finally {[39m
+[31m+     terminal.close()[39m
+[31m+     await context.close()[39m
+[31m+[39m
+[31m+     console.log('Navegador encerrado com seguran├ºa.')[39m
+[31m+   }[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ void main()[39m
+[31m+[39m
+
+[36m [2mÔØ»[22m tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts:[2m29:20[22m[39m
+    [90m 27|[39m [34mdescribe[39m([32m'inspe├º├úo segura por Esfera'[39m[33m,[39m () [33m=>[39m {
+    [90m 28|[39m   [34mit[39m([32m'usa adaptador, coletor e classificador novos'[39m[33m,[39m () [33m=>[39m {
+    [90m 29|[39m     [34mexpect[39m(source)[33m.[39m[34mtoContain[39m([32m'PlaywrightDeskDataProcessPageAdapter'[39m)
+    [90m   |[39m                    [31m^[39m
+    [90m 30|[39m
+    [90m 31|[39m     [34mexpect[39m(source)[33m.[39m[34mtoContain[39m([32m'DeskDataProcessCollector'[39m)
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/3]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts[2m > [22minspe├º├úo segura por Esfera[2m > [22musa o modo estruturado por padr├úo
+[31m[1mAssertionError[22m: expected '' not to be '' // Object.is equality[39m
+[36m [2mÔØ»[22m tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts:[2m39:23[22m[39m
+    [90m 37|[39m     [35mconst[39m block [33m=[39m [34mstructuredInspectionBlock[39m()
+    [90m 38|[39m
+    [90m 39|[39m     [34mexpect[39m(block)[33m.[39mnot[33m.[39m[34mtoBe[39m([32m''[39m)
+    [90m   |[39m                       [31m^[39m
+    [90m 40|[39m
+    [90m 41|[39m     expect(block).toContain("process.argv.includes('--legacy-inspectioÔÇª
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/3]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts[2m > [22minspe├º├úo segura por Esfera[2m > [22memite somente evid├¬ncia operacional segura
+[31m[1mAssertionError[22m: expected '' to contain 'processCount'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- processCount[39m
+
+[36m [2mÔØ»[22m tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts:[2m49:19[22m[39m
+    [90m 47|[39m     [35mconst[39m block [33m=[39m [34mstructuredInspectionBlock[39m()
+    [90m 48|[39m
+    [90m 49|[39m     [34mexpect[39m(block)[33m.[39m[34mtoContain[39m([32m'processCount'[39m)
+    [90m   |[39m                   [31m^[39m
+    [90m 50|[39m
+    [90m 51|[39m     [34mexpect[39m(block)[33m.[39m[34mtoContain[39m([32m'pageCount'[39m)
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/3]ÔÄ»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[90m (3)[39m
+[2m   Start at [22m 17:13:31
+[2m   Duration [22m 365ms[2m (transform 31ms, setup 0ms, import 54ms, tests 17ms, environment 0ms)[22m
+
+ÔÇëELIFECYCLEÔÇë Test failed. See above for more details.

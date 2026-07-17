@@ -1,3 +1,4 @@
+import type { BrowserContext } from 'playwright'
 import type { BrowserManagerSnapshot } from '../../shared/types/browser-api'
 import type { ManagedBrowserContext, PlatformPageManager } from './platform-page-manager'
 
@@ -5,7 +6,7 @@ export interface BrowserRuntimeManager {
   start(): Promise<BrowserManagerSnapshot>
   stop(): Promise<BrowserManagerSnapshot>
   getSnapshot(): BrowserManagerSnapshot
-  getContext(): ManagedBrowserContext
+  getContext(): BrowserContext
 }
 
 export interface PlatformPagesInitializer {
@@ -19,14 +20,24 @@ export class BrowserWorkspaceService {
   ) {}
 
   async start(): Promise<BrowserManagerSnapshot> {
-    const snapshot = await this.browserManager.start()
+    return this.ensureStarted()
+  }
+
+  async ensureStarted(): Promise<BrowserManagerSnapshot> {
+    const currentSnapshot = this.browserManager.getSnapshot()
+
+    const wasAlreadyRunning = currentSnapshot.state === 'RUNNING'
+
+    const runningSnapshot = wasAlreadyRunning ? currentSnapshot : await this.browserManager.start()
 
     try {
       await this.pageManager.ensurePages(this.browserManager.getContext())
 
-      return snapshot
+      return runningSnapshot
     } catch (error) {
-      await this.browserManager.stop().catch(() => undefined)
+      if (!wasAlreadyRunning) {
+        await this.browserManager.stop().catch(() => undefined)
+      }
 
       throw error
     }
@@ -38,6 +49,10 @@ export class BrowserWorkspaceService {
 
   getSnapshot(): BrowserManagerSnapshot {
     return this.browserManager.getSnapshot()
+  }
+
+  getContext(): BrowserContext {
+    return this.browserManager.getContext()
   }
 }
 

@@ -1,0 +1,18 @@
+CapturedAt=2026-07-15T17:24:46.3511253-03:00
+Test=tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts
+ExitCode=0
+
+
+> agente-cpi@1.0.0 test E:\agente-cpi
+> tsx scripts/run-vitest-electron.ts run "tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts"
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90mE:/agente-cpi[39m
+
+ [32mÔ£ô[39m tests/unit/scripts/inspect-deskdata-spheres-guard.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m   Start at [22m 17:24:45
+[2m   Duration [22m 421ms[2m (transform 34ms, setup 0ms, import 59ms, tests 6ms, environment 0ms)[22m
+

@@ -1,4 +1,10 @@
 import type { BrowserContext, Page } from 'playwright'
+import type {
+  DeskDataClassification,
+  DeskDataResult
+} from '../../domain/research/deskdata-process-record'
+import { classifyDeskDataSpheres } from '../../domain/research/classify-deskdata-spheres'
+import type { ResearchClassification } from '../../domain/research/research-classification'
 import type { CpiResearchIdentity } from '../cpi/cpi-research-identity-reader'
 import {
   CpiResearchPdfPreparationWorkflow,
@@ -8,35 +14,45 @@ import {
 import { DeskDataCpfFormController } from '../deskdata/deskdata-cpf-form-controller'
 import { DeskDataDatasetController } from '../deskdata/deskdata-dataset-controller'
 import {
-  DeskDataInspectionClassifier,
-  type DeskDataInspectionClassification
-} from '../deskdata/deskdata-inspection-classifier'
-import { DeskDataLiveResultCapture } from '../deskdata/deskdata-live-result-capture'
-import {
   DeskDataPdfDownloadController,
   type DeskDataPdfDownloadResult
 } from '../deskdata/deskdata-pdf-download-controller'
+import { DeskDataPdfProcessReader } from '../deskdata/deskdata-pdf-process-reader'
 import { DeskDataResultReadyWaiter } from '../deskdata/deskdata-result-ready-waiter'
 import { DeskDataSearchSubmitController } from '../deskdata/deskdata-search-submit-controller'
+
+export type CpiDeskDataClassification = Extract<
+  ResearchClassification,
+  'CONSTA_RESTRICAO' | 'HA_INFORMACOES'
+>
+
+export type FullResearchPreparationClassification = DeskDataClassification & {
+  classification: CpiDeskDataClassification
+}
 
 export interface FullResearchPreparationDependencies {
   cpfForm: Pick<DeskDataCpfFormController, 'fillCpf'>
   dataset: Pick<DeskDataDatasetController, 'applyApprovedDatasets'>
   submit: Pick<DeskDataSearchSubmitController, 'submitOnce'>
   resultReady: Pick<DeskDataResultReadyWaiter, 'waitUntilReady'>
-  resultCapture: Pick<DeskDataLiveResultCapture, 'capture'>
-  classifier: Pick<DeskDataInspectionClassifier, 'classify'>
   pdfDownloader: Pick<DeskDataPdfDownloadController, 'downloadOnce'>
+  pdfProcessReader: Pick<DeskDataPdfProcessReader, 'read'>
   cpiPreparation: Pick<CpiResearchPdfPreparationWorkflow, 'prepareWithAttachment'>
 }
 
 export interface FullResearchPreparationResult {
   maskedCpf: string
   selectedDatasetCount: number
-  classification: DeskDataInspectionClassification
+  classification: FullResearchPreparationClassification
   pdf: DeskDataPdfDownloadResult
   cpi: CpiResearchPdfPreparationResult
   detailFrame: CpiResearchPdfPreparationFrame
+}
+
+export function mapDeskDataResultToResearchClassification(
+  result: DeskDataResult
+): CpiDeskDataClassification {
+  return result === 'SIM_CONSTA_RESTRICAO' ? 'CONSTA_RESTRICAO' : 'HA_INFORMACOES'
 }
 
 function createDefaultDependencies(): FullResearchPreparationDependencies {
@@ -45,9 +61,8 @@ function createDefaultDependencies(): FullResearchPreparationDependencies {
     dataset: new DeskDataDatasetController(),
     submit: new DeskDataSearchSubmitController(),
     resultReady: new DeskDataResultReadyWaiter(),
-    resultCapture: new DeskDataLiveResultCapture(),
-    classifier: new DeskDataInspectionClassifier(),
     pdfDownloader: new DeskDataPdfDownloadController(),
+    pdfProcessReader: new DeskDataPdfProcessReader(),
     cpiPreparation: new CpiResearchPdfPreparationWorkflow()
   }
 }
@@ -71,11 +86,16 @@ export class FullResearchPreparationWorkflow {
 
     await this.dependencies.resultReady.waitUntilReady(deskDataPage)
 
-    const inspection = await this.dependencies.resultCapture.capture(deskDataPage)
-
-    const classification = this.dependencies.classifier.classify(inspection)
-
     const pdf = await this.dependencies.pdfDownloader.downloadOnce(context, deskDataPage)
+
+    const processes = await this.dependencies.pdfProcessReader.read(pdf.filePath)
+
+    const sphereClassification = classifyDeskDataSpheres(processes)
+
+    const classification: FullResearchPreparationClassification = {
+      ...sphereClassification,
+      classification: mapDeskDataResultToResearchClassification(sphereClassification.result)
+    }
 
     const cpi = await this.dependencies.cpiPreparation.prepareWithAttachment(
       detailFrame,

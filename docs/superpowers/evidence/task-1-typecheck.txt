@@ -1,0 +1,13 @@
+
+> agente-cpi@1.0.0 typecheck E:\agente-cpi
+> pnpm run typecheck:node && pnpm run typecheck:web
+
+
+> agente-cpi@1.0.0 typecheck:node E:\agente-cpi
+> tsc --noEmit -p tsconfig.node.json --composite false
+
+src/automation/deskdata/deskdata-inspection-classifier.ts(3,8): error TS2305: Module '"../../domain/research/classify-deskdata-result"' has no exported member 'DeskDataResultSummary'.
+src/automation/deskdata/deskdata-inspection-classifier.ts(22,7): error TS2322: Type 'DeskDataClassification' is not assignable to type '"CONSTA_RESTRICAO" | "HA_INFORMACOES" | "NADA_CONSTA" | "INDEFINIDO"'.
+src/automation/deskdata/deskdata-process-result-analyzer.ts(1,15): error TS2305: Module '"../../domain/research/classify-deskdata-result"' has no exported member 'DeskDataResultSummary'.
+ÔÇëELIFECYCLEÔÇë Command failed with exit code 2.
+ÔÇëELIFECYCLEÔÇë Command failed with exit code 2.

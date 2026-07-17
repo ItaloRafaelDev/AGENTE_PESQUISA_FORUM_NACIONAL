@@ -1,13 +1,24 @@
+import { useAgentCountdown } from '../hooks/use-agent-countdown'
+import ResearchHistoryPanel from './ResearchHistoryPanel'
 import { useEffect, useState } from 'react'
-import type { AgentControlSnapshot } from '../../../shared/types/agent-control-api'
+import {
+  createInitialAgentPublicState,
+  type AgentPublicState
+} from '../../../shared/types/agent-runtime-api'
 import type { BrowserManagerSnapshot } from '../../../shared/types/browser-api'
 import type {
-  PlatformSessionsSnapshot,
-  PlatformSessionState
+  PlatformSessionState,
+  PlatformSessionsSnapshot
 } from '../../../shared/types/session-api'
 
 type ActionName =
-  'browser-start' | 'browser-stop' | 'agent-start' | 'agent-pause' | 'agent-resume' | 'agent-stop'
+  | 'browser-start'
+  | 'browser-stop'
+  | 'agent-start'
+  | 'agent-pause'
+  | 'agent-resume'
+  | 'agent-stop'
+  | 'login-completed'
 
 interface LogEntry {
   id: number
@@ -22,13 +33,7 @@ const initialBrowserSnapshot: BrowserManagerSnapshot = {
   startedAt: null
 }
 
-const initialAgentSnapshot: AgentControlSnapshot = {
-  state: 'PARADO',
-  pauseRequested: false,
-  consecutiveErrors: 0,
-  circuitOpen: false,
-  safeMode: true
-}
+const initialAgentSnapshot = createInitialAgentPublicState()
 
 const initialSessionsSnapshot: PlatformSessionsSnapshot = {
   cpi: {
@@ -77,13 +82,15 @@ function StatusIndicator({ active, label }: { active: boolean; label: string }):
 export default function AgentDashboard(): React.JSX.Element {
   const [browser, setBrowser] = useState(initialBrowserSnapshot)
 
-  const [agent, setAgent] = useState(initialAgentSnapshot)
+  const [agent, setAgent] = useState<AgentPublicState>(initialAgentSnapshot)
 
   const [sessions, setSessions] = useState(initialSessionsSnapshot)
 
   const [busyAction, setBusyAction] = useState<ActionName | null>(null)
 
   const [logs, setLogs] = useState<LogEntry[]>([])
+
+  const countdownSeconds = useAgentCountdown(agent.nextCheckAt, agent.remainingSeconds)
 
   function addLog(message: string, type: LogEntry['type'] = 'info'): void {
     setLogs((currentLogs) =>
@@ -99,6 +106,16 @@ export default function AgentDashboard(): React.JSX.Element {
     )
   }
 
+  async function refreshEnvironment(): Promise<void> {
+    const [browserSnapshot, sessionSnapshot] = await Promise.all([
+      window.agent.browser.getStatus(),
+      window.agent.sessions.getStatus()
+    ])
+
+    setBrowser(browserSnapshot)
+    setSessions(sessionSnapshot)
+  }
+
   useEffect(() => {
     let mounted = true
 
@@ -106,7 +123,7 @@ export default function AgentDashboard(): React.JSX.Element {
       try {
         const [browserSnapshot, agentSnapshot, sessionSnapshot] = await Promise.all([
           window.agent.browser.getStatus(),
-          window.agent.control.getStatus(),
+          window.agent.control.getState(),
           window.agent.sessions.getStatus()
         ])
 
@@ -132,30 +149,23 @@ export default function AgentDashboard(): React.JSX.Element {
 
     void loadInitialState()
 
-    const operationalInterval = window.setInterval(() => {
-      void Promise.all([window.agent.control.getStatus(), window.agent.sessions.getStatus()])
-        .then(([agentSnapshot, sessionSnapshot]) => {
-          if (!mounted) {
-            return
-          }
+    const unsubscribe = window.agent.control.onStateChanged((state) => {
+      if (!mounted) {
+        return
+      }
 
-          setAgent(agentSnapshot)
-          setSessions(sessionSnapshot)
-        })
-        .catch(() => undefined)
-    }, 3_000)
+      setAgent(state)
+    })
 
     return () => {
       mounted = false
-
-      window.clearInterval(operationalInterval)
+      unsubscribe()
     }
   }, [])
 
-  async function executeAction<T>(
+  async function executeAgentAction(
     actionName: ActionName,
-    action: () => Promise<T>,
-    applyResult: (result: T) => void,
+    action: () => Promise<AgentPublicState>,
     successMessage: string
   ): Promise<void> {
     setBusyAction(actionName)
@@ -163,7 +173,35 @@ export default function AgentDashboard(): React.JSX.Element {
     try {
       const result = await action()
 
-      applyResult(result)
+      setAgent(result)
+
+      await refreshEnvironment().catch(() => undefined)
+
+      addLog(successMessage, 'success')
+    } catch (error: unknown) {
+      addLog(error instanceof Error ? error.message : 'Falha inesperada.', 'error')
+    } finally {
+      setBusyAction(null)
+    }
+  }
+
+  async function executeBrowserAction(
+    actionName: ActionName,
+    action: () => Promise<BrowserManagerSnapshot>,
+    successMessage: string
+  ): Promise<void> {
+    setBusyAction(actionName)
+
+    try {
+      const result = await action()
+
+      setBrowser(result)
+
+      await window.agent.sessions
+        .getStatus()
+        .then(setSessions)
+        .catch(() => undefined)
+
       addLog(successMessage, 'success')
     } catch (error: unknown) {
       addLog(error instanceof Error ? error.message : 'Falha inesperada.', 'error')
@@ -174,13 +212,17 @@ export default function AgentDashboard(): React.JSX.Element {
 
   const browserRunning = browser.state === 'RUNNING'
 
-  const agentStopped = agent.state === 'PARADO'
-
-  const agentPaused = agent.state === 'PAUSADO'
-
   const operationBusy = busyAction !== null
 
-  const canStartAgent = browserRunning && agentStopped && sessions.allAuthenticated
+  const canStartAgent = agent.status === 'PARADO' || agent.status === 'ERRO_E1'
+
+  const canPauseAgent = agent.status === 'EXECUTANDO' || agent.status === 'OCIOSO'
+
+  const canResumeAgent = agent.status === 'PAUSADO'
+
+  const canStopAgent = agent.status !== 'PARADO' && agent.status !== 'PARANDO'
+
+  const waitingLogin = agent.status === 'AGUARDANDO_LOGIN'
 
   return (
     <div className="dashboard-shell">
@@ -196,8 +238,8 @@ export default function AgentDashboard(): React.JSX.Element {
         </div>
 
         <StatusIndicator
-          active={agent.safeMode}
-          label={agent.safeMode ? 'Modo seguro ativo' : 'Modo seguro inativo'}
+          active={agent.status !== 'PARADO'}
+          label={agent.status === 'PARADO' ? 'Agente parado' : formatState(agent.status)}
         />
       </header>
 
@@ -228,12 +270,11 @@ export default function AgentDashboard(): React.JSX.Element {
               <button
                 className="button primary"
                 type="button"
-                disabled={operationBusy || browser.state !== 'STOPPED'}
+                disabled={operationBusy || browserRunning}
                 onClick={() =>
-                  executeAction(
+                  void executeBrowserAction(
                     'browser-start',
                     window.agent.browser.start,
-                    setBrowser,
                     'Navegador aberto com sucesso.'
                   )
                 }
@@ -246,10 +287,9 @@ export default function AgentDashboard(): React.JSX.Element {
                 type="button"
                 disabled={operationBusy || !browserRunning}
                 onClick={() =>
-                  executeAction(
+                  void executeBrowserAction(
                     'browser-stop',
                     window.agent.browser.stop,
-                    setBrowser,
                     'Navegador encerrado com segurança.'
                   )
                 }
@@ -264,42 +304,53 @@ export default function AgentDashboard(): React.JSX.Element {
               <div>
                 <span className="panel-label">Agente</span>
 
-                <strong data-testid="agent-state">{formatState(agent.state)}</strong>
+                <strong data-testid="agent-state">{formatState(agent.status)}</strong>
               </div>
 
               <StatusIndicator
-                active={!agentStopped}
-                label={agentStopped ? 'Parado' : 'Em operação'}
+                active={agent.status !== 'PARADO'}
+                label={formatState(agent.status)}
               />
             </div>
 
             <div className="metrics">
               <div>
-                <span>Erros consecutivos</span>
-                <strong>{agent.consecutiveErrors}</strong>
+                <span>Ciclos concluídos</span>
+                <strong>{agent.completedCycles}</strong>
               </div>
 
               <div>
-                <span>Circuit breaker</span>
-                <strong>{agent.circuitOpen ? 'ABERTO' : 'FECHADO'}</strong>
+                <span>Estado da fila</span>
+                <strong>{formatState(agent.queueStatus)}</strong>
+              </div>
+
+              <div>
+                <span>Etapa atual</span>
+                <strong>{agent.currentStage ? formatState(agent.currentStage) : '—'}</strong>
+              </div>
+
+              <div>
+                <span>Próxima verificação</span>
+                <strong>{countdownSeconds !== null ? `${countdownSeconds}s` : '—'}</strong>
               </div>
             </div>
+
+            {agent.currentMaskedCpf ? (
+              <p>
+                CPF em processamento:
+                <span className="path-value">{agent.currentMaskedCpf}</span>
+              </p>
+            ) : null}
 
             <div className="button-row agent-controls">
               <button
                 className="button primary"
                 type="button"
                 disabled={operationBusy || !canStartAgent}
-                title={
-                  canStartAgent
-                    ? 'Iniciar agente'
-                    : 'Autentique a CPI Central e a DeskData antes de iniciar'
-                }
                 onClick={() =>
-                  executeAction(
+                  void executeAgentAction(
                     'agent-start',
                     window.agent.control.start,
-                    setAgent,
                     'Agente iniciado.'
                   )
                 }
@@ -310,13 +361,12 @@ export default function AgentDashboard(): React.JSX.Element {
               <button
                 className="button secondary"
                 type="button"
-                disabled={operationBusy || agentStopped || agentPaused}
+                disabled={operationBusy || !canPauseAgent}
                 onClick={() =>
-                  executeAction(
+                  void executeAgentAction(
                     'agent-pause',
                     window.agent.control.pause,
-                    setAgent,
-                    'Pausa segura aplicada.'
+                    'Pausa segura solicitada.'
                   )
                 }
               >
@@ -326,12 +376,11 @@ export default function AgentDashboard(): React.JSX.Element {
               <button
                 className="button secondary"
                 type="button"
-                disabled={operationBusy || !agentPaused}
+                disabled={operationBusy || !canResumeAgent}
                 onClick={() =>
-                  executeAction(
+                  void executeAgentAction(
                     'agent-resume',
                     window.agent.control.resume,
-                    setAgent,
                     'Execução retomada.'
                   )
                 }
@@ -342,18 +391,34 @@ export default function AgentDashboard(): React.JSX.Element {
               <button
                 className="button danger"
                 type="button"
-                disabled={operationBusy || agentStopped}
+                disabled={operationBusy || !canStopAgent}
                 onClick={() =>
-                  executeAction(
+                  void executeAgentAction(
                     'agent-stop',
                     window.agent.control.stop,
-                    setAgent,
-                    'Agente encerrado com segurança.'
+                    'Agente parado com segurança.'
                   )
                 }
               >
-                Parar com segurança
+                Parar
               </button>
+
+              {waitingLogin ? (
+                <button
+                  className="button primary"
+                  type="button"
+                  disabled={operationBusy}
+                  onClick={() =>
+                    void executeAgentAction(
+                      'login-completed',
+                      window.agent.control.loginCompleted,
+                      'Login validado e execução retomada.'
+                    )
+                  }
+                >
+                  Login concluído — continuar
+                </button>
+              ) : null}
             </div>
           </article>
         </section>
@@ -386,6 +451,22 @@ export default function AgentDashboard(): React.JSX.Element {
           </article>
         </section>
 
+        {agent.lastError ? (
+          <section className="activity-panel" role="alert">
+            <div className="section-heading">
+              <div>
+                <span className="panel-label">Erro E1</span>
+
+                <h2>{formatState(agent.lastError.stage)}</h2>
+              </div>
+
+              <span>{new Date(agent.lastError.occurredAt).toLocaleString('pt-BR')}</span>
+            </div>
+
+            <p>{agent.lastError.message}</p>
+          </section>
+        ) : null}
+
         <section className="activity-panel">
           <div className="section-heading">
             <div>
@@ -404,12 +485,14 @@ export default function AgentDashboard(): React.JSX.Element {
               logs.map((entry) => (
                 <div className={`log-entry ${entry.type}`} key={entry.id}>
                   <time>{entry.timestamp}</time>
+
                   <span>{entry.message}</span>
                 </div>
               ))
             )}
           </div>
         </section>
+        <ResearchHistoryPanel />
       </main>
     </div>
   )

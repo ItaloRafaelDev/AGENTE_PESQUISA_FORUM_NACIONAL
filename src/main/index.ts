@@ -1,31 +1,51 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { stat } from 'node:fs/promises'
 import { join } from 'node:path'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { BrowserManager } from '../automation/browser/browser-manager'
 import { BrowserWorkspaceService } from '../automation/browser/browser-workspace-service'
 import { PlatformPageManager } from '../automation/browser/platform-page-manager'
 import { PlaywrightBrowserLauncher } from '../automation/browser/playwright-browser-launcher'
-import { CpiQueueAvailabilityReader } from '../automation/cpi/cpi-queue-availability'
 import { CpiQueueFilterController } from '../automation/cpi/cpi-queue-filter-controller'
-import { CpiQueueMonitor } from '../automation/cpi/cpi-queue-monitor'
+import { ContinuousResearchRunner } from '../automation/flow/continuous-research-runner'
+import { ResearchHistoryService } from '../automation/history/research-history-service'
 import { PlatformSessionService } from '../automation/session/platform-session-service'
-import { AgentController } from '../automation/workflow/agent-controller'
-import { AgentRuntimeService } from '../automation/workflow/agent-runtime-service'
+import { AgentPublicStateStore } from '../automation/workflow/agent-public-state-store'
+import { ContinuousAgentRuntimeService } from '../automation/workflow/continuous-agent-runtime-service'
+import { ResearchHistoryRepository } from '../infrastructure/database/research-history-repository'
 import {
   ensureRuntimeDirectories,
   resolveRuntimePaths
 } from '../infrastructure/filesystem/runtime-paths'
-import { registerAgentIpcHandlers } from './ipc/register-agent-ipc-handlers'
 import { registerBrowserIpcHandlers } from './ipc/register-browser-ipc-handlers'
+import { registerContinuousAgentIpcHandlers } from './ipc/register-continuous-agent-ipc-handlers'
+import { registerHistoryIpcHandlers } from './ipc/register-history-ipc-handlers'
+import { registerPdfIpcHandlers } from './ipc/register-pdf-ipc-handlers'
 import { registerSessionIpcHandlers } from './ipc/register-session-ipc-handlers'
+import { PdfFileService } from './services/pdf-file-service'
 
 let browserService: BrowserWorkspaceService | null = null
-let agentRuntimeService: AgentRuntimeService | null = null
 
-const agentController = new AgentController()
+let agentRuntimeService: ContinuousAgentRuntimeService | null = null
+
+let historyRepository: ResearchHistoryRepository | null = null
+
+let disposeAgentIpc: (() => void) | null = null
+
+let disposeHistoryIpc: (() => void) | null = null
 
 let isQuitting = false
+
+const eventSender = {
+  send(channel: string, payload: unknown): void {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      if (!window.isDestroyed()) {
+        window.webContents.send(channel, payload)
+      }
+    })
+  }
+}
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -106,22 +126,42 @@ if (!singleInstanceLock) {
 
       const queueFilterController = new CpiQueueFilterController()
 
-      const queueMonitor = new CpiQueueMonitor(
-        queueFilterController,
-        new CpiQueueAvailabilityReader()
+      historyRepository = ResearchHistoryRepository.open(
+        join(app.getPath('userData'), 'agente-cpi.sqlite')
       )
 
-      agentRuntimeService = new AgentRuntimeService(
-        agentController,
-        browserManager,
-        sessionService,
-        queueFilterController,
-        queueMonitor
-      )
+      historyRepository.markUnfinishedAsInterrupted(new Date().toISOString())
+
+      const historyService = new ResearchHistoryService(historyRepository)
+
+      const stateStore = new AgentPublicStateStore()
+
+      agentRuntimeService = new ContinuousAgentRuntimeService({
+        stateStore,
+        browser: browserService,
+        sessions: sessionService,
+        filter: queueFilterController,
+        runner: new ContinuousResearchRunner(),
+        history: historyService
+      })
+
+      const pdfFileService = new PdfFileService(shell, {
+        stat
+      })
 
       registerBrowserIpcHandlers(ipcMain, browserService)
-      registerAgentIpcHandlers(ipcMain, agentRuntimeService)
+
       registerSessionIpcHandlers(ipcMain, sessionService)
+
+      disposeAgentIpc = registerContinuousAgentIpcHandlers(
+        ipcMain,
+        agentRuntimeService,
+        eventSender
+      )
+
+      disposeHistoryIpc = registerHistoryIpcHandlers(ipcMain, historyService, eventSender)
+
+      registerPdfIpcHandlers(ipcMain, pdfFileService)
 
       createWindow()
 
@@ -133,6 +173,7 @@ if (!singleInstanceLock) {
     })
     .catch((error: unknown) => {
       console.error('Falha ao inicializar o Agente CPI:', error)
+
       app.quit()
     })
 
@@ -141,32 +182,34 @@ if (!singleInstanceLock) {
       return
     }
 
-    const browserRunning = browserService?.getSnapshot().state === 'RUNNING'
-
-    const agentRunning =
-      agentRuntimeService !== null && agentRuntimeService.getSnapshot().state !== 'PARADO'
-
-    if (!browserRunning && !agentRunning) {
-      return
-    }
-
     event.preventDefault()
     isQuitting = true
 
     void (async () => {
       try {
-        await agentRuntimeService?.stop()
+        await agentRuntimeService?.shutdown()
       } catch (error: unknown) {
         console.error('Falha ao encerrar o agente:', error)
       }
 
       try {
-        if (browserRunning) {
+        if (browserService?.getSnapshot().state === 'RUNNING') {
           await browserService?.stop()
         }
       } catch (error: unknown) {
         console.error('Falha ao encerrar o navegador:', error)
       }
+
+      disposeAgentIpc?.()
+      disposeHistoryIpc?.()
+
+      historyRepository?.close()
+
+      disposeAgentIpc = null
+      disposeHistoryIpc = null
+      historyRepository = null
+      agentRuntimeService = null
+      browserService = null
 
       app.quit()
     })()

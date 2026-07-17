@@ -1,0 +1,17 @@
+CapturedAt=2026-07-15T17:39:25.6139849-03:00
+Command=pnpm exec tsx scripts/test-deskdata-adapter-tsx-runtime.ts
+ExitCode=1
+
+E:\agente-cpi\src\automation\deskdata\playwright-deskdata-process-page-adapter.ts:64
+  return new DeskDataProcessCollectionError(code, message)
+         ^
+
+DeskDataProcessCollectionError: A se├º├úo Processos n├úo foi localizada.
+    at collectionError (E:\agente-cpi\src\automation\deskdata\playwright-deskdata-process-page-adapter.ts:64:10)
+    at PlaywrightDeskDataProcessPageAdapter.waitUntilReady (E:\agente-cpi\src\automation\deskdata\playwright-deskdata-process-page-adapter.ts:90:11)
+    at async DeskDataProcessCollector.collect (E:\agente-cpi\src\automation\deskdata\deskdata-process-collector.ts:14:5)
+    at async main (E:\agente-cpi\scripts\test-deskdata-adapter-tsx-runtime.ts:75:23) {
+  code: 'PROCESS_SECTION_NOT_FOUND'
+}
+
+Node.js v24.11.0

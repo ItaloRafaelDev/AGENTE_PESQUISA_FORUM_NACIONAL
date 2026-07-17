@@ -1,0 +1,39 @@
+CapturedAt=2026-07-15T17:34:29.2233581-03:00
+Test=tests/unit/automation/deskdata/playwright-deskdata-evaluation-runtime.test.ts
+ExitCode=1
+
+
+> agente-cpi@1.0.0 test E:\agente-cpi
+> tsx scripts/run-vitest-electron.ts run "tests/unit/automation/deskdata/playwright-deskdata-evaluation-runtime.test.ts"
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90mE:/agente-cpi[39m
+
+ [31mÔØ»[39m tests/unit/automation/deskdata/playwright-deskdata-evaluation-runtime.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 524[2mms[22m[39m
+[31m     [31m├ù[31m instala o helper exigido pelo c├│digo serializado pelo tsx[39m[32m 258[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m[1m[41m Failed Tests 1 [49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m tests/unit/automation/deskdata/playwright-deskdata-evaluation-runtime.test.ts[2m > [22mruntime de avalia├º├úo do adaptador[2m > [22minstala o helper exigido pelo c├│digo serializado pelo tsx
+[31m[1mAssertionError[22m: expected 'undefined' to be 'function' // Object.is equality[39m
+
+Expected: [32m"[7mf[27mun[7mction[27m"[39m
+Received: [31m"un[7mdefined[27m"[39m
+
+[36m [2mÔØ»[22m tests/unit/automation/deskdata/playwright-deskdata-evaluation-runtime.test.ts:[2m35:61[22m[39m
+    [90m 33|[39m       [35mawait[39m adapter[33m.[39m[34mwaitUntilReady[39m()
+    [90m 34|[39m
+    [90m 35|[39m       await expect(page.evaluate('typeof globalThis.__name')).resolvesÔÇª
+    [90m   |[39m                                                             [31m^[39m
+    [90m 36|[39m     } [35mfinally[39m {
+    [90m 37|[39m       [35mawait[39m page[33m.[39m[34mclose[39m()
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]ÔÄ»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m   Start at [22m 17:34:27
+[2m   Duration [22m 1.38s[2m (transform 67ms, setup 0ms, import 541ms, tests 524ms, environment 0ms)[22m
+
+ÔÇëELIFECYCLEÔÇë Test failed. See above for more details.

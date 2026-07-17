@@ -1,10 +1,14 @@
 // @vitest-environment jsdom
 
 import '@testing-library/jest-dom/vitest'
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import AgentDashboard from '@/renderer/src/components/AgentDashboard'
+import {
+  createInitialAgentPublicState,
+  type AgentPublicState
+} from '@/shared/types/agent-runtime-api'
 
 const browserStopped = {
   state: 'STOPPED' as const,
@@ -13,22 +17,9 @@ const browserStopped = {
 }
 
 const browserRunning = {
+  ...browserStopped,
   state: 'RUNNING' as const,
-  profilePath: 'C:\\AgenteCPI\\browser-profile',
-  startedAt: '2026-07-14T08:00:00.000Z'
-}
-
-const agentStopped = {
-  state: 'PARADO' as const,
-  pauseRequested: false,
-  consecutiveErrors: 0,
-  circuitOpen: false,
-  safeMode: true
-}
-
-const agentWaitingResearch = {
-  ...agentStopped,
-  state: 'AGUARDANDO_NOVA_PESQUISA' as const
+  startedAt: '2026-07-14T10:00:00.000Z'
 }
 
 const sessionsAuthenticated = {
@@ -36,79 +27,121 @@ const sessionsAuthenticated = {
     state: 'AUTHENTICATED' as const,
     url: 'https://adm.cpicentral.com.br/zpersEspecial/pesquisas/aguardando/mod_t_aguardando.aspx'
   },
-
   deskData: {
     state: 'AUTHENTICATED' as const,
     url: 'https://deskdata.com.br/pessoas/'
   },
-
   allAuthenticated: true,
-  checkedAt: '2026-07-14T08:00:00.000Z'
+  checkedAt: '2026-07-14T10:00:00.000Z'
 }
 
 const browserStart = vi.fn()
 const browserStop = vi.fn()
-const browserStatus = vi.fn()
+const browserGetStatus = vi.fn()
 
+const agentGetState = vi.fn()
 const agentStart = vi.fn()
 const agentPause = vi.fn()
 const agentResume = vi.fn()
 const agentStop = vi.fn()
-const agentStatus = vi.fn()
+const loginCompleted = vi.fn()
 
-const sessionsStatus = vi.fn()
+const sessionsGetStatus = vi.fn()
+
+let stateListener: ((state: AgentPublicState) => void) | null = null
 
 beforeEach(() => {
   browserStart.mockReset()
   browserStop.mockReset()
-  browserStatus.mockReset()
-
+  browserGetStatus.mockReset()
+  agentGetState.mockReset()
   agentStart.mockReset()
   agentPause.mockReset()
   agentResume.mockReset()
   agentStop.mockReset()
-  agentStatus.mockReset()
+  loginCompleted.mockReset()
+  sessionsGetStatus.mockReset()
 
-  sessionsStatus.mockReset()
+  stateListener = null
 
   browserStart.mockResolvedValue(browserRunning)
+
   browserStop.mockResolvedValue(browserStopped)
-  browserStatus.mockResolvedValue(browserStopped)
 
-  agentStart.mockResolvedValue(agentWaitingResearch)
+  browserGetStatus.mockResolvedValue(browserStopped)
 
-  agentPause.mockResolvedValue({
-    ...agentWaitingResearch,
-    state: 'PAUSADO',
-    pauseRequested: true
+  agentGetState.mockResolvedValue(createInitialAgentPublicState())
+
+  agentStart.mockResolvedValue({
+    ...createInitialAgentPublicState(),
+    status: 'OCIOSO'
   })
 
-  agentResume.mockResolvedValue(agentWaitingResearch)
-  agentStop.mockResolvedValue(agentStopped)
-  agentStatus.mockResolvedValue(agentStopped)
+  agentPause.mockResolvedValue({
+    ...createInitialAgentPublicState(),
+    status: 'PAUSADO'
+  })
 
-  sessionsStatus.mockResolvedValue(sessionsAuthenticated)
+  agentResume.mockResolvedValue({
+    ...createInitialAgentPublicState(),
+    status: 'OCIOSO'
+  })
+
+  agentStop.mockResolvedValue(createInitialAgentPublicState())
+
+  loginCompleted.mockResolvedValue({
+    ...createInitialAgentPublicState(),
+    status: 'OCIOSO'
+  })
+
+  sessionsGetStatus.mockResolvedValue(sessionsAuthenticated)
 
   Object.defineProperty(window, 'agent', {
     configurable: true,
-
     value: {
       browser: {
         start: browserStart,
         stop: browserStop,
-        getStatus: browserStatus
+        getStatus: browserGetStatus
       },
-
       control: {
+        getState: agentGetState,
         start: agentStart,
         pause: agentPause,
         resume: agentResume,
         stop: agentStop,
-        getStatus: agentStatus
-      },
+        loginCompleted,
+        onStateChanged: (listener: (state: AgentPublicState) => void) => {
+          stateListener = listener
 
+          return () => {
+            stateListener = null
+          }
+        }
+      },
       sessions: {
-        getStatus: sessionsStatus
+        getStatus: sessionsGetStatus
+      },
+      history: {
+        list: vi.fn().mockResolvedValue({
+          items: [],
+          page: 1,
+          pageSize: 50,
+          total: 0,
+          totalPages: 0
+        }),
+        clear: vi.fn().mockResolvedValue(undefined),
+        onRecordCreated: vi.fn(() => () => undefined),
+        onRecordUpdated: vi.fn(() => () => undefined),
+        onCleared: vi.fn(() => () => undefined)
+      },
+      pdf: {
+        open: vi.fn().mockResolvedValue({
+          status: 'OPENED'
+        }),
+        reveal: vi.fn().mockResolvedValue({
+          status: 'REVEALED'
+        })
       }
     }
   })
@@ -116,26 +149,30 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup()
-  vi.restoreAllMocks()
 })
 
-describe('AgentDashboard', () => {
-  it('deve iniciar o monitor quando as plataformas estiverem autenticadas', async () => {
+describe('AgentDashboard contínuo', () => {
+  it('inicia parado sem abrir navegador ou pesquisa', async () => {
+    render(<AgentDashboard />)
+
+    expect(await screen.findByTestId('agent-state')).toHaveTextContent('PARADO')
+
+    expect(browserStart).not.toHaveBeenCalled()
+    expect(agentStart).not.toHaveBeenCalled()
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Iniciar agente'
+      })
+    ).toBeEnabled()
+  })
+
+  it('inicia o agente diretamente pelo dashboard', async () => {
     const user = userEvent.setup()
 
     render(<AgentDashboard />)
 
-    await waitFor(() => {
-      expect(browserStatus).toHaveBeenCalledTimes(1)
-      expect(agentStatus).toHaveBeenCalledTimes(1)
-      expect(sessionsStatus).toHaveBeenCalledTimes(1)
-    })
-
-    await user.click(
-      screen.getByRole('button', {
-        name: 'Abrir navegador'
-      })
-    )
+    await screen.findByTestId('agent-state')
 
     await user.click(
       screen.getByRole('button', {
@@ -145,51 +182,60 @@ describe('AgentDashboard', () => {
 
     expect(agentStart).toHaveBeenCalledTimes(1)
 
-    expect(screen.getByTestId('agent-state')).toHaveTextContent('AGUARDANDO NOVA PESQUISA')
+    await waitFor(() => {
+      expect(screen.getByTestId('agent-state')).toHaveTextContent('OCIOSO')
+    })
   })
 
-  it('deve atualizar automaticamente o estado operacional', async () => {
-    const originalSetInterval = window.setInterval.bind(window)
-
-    let operationalIntervalCallback: (() => void) | undefined
-
-    vi.spyOn(window, 'setInterval').mockImplementation(
-      (handler: TimerHandler, timeout?: number): number => {
-        if (timeout === 3_000 && typeof handler === 'function') {
-          operationalIntervalCallback = () => {
-            handler()
-          }
-
-          return 9_001
-        }
-
-        return originalSetInterval(handler, timeout)
-      }
-    )
+  it('mostra confirmação manual quando aguarda login', async () => {
+    agentGetState.mockResolvedValue({
+      ...createInitialAgentPublicState(),
+      status: 'AGUARDANDO_LOGIN'
+    })
 
     render(<AgentDashboard />)
 
+    expect(
+      await screen.findByRole('button', {
+        name: 'Login concluído — continuar'
+      })
+    ).toBeEnabled()
+  })
+
+  it('recebe atualizações em tempo real sem polling do agente', async () => {
+    render(<AgentDashboard />)
+
+    await screen.findByTestId('agent-state')
+
+    stateListener?.({
+      ...createInitialAgentPublicState(),
+      status: 'EXECUTANDO',
+      currentStage: 'PREPARING_DESKDATA',
+      currentMaskedCpf: '***.***.***-44'
+    })
+
     await waitFor(() => {
-      expect(agentStatus).toHaveBeenCalledTimes(1)
+      expect(screen.getByTestId('agent-state')).toHaveTextContent('EXECUTANDO')
+
+      expect(screen.getByText('***.***.***-44')).toBeInTheDocument()
     })
 
-    expect(screen.getByTestId('agent-state')).toHaveTextContent('PARADO')
+    expect(agentGetState).toHaveBeenCalledTimes(1)
+  })
 
-    expect(operationalIntervalCallback).toBeDefined()
-
-    agentStatus.mockResolvedValue(agentWaitingResearch)
-
-    await act(async () => {
-      operationalIntervalCallback?.()
-
-      await Promise.resolve()
-      await Promise.resolve()
+  it('exibe erro E1 sanitizado', async () => {
+    agentGetState.mockResolvedValue({
+      ...createInitialAgentPublicState(),
+      status: 'ERRO_E1',
+      lastError: {
+        stage: 'SAVING_CPI',
+        message: 'Falha com CPF ***.***.***-44',
+        occurredAt: '2026-07-14T10:00:00.000Z'
+      }
     })
 
-    await waitFor(() => {
-      expect(agentStatus).toHaveBeenCalledTimes(2)
+    render(<AgentDashboard />)
 
-      expect(screen.getByTestId('agent-state')).toHaveTextContent('AGUARDANDO NOVA PESQUISA')
-    })
+    expect(await screen.findByRole('alert')).toHaveTextContent('Falha com CPF ***.***.***-44')
   })
 })

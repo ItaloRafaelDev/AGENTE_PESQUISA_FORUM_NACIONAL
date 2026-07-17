@@ -1,0 +1,20 @@
+CapturedAt=2026-07-15T17:34:30.9412148-03:00
+Command=pnpm exec tsx scripts/test-deskdata-adapter-tsx-runtime.ts
+ExitCode=1
+
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+page.evaluate: ReferenceError: __name is not defined
+    at eval (eval at evaluate (:303:30), <anonymous>:1:46)
+    at UtilityScript.evaluate (<anonymous>:305:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+    at PlaywrightDeskDataProcessPageAdapter.tryMarkProcessSection (E:\agente-cpi\src\automation\deskdata\playwright-deskdata-process-page-adapter.ts:447:22)
+    at PlaywrightDeskDataProcessPageAdapter.waitUntilReady (E:\agente-cpi\src\automation\deskdata\playwright-deskdata-process-page-adapter.ts:45:35)
+    at DeskDataProcessCollector.collect (E:\agente-cpi\src\automation\deskdata\deskdata-process-collector.ts:14:25)
+    at main (E:\agente-cpi\scripts\test-deskdata-adapter-tsx-runtime.ts:75:67) {
+  log: []
+}
+
+Node.js v24.11.0

@@ -18,6 +18,9 @@ import { DeskDataProcessDomCapture } from '../src/automation/deskdata/deskdata-p
 import { parseDeskDataInspectionScenario } from '../src/automation/deskdata/deskdata-inspection-scenario-parser'
 import { findDeskDataPeoplePage } from '../src/automation/deskdata/deskdata-page-finder'
 import { DeskDataSafeClassificationReportBuilder } from '../src/automation/deskdata/deskdata-safe-classification-report-builder'
+import { PlaywrightDeskDataProcessPageAdapter } from '../src/automation/deskdata/playwright-deskdata-process-page-adapter'
+import { DeskDataProcessCollector } from '../src/automation/deskdata/deskdata-process-collector'
+import { classifyDeskDataSpheres } from '../src/domain/research/classify-deskdata-spheres'
 const DESKDATA_PEOPLE_URL = 'https://deskdata.com.br/pessoas/'
 
 const HEADING_SELECTOR = [
@@ -58,7 +61,11 @@ async function captureRawInspection(
 }
 
 async function main(): Promise<void> {
-  const scenario = parseDeskDataInspectionScenario(process.argv.slice(2))
+  const legacyInspection = process.argv.includes('--legacy-inspection')
+
+  const scenario = parseDeskDataInspectionScenario(
+    process.argv.slice(2).filter((argument) => argument !== '--legacy-inspection')
+  )
   const appData = process.env.APPDATA
 
   if (!appData) {
@@ -162,6 +169,38 @@ async function main(): Promise<void> {
     await terminal.question(
       'Quando o resultado estiver totalmente carregado, pressione ENTER para capturar...'
     )
+
+    // STRUCTURED_SPHERE_INSPECTION_START
+    if (!legacyInspection) {
+      const processPageAdapter = new PlaywrightDeskDataProcessPageAdapter(deskDataPage)
+
+      const processes = await new DeskDataProcessCollector(processPageAdapter).collect()
+
+      const classification = classifyDeskDataSpheres(processes)
+
+      const pageCount = processes.reduce(
+        (maximum, process) => Math.max(maximum, process.sourcePage),
+        processes.length > 0 ? 1 : 0
+      )
+
+      const safeOutput = {
+        scenario,
+        processCount: classification.totalProcesses,
+        pageCount,
+        normalizedSpheres: classification.normalizedSpheres,
+        result: classification.result,
+        reason: classification.reason
+      }
+
+      console.log(JSON.stringify(safeOutput, null, 2))
+
+      await terminal.question(
+        'Inspeção estruturada concluída. Pressione ENTER para fechar o navegador...'
+      )
+
+      return
+    }
+    // STRUCTURED_SPHERE_INSPECTION_END
 
     const inspector = new DeskDataProcessResultInspector()
 

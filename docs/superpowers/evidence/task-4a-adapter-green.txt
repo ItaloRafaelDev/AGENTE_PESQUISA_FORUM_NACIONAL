@@ -1,0 +1,39 @@
+CapturedAt=2026-07-15T17:04:02.8373369-03:00
+Test=tests/unit/automation/deskdata/playwright-deskdata-process-page-adapter.test.ts
+ExitCode=1
+
+
+> agente-cpi@1.0.0 test E:\agente-cpi
+> tsx scripts/run-vitest-electron.ts run "tests/unit/automation/deskdata/playwright-deskdata-process-page-adapter.test.ts"
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90mE:/agente-cpi[39m
+
+ [31mÔØ»[39m tests/unit/automation/deskdata/playwright-deskdata-process-page-adapter.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 9375[2mms[22m[39m
+[31m     [31m├ù[31m isola Processos, expande o cart├úo e l├¬ campos estruturados[39m[33m 5179[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m reconhece aus├¬ncia expl├¡cita de processos [33m 335[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m falha quando a se├º├úo Processos n├úo existe [33m 504[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m falha quando Pr├│ximo n├úo muda o conte├║do [33m 1012[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m[1m[41m Failed Tests 1 [49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m tests/unit/automation/deskdata/playwright-deskdata-process-page-adapter.test.ts[2m > [22mPlaywrightDeskDataProcessPageAdapter[2m > [22misola Processos, expande o cart├úo e l├¬ campos estruturados
+[31m[1mError[22m: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".[39m
+[36m [2mÔØ»[22m tests/unit/automation/deskdata/playwright-deskdata-process-page-adapter.test.ts:[2m27:3[22m[39m
+    [90m 25|[39m   })
+    [90m 26|[39m
+    [90m 27|[39m   it('isola Processos, expande o cart├úo e l├¬ campos estruturados', asyÔÇª
+    [90m   |[39m   [31m^[39m
+    [90m 28|[39m     [35mawait[39m page[33m.[39m[34msetContent[39m([32m`
+    [90m 29|[39m           <main>
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]ÔÄ»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m3 passed[39m[22m[90m (4)[39m
+[2m   Start at [22m 17:03:52
+[2m   Duration [22m 10.50s[2m (transform 232ms, setup 0ms, import 769ms, tests 9.37s, environment 0ms)[22m
+
+ÔÇëELIFECYCLEÔÇë Test failed. See above for more details.

@@ -1,0 +1,217 @@
+CapturedAt=2026-07-15T17:42:13.4772686-03:00
+Adapter=.\src\automation\deskdata\playwright-deskdata-process-page-adapter.ts
+AdapterSHA256=A9D16A28C7F018DCD68306C250F5AEAF1935A8FF4511FE6D5F2705DF957E5429
+RuntimeExitCode=1
+
+=== RUNTIME OUTPUT ===
+node:internal/modules/cjs/loader:1420
+  const err = new Error(message);
+              ^
+
+Error: Cannot find module 'playwright'
+Require stack:
+- C:\Users\italo\AppData\Local\Temp\agente-cpi-diagnose-process-section-runtime.ts
+    at node:internal/modules/cjs/loader:1420:15
+    at nextResolveSimple (E:\agente-cpi\node_modules\.pnpm\tsx@4.23.1\node_modules\tsx\dist\register-BoI6-WNn.cjs:10:1017)
+    at E:\agente-cpi\node_modules\.pnpm\tsx@4.23.1\node_modules\tsx\dist\register-BoI6-WNn.cjs:9:4613
+    at E:\agente-cpi\node_modules\.pnpm\tsx@4.23.1\node_modules\tsx\dist\register-BoI6-WNn.cjs:9:3894
+    at resolveTsPaths (E:\agente-cpi\node_modules\.pnpm\tsx@4.23.1\node_modules\tsx\dist\register-BoI6-WNn.cjs:10:770)
+    at E:\agente-cpi\node_modules\.pnpm\tsx@4.23.1\node_modules\tsx\dist\register-BoI6-WNn.cjs:10:1171
+    at T._resolveFilename (file:///E:/agente-cpi/node_modules/.pnpm/tsx@4.23.1/node_modules/tsx/dist/register-zZ7SWseA.mjs:2:15301)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1058:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1063:22)
+    at Module._load (node:internal/modules/cjs/loader:1226:37) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\italo\\AppData\\Local\\Temp\\agente-cpi-diagnose-process-section-runtime.ts'
+  ]
+}
+
+Node.js v24.11.0
+
+=== ADAPTER SOURCE CONTEXT ===
+--- linhas 4 a 21 ---
+   4:   DeskDataProcessPagePort,
+   5:   DeskDataProcessPageSnapshot
+   6: } from './deskdata-process-page-port'
+   7: import { DeskDataProcessCollectionError } from './deskdata-process-collection-error'
+   8: 
+   9: const PROCESS_SECTION_MARKER = 'data-agent-cpi-process-section'
+  10: 
+  11: const NEXT_PAGE_MARKER = 'data-agent-cpi-next-page'
+  12: 
+  13: const EVALUATION_RUNTIME_SOURCE = `
+  14: (() => {
+  15:   if (
+  16:     typeof globalThis.__name ===
+  17:     'function'
+  18:   ) {
+  19:     return
+  20:   }
+  21: 
+
+--- linhas 40 a 57 ---
+  40:     }
+  41:   )
+  42: })()
+  43: `
+  44: 
+  45: const PROCESS_HEADING_SELECTOR = [
+  46:   'h1',
+  47:   'h2',
+  48:   'h3',
+  49:   'h4',
+  50:   'h5',
+  51:   'h6',
+  52:   'legend',
+  53:   '[role="heading"]',
+  54:   '[data-section-title]',
+  55:   '.card-header',
+  56:   '.panel-heading',
+  57:   '.accordion-header'
+
+--- linhas 72 a 89 ---
+  72: 
+  73:   async waitUntilReady(): Promise<void> {
+  74:     const deadline = Date.now() + this.timeoutMs
+  75: 
+  76:     while (Date.now() < deadline) {
+  77:       const resolved = await this.tryMarkProcessSection()
+  78: 
+  79:       if (resolved) {
+  80:         const section = this.processSectionLocator()
+  81: 
+  82:         if (await section.isVisible()) {
+  83:           return
+  84:         }
+  85:       }
+  86: 
+  87:       await this.page.waitForTimeout(100)
+  88:     }
+  89: 
+
+--- linhas 464 a 481 ---
+ 464:       'A próxima página não alterou o conteúdo da seção Processos.'
+ 465:     )
+ 466:   }
+ 467: 
+ 468:   private processSectionLocator(): Locator {
+ 469:     return this.page.locator(`[${PROCESS_SECTION_MARKER}="true"]`)
+ 470:   }
+ 471: 
+ 472:   private async ensureProcessSection(): Promise<void> {
+ 473:     if (!(await this.tryMarkProcessSection())) {
+ 474:       throw collectionError('PROCESS_SECTION_NOT_FOUND', 'A seção Processos não foi localizada.')
+ 475:     }
+ 476:   }
+ 477: 
+ 478:   private async ensureEvaluationRuntime(): Promise<void> {
+ 479:     await this.page.evaluate(EVALUATION_RUNTIME_SOURCE)
+ 480:   }
+ 481: 
+
+--- linhas 468 a 485 ---
+ 468:   private processSectionLocator(): Locator {
+ 469:     return this.page.locator(`[${PROCESS_SECTION_MARKER}="true"]`)
+ 470:   }
+ 471: 
+ 472:   private async ensureProcessSection(): Promise<void> {
+ 473:     if (!(await this.tryMarkProcessSection())) {
+ 474:       throw collectionError('PROCESS_SECTION_NOT_FOUND', 'A seção Processos não foi localizada.')
+ 475:     }
+ 476:   }
+ 477: 
+ 478:   private async ensureEvaluationRuntime(): Promise<void> {
+ 479:     await this.page.evaluate(EVALUATION_RUNTIME_SOURCE)
+ 480:   }
+ 481: 
+ 482:   private async tryMarkProcessSection(): Promise<boolean> {
+ 483:     await this.ensureEvaluationRuntime()
+ 484:     return this.page.evaluate(
+ 485:       ({ headingSelector, marker }) => {
+
+--- linhas 473 a 490 ---
+ 473:     if (!(await this.tryMarkProcessSection())) {
+ 474:       throw collectionError('PROCESS_SECTION_NOT_FOUND', 'A seção Processos não foi localizada.')
+ 475:     }
+ 476:   }
+ 477: 
+ 478:   private async ensureEvaluationRuntime(): Promise<void> {
+ 479:     await this.page.evaluate(EVALUATION_RUNTIME_SOURCE)
+ 480:   }
+ 481: 
+ 482:   private async tryMarkProcessSection(): Promise<boolean> {
+ 483:     await this.ensureEvaluationRuntime()
+ 484:     return this.page.evaluate(
+ 485:       ({ headingSelector, marker }) => {
+ 486:         const normalize = (value: string | null | undefined): string =>
+ 487:           (value ?? '')
+ 488:             .normalize('NFD')
+ 489:             .replace(/[\u0300-\u036f]/g, '')
+ 490:             .toLocaleLowerCase('pt-BR')
+
+--- linhas 477 a 494 ---
+ 477: 
+ 478:   private async ensureEvaluationRuntime(): Promise<void> {
+ 479:     await this.page.evaluate(EVALUATION_RUNTIME_SOURCE)
+ 480:   }
+ 481: 
+ 482:   private async tryMarkProcessSection(): Promise<boolean> {
+ 483:     await this.ensureEvaluationRuntime()
+ 484:     return this.page.evaluate(
+ 485:       ({ headingSelector, marker }) => {
+ 486:         const normalize = (value: string | null | undefined): string =>
+ 487:           (value ?? '')
+ 488:             .normalize('NFD')
+ 489:             .replace(/[\u0300-\u036f]/g, '')
+ 490:             .toLocaleLowerCase('pt-BR')
+ 491:             .replace(/\s+/g, ' ')
+ 492:             .trim()
+ 493: 
+ 494:         const isVisible = (element: Element): boolean => {
+
+--- linhas 478 a 495 ---
+ 478:   private async ensureEvaluationRuntime(): Promise<void> {
+ 479:     await this.page.evaluate(EVALUATION_RUNTIME_SOURCE)
+ 480:   }
+ 481: 
+ 482:   private async tryMarkProcessSection(): Promise<boolean> {
+ 483:     await this.ensureEvaluationRuntime()
+ 484:     return this.page.evaluate(
+ 485:       ({ headingSelector, marker }) => {
+ 486:         const normalize = (value: string | null | undefined): string =>
+ 487:           (value ?? '')
+ 488:             .normalize('NFD')
+ 489:             .replace(/[\u0300-\u036f]/g, '')
+ 490:             .toLocaleLowerCase('pt-BR')
+ 491:             .replace(/\s+/g, ' ')
+ 492:             .trim()
+ 493: 
+ 494:         const isVisible = (element: Element): boolean => {
+ 495:           const style = window.getComputedStyle(element)
+
+--- linhas 552 a 562 ---
+ 552:         uniqueCandidates[0].setAttribute(marker, 'true')
+ 553: 
+ 554:         return true
+ 555:       },
+ 556:       {
+ 557:         headingSelector: PROCESS_HEADING_SELECTOR,
+ 558:         marker: PROCESS_SECTION_MARKER
+ 559:       }
+ 560:     )
+ 561:   }
+ 562: }
+
+--- linhas 553 a 562 ---
+ 553: 
+ 554:         return true
+ 555:       },
+ 556:       {
+ 557:         headingSelector: PROCESS_HEADING_SELECTOR,
+ 558:         marker: PROCESS_SECTION_MARKER
+ 559:       }
+ 560:     )
+ 561:   }
+ 562: }
+

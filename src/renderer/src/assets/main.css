@@ -314,3 +314,81 @@ button {
     padding-left: 28px;
   }
 }
+
+.history-panel {
+  overflow: hidden;
+}
+
+.history-feedback {
+  margin: 0 0 16px;
+  color: var(--text-secondary, #667085);
+}
+
+.history-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.history-table th,
+.history-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  text-align: left;
+  vertical-align: middle;
+  font-size: 0.875rem;
+}
+
+.history-table th {
+  color: var(--text-secondary, #667085);
+  font-weight: 600;
+}
+
+.history-table code {
+  white-space: nowrap;
+}
+
+.history-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.button.compact {
+  padding: 7px 10px;
+  font-size: 0.8rem;
+}
+
+.history-status {
+  display: inline-flex;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.history-status-concluido {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.history-status-erro_e1 {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+}
+
+.history-status-em_andamento {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.history-status-interrompido {
+  background: rgba(234, 88, 12, 0.12);
+  color: #c2410c;
+}

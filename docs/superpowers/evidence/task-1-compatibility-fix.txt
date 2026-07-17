@@ -1,0 +1,9 @@
+CapturedAt=2026-07-15T16:42:44.7422443-03:00
+RootCause1=New sphere classifier replaced a legacy public contract.
+RootCause2=PowerShell test-path array was forwarded as one Vitest filter.
+Fix1=Legacy classifier restored and new sphere classifier isolated.
+Fix2=Each focused test file executed in an independent pnpm test command.
+FocusedTests=PASS
+Typecheck=PASS
+PortalOpened=false
+CpiResultSaved=false

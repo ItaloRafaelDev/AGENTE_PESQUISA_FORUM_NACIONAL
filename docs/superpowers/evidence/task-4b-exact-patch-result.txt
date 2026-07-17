@@ -1,0 +1,14 @@
+CapturedAt=2026-07-15T17:25:52.3645030-03:00
+OriginalHash=4710B3F1F50213EC602114CF9644129ED059E16EC32AC1CEE5F04C0AF67CDC74
+FinalHash=B65154FA8A60CA1DEDEDC7D38B10DF0FA4FC6324283E5B5E7B79772875184E05
+InsertionPoint=Before DeskDataProcessResultInspector at original line 166
+DefaultMode=STRUCTURED_SPHERE_INSPECTION
+LegacyModeFlag=--legacy-inspection
+GuardTest=PASS
+AdapterTest=PASS
+CollectorTest=PASS
+SphereClassifierTest=PASS
+InspectorLint=PASS
+Typecheck=PASS
+RealPortalOpened=false
+CpiResultSaved=false

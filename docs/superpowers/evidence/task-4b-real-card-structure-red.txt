@@ -1,0 +1,38 @@
+CapturedAt=2026-07-15T17:44:48.8803300-03:00
+Test=tests/unit/automation/deskdata/playwright-deskdata-real-card-structure.test.ts
+ExitCode=1
+
+
+> agente-cpi@1.0.0 test E:\agente-cpi
+> tsx scripts/run-vitest-electron.ts run "tests/unit/automation/deskdata/playwright-deskdata-real-card-structure.test.ts"
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90mE:/agente-cpi[39m
+
+ [31mÔØ»[39m tests/unit/automation/deskdata/playwright-deskdata-real-card-structure.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1917[2mms[22m[39m
+[31m     [31m├ù[31m l├¬ Esfera em td.w-label dentro de div.card[39m[33m 1727[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m[1m[41m Failed Tests 1 [49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m tests/unit/automation/deskdata/playwright-deskdata-real-card-structure.test.ts[2m > [22mestrutura real de cart├úo da DeskData[2m > [22ml├¬ Esfera em td.w-label dentro de div.card
+[31m[1mDeskDataProcessCollectionError[22m: A se├º├úo Processos n├úo foi localizada.[39m
+[36m [2mÔØ»[22m collectionError src/automation/deskdata/playwright-deskdata-process-page-adapter.ts:[2m64:10[22m[39m
+    [90m 62|[39m   message[33m:[39m string
+    [90m 63|[39m )[33m:[39m [33mDeskDataProcessCollectionError[39m {
+    [90m 64|[39m   [35mreturn[39m [35mnew[39m [33mDeskDataProcessCollectionError[39m(code[33m,[39m message)
+    [90m   |[39m          [31m^[39m
+    [90m 65|[39m }
+    [90m 66|[39m
+[90m [2mÔØ»[22m PlaywrightDeskDataProcessPageAdapter.waitUntilReady src/automation/deskdata/playwright-deskdata-process-page-adapter.ts:[2m90:11[22m[39m
+[90m [2mÔØ»[22m DeskDataProcessCollector.collect src/automation/deskdata/deskdata-process-collector.ts:[2m14:5[22m[39m
+[90m [2mÔØ»[22m tests/unit/automation/deskdata/playwright-deskdata-real-card-structure.test.ts:[2m85:25[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]ÔÄ»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m   Start at [22m 17:44:45
+[2m   Duration [22m 2.74s[2m (transform 104ms, setup 0ms, import 539ms, tests 1.92s, environment 0ms)[22m
+
+ÔÇëELIFECYCLEÔÇë Test failed. See above for more details.

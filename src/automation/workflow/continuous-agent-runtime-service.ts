@@ -20,7 +20,7 @@ const CPI_HOSTNAME = 'adm.cpicentral.com.br'
 
 const CPI_QUEUE_PATH = '/zpersespecial/pesquisas/aguardando/mod_t_aguardando.aspx'
 
-const DESKDATA_HOSTNAME = 'deskdata.com.br'
+const DESKDATA_HOSTNAME = 'app.deskdata.com.br'
 
 type RequestedExit = 'NONE' | 'PAUSE' | 'STOP'
 

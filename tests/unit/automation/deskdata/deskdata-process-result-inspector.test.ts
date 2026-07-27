@@ -9,7 +9,7 @@ describe('DeskDataProcessResultInspector', () => {
     const raw: RawDeskDataProcessInspection = {
       scenario: 'caso-a-criminal',
       capturedAt: '2026-07-14T12:00:00.000Z',
-      sourceUrl: 'https://deskdata.com.br/pessoas/resultado/?cpf=52998224725',
+      sourceUrl: 'https://app.deskdata.com.br/pessoas/resultado/?cpf=52998224725',
       pageTitle: 'Resultado 529.982.247-25',
       bodyText: [
         'Nome da pessoa',
@@ -70,7 +70,7 @@ describe('DeskDataProcessResultInspector', () => {
     const result = inspector.build({
       scenario: 'caso-b-sem-processos',
       capturedAt: '2026-07-14T12:00:00.000Z',
-      sourceUrl: 'https://deskdata.com.br/pessoas/resultado/',
+      sourceUrl: 'https://app.deskdata.com.br/pessoas/resultado/',
       pageTitle: 'Resultado',
       bodyText: 'Nenhum processo encontrado para 529.982.247-25',
       headings: ['Processos'],

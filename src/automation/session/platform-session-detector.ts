@@ -41,16 +41,30 @@ export function detectDeskDataSession(evidence: PageSessionEvidence | null): Pla
 
   const url = new URL(evidence.url)
   const pathname = url.pathname.toLowerCase()
+  const hostname = url.hostname.toLowerCase()
+
+  if (pathname.includes('/login') || pathname.includes('/entrar') || pathname.includes('/acesso')) {
+    return 'WAITING_LOGIN'
+  }
+
+  const isNewApplication = hostname === 'app.deskdata.com.br'
+  const isLegacyApplication = hostname === 'deskdata.com.br'
 
   if (
-    url.hostname === 'deskdata.com.br' &&
-    (pathname === '/pessoas' || pathname.startsWith('/pessoas/'))
+    isNewApplication &&
+    (pathname === '/' ||
+      pathname === '/painel' ||
+      pathname === '/painel/' ||
+      pathname === '/pessoas' ||
+      pathname.startsWith('/pessoas/') ||
+      pathname === '/historico' ||
+      pathname.startsWith('/historico/'))
   ) {
     return 'AUTHENTICATED'
   }
 
-  if (pathname.includes('/login') || pathname.includes('/entrar') || pathname.includes('/acesso')) {
-    return 'WAITING_LOGIN'
+  if (isLegacyApplication && (pathname === '/pessoas' || pathname.startsWith('/pessoas/'))) {
+    return 'AUTHENTICATED'
   }
 
   return 'INDETERMINATE'

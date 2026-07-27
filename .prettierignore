@@ -5,3 +5,9 @@ LICENSE.md
 tsconfig.json
 tsconfig.*.json
 artifacts/deskdata-inspection/
+
+# Generated agent backups
+.agent-backups/
+
+# Generated agent backups
+.agent-config-backups/

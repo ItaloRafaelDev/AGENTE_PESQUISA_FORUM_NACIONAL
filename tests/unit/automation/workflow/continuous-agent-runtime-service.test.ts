@@ -34,7 +34,7 @@ const cpiPage = createPage(
   'https://adm.cpicentral.com.br/zpersEspecial/pesquisas/aguardando/mod_t_aguardando.aspx'
 )
 
-const deskDataPage = createPage('https://deskdata.com.br/pessoas/')
+const deskDataPage = createPage('https://app.deskdata.com.br/pessoas/')
 
 const context = {
   pages: () => [cpiPage, deskDataPage]

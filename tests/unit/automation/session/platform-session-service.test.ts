@@ -63,7 +63,7 @@ describe('PlatformSessionService', () => {
       new FakePage(
         'https://adm.cpicentral.com.br/zpersEspecial/pesquisas/aguardando/mod_t_aguardando.aspx'
       ),
-      new FakePage('https://deskdata.com.br/pessoas/')
+      new FakePage('https://app.deskdata.com.br/pessoas/')
     ])
 
     const service = new PlatformSessionService(new FakeBrowserRuntime('RUNNING', context))
@@ -79,7 +79,7 @@ describe('PlatformSessionService', () => {
   it('deve reconhecer a CPI aguardando login manual', async () => {
     const context = new FakeContext([
       new FakePage('https://adm.cpicentral.com.br/access_fault.aspx'),
-      new FakePage('https://deskdata.com.br/pessoas/')
+      new FakePage('https://app.deskdata.com.br/pessoas/')
     ])
 
     const service = new PlatformSessionService(new FakeBrowserRuntime('RUNNING', context))

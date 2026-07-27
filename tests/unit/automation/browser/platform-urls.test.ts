@@ -6,7 +6,7 @@ describe('parsePlatformUrls', () => {
     expect(parsePlatformUrls()).toEqual({
       cpiQueueUrl:
         'https://adm.cpicentral.com.br/zpersEspecial/pesquisas/aguardando/mod_t_aguardando.aspx',
-      deskDataPeopleUrl: 'https://deskdata.com.br/pessoas/'
+      deskDataPeopleUrl: 'https://app.deskdata.com.br/pessoas/'
     })
   })
 

@@ -29,7 +29,7 @@ const sessionsAuthenticated = {
   },
   deskData: {
     state: 'AUTHENTICATED' as const,
-    url: 'https://deskdata.com.br/pessoas/'
+    url: 'https://app.deskdata.com.br/pessoas/'
   },
   allAuthenticated: true,
   checkedAt: '2026-07-14T10:00:00.000Z'

@@ -66,11 +66,11 @@ class FakePage implements DeskDataSubmitPage {
 describe('DeskDataSearchSubmitController', () => {
   it('deve enviar a consulta exatamente uma vez', async () => {
     const state: MutablePageState = {
-      url: 'https://deskdata.com.br/pessoas/'
+      url: 'https://app.deskdata.com.br/pessoas/'
     }
 
     const button = new FakeLocator(1, true, () => {
-      state.url = 'https://deskdata.com.br/pessoas/resultado/'
+      state.url = 'https://app.deskdata.com.br/pessoas/resultado/'
     })
 
     const page = new FakePage(state, button)
@@ -93,7 +93,7 @@ describe('DeskDataSearchSubmitController', () => {
   it('deve falhar quando o botão Consultar não existir', async () => {
     const page = new FakePage(
       {
-        url: 'https://deskdata.com.br/pessoas/'
+        url: 'https://app.deskdata.com.br/pessoas/'
       },
       new FakeLocator(0, false)
     )
@@ -108,7 +108,7 @@ describe('DeskDataSearchSubmitController', () => {
   it('deve falhar quando o botão estiver desabilitado', async () => {
     const page = new FakePage(
       {
-        url: 'https://deskdata.com.br/pessoas/'
+        url: 'https://app.deskdata.com.br/pessoas/'
       },
       new FakeLocator(1, false)
     )

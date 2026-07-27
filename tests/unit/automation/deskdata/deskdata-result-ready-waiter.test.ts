@@ -6,12 +6,11 @@ import {
 import { DESKDATA_PDF_EXPORT_SELECTOR } from '@/automation/deskdata/deskdata-pdf-download-controller'
 
 describe('DeskDataResultReadyWaiter', () => {
-  it('deve aguardar a rota de resultado e o botão Exportar', async () => {
+  it('waits for the normal result route and Exportar button', async () => {
     let attempts = 0
 
     const count = vi.fn(async () => {
       attempts += 1
-
       return attempts >= 3 ? 1 : 0
     })
 
@@ -20,8 +19,8 @@ describe('DeskDataResultReadyWaiter', () => {
     const page: DeskDataResultReadyPage = {
       url: () =>
         attempts >= 2
-          ? 'https://deskdata.com.br/pessoas/resultado/teste'
-          : 'https://deskdata.com.br/pessoas/',
+          ? 'https://app.deskdata.com.br/pessoas/resultado/teste'
+          : 'https://app.deskdata.com.br/pessoas/',
       locator: vi.fn((selector: string) => {
         if (selector !== DESKDATA_PDF_EXPORT_SELECTOR) {
           throw new Error('Seletor inesperado: ' + selector)
@@ -32,16 +31,42 @@ describe('DeskDataResultReadyWaiter', () => {
       waitForTimeout
     }
 
-    const result = await new DeskDataResultReadyWaiter({
-      searchAttempts: 4,
-      searchIntervalMs: 0
-    }).waitUntilReady(page)
-
-    expect(result).toEqual({
+    await expect(
+      new DeskDataResultReadyWaiter({
+        searchAttempts: 4,
+        searchIntervalMs: 0
+      }).waitUntilReady(page)
+    ).resolves.toEqual({
       status: 'READY',
       resultPath: '/pessoas/resultado/teste'
     })
-    expect(count.mock.calls.length).toBeGreaterThanOrEqual(3)
+
     expect(waitForTimeout).toHaveBeenCalledTimes(2)
+  })
+
+  it('accepts the historical result route with a trailing slash', async () => {
+    const page: DeskDataResultReadyPage = {
+      url: () => 'https://deskdata.com.br/historico/detalhes/?q=Q-TESTE',
+      locator: vi.fn((selector: string) => {
+        if (selector !== DESKDATA_PDF_EXPORT_SELECTOR) {
+          throw new Error('Seletor inesperado: ' + selector)
+        }
+
+        return {
+          count: async () => 1
+        }
+      }),
+      waitForTimeout: vi.fn(async () => undefined)
+    }
+
+    await expect(
+      new DeskDataResultReadyWaiter({
+        searchAttempts: 1,
+        searchIntervalMs: 0
+      }).waitUntilReady(page)
+    ).resolves.toEqual({
+      status: 'READY',
+      resultPath: '/historico/detalhes/'
+    })
   })
 })

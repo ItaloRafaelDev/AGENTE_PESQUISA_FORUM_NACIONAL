@@ -1,4 +1,4 @@
-import { DESKDATA_PDF_EXPORT_SELECTOR } from './deskdata-pdf-download-controller'
+﻿import { DESKDATA_PDF_EXPORT_SELECTOR } from './deskdata-pdf-download-controller'
 
 export interface DeskDataResultReadyLocator {
   count(): Promise<number>
@@ -20,6 +20,12 @@ export interface DeskDataResultReadySnapshot {
   resultPath: string
 }
 
+function normalizePath(pathname: string): string {
+  const normalized = pathname.replace(/\/+$/, '')
+
+  return normalized || '/'
+}
+
 export class DeskDataResultReadyWaiter {
   private readonly searchAttempts: number
   private readonly searchIntervalMs: number
@@ -29,11 +35,11 @@ export class DeskDataResultReadyWaiter {
     this.searchIntervalMs = options.searchIntervalMs ?? 500
 
     if (this.searchAttempts < 1) {
-      throw new Error('O número de tentativas do resultado deve ser maior que zero.')
+      throw new Error('O numero de tentativas do resultado deve ser maior que zero.')
     }
 
     if (this.searchIntervalMs < 0) {
-      throw new Error('O intervalo de espera do resultado não pode ser negativo.')
+      throw new Error('O intervalo de espera do resultado nao pode ser negativo.')
     }
   }
 
@@ -46,11 +52,11 @@ export class DeskDataResultReadyWaiter {
 
       if (exportCount > 1) {
         throw new Error(
-          'O botão Exportar deveria possuir exatamente um controle. Encontrados: ' + exportCount
+          'O botao Exportar deveria possuir exatamente um controle. Encontrados: ' + exportCount
         )
       }
 
-      if (resultPath.startsWith('/pessoas/resultado/') && exportCount === 1) {
+      if (this.isSupportedResultPath(resultPath) && exportCount === 1) {
         return {
           status: 'READY',
           resultPath
@@ -62,7 +68,17 @@ export class DeskDataResultReadyWaiter {
       }
     }
 
-    throw new Error('O resultado da DeskData não ficou disponível dentro do tempo limite.')
+    throw new Error('O resultado da DeskData nao ficou disponivel dentro do tempo limite.')
+  }
+
+  private isSupportedResultPath(resultPath: string): boolean {
+    const normalizedPath = normalizePath(resultPath)
+
+    return (
+      normalizedPath === '/pessoas/resultado' ||
+      normalizedPath.startsWith('/pessoas/resultado/') ||
+      normalizedPath === '/historico/detalhes'
+    )
   }
 
   private extractPath(pageUrl: string): string {

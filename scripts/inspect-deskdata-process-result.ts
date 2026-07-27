@@ -21,7 +21,7 @@ import { DeskDataSafeClassificationReportBuilder } from '../src/automation/deskd
 import { PlaywrightDeskDataProcessPageAdapter } from '../src/automation/deskdata/playwright-deskdata-process-page-adapter'
 import { DeskDataProcessCollector } from '../src/automation/deskdata/deskdata-process-collector'
 import { classifyDeskDataSpheres } from '../src/domain/research/classify-deskdata-spheres'
-const DESKDATA_PEOPLE_URL = 'https://deskdata.com.br/pessoas/'
+const DESKDATA_PEOPLE_URL = 'https://app.deskdata.com.br/pessoas/'
 
 const HEADING_SELECTOR = [
   'h1',

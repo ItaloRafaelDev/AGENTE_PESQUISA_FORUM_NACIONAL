@@ -7,7 +7,7 @@
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",
-    "lint": "eslint --cache . --ignore-pattern docs/superpowers/evidence/**",
+    "lint": "eslint --cache . --ignore-pattern docs/superpowers/evidence/** --ignore-pattern .agent-backups/** --ignore-pattern .agent-config-backups/**",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "pnpm run typecheck:node && pnpm run typecheck:web",

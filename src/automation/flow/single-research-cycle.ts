@@ -1,4 +1,4 @@
-import type { BrowserContext, Frame, Page } from 'playwright'
+﻿import type { BrowserContext, Frame, Page } from 'playwright'
 import {
   CpiFirstResearchOpener,
   type OpenedResearchSnapshot
@@ -188,7 +188,11 @@ export class SingleResearchCycle {
 
     await this.runStage(
       'PREPARING_NEXT_SEARCH',
-      () => this.dependencies.nextSearchController.prepare(input.deskDataPage),
+      async () => {
+        await this.closeHistoricalDeskDataResult(preparation, input.deskDataPage)
+
+        return this.dependencies.nextSearchController.prepare(input.deskDataPage)
+      },
       input.hooks
     )
 
@@ -209,6 +213,30 @@ export class SingleResearchCycle {
     }
   }
 
+  private async closeHistoricalDeskDataResult(
+    preparation: FullResearchPreparationResult,
+    mainPage: Page
+  ): Promise<void> {
+    if (!preparation.closeDeskDataResultPageAfterSave) {
+      return
+    }
+
+    const resultPage = preparation.deskDataResultPage
+
+    if (!resultPage) {
+      throw new Error('A aba historica da DeskData nao foi preservada para fechamento.')
+    }
+
+    if (resultPage === mainPage) {
+      throw new Error('A aba principal da DeskData nao pode ser fechada como resultado historico.')
+    }
+
+    if (!resultPage.isClosed()) {
+      await resultPage.close({
+        runBeforeUnload: false
+      })
+    }
+  }
   private assertCanStart(signal: AbortSignal | undefined): void {
     if (!signal?.aborted) {
       return

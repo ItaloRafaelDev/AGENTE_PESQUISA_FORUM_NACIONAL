@@ -24,7 +24,7 @@ describe('DeskDataLiveResultCapture', () => {
     }
 
     const page = {
-      url: vi.fn(() => 'https://deskdata.com.br/pessoas/resultado/teste'),
+      url: vi.fn(() => 'https://app.deskdata.com.br/pessoas/resultado/teste'),
       title: vi.fn(async () => 'Resultado DeskData'),
       locator: vi.fn((selector: string) => {
         if (selector === 'body') {

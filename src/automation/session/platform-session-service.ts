@@ -54,7 +54,9 @@ export class PlatformSessionService {
 
     const cpiPage = pages.find((page) => this.hasHostname(page.url(), 'adm.cpicentral.com.br'))
 
-    const deskDataPage = pages.find((page) => this.hasHostname(page.url(), 'deskdata.com.br'))
+    const deskDataPage =
+      pages.find((page) => this.hasHostname(page.url(), 'app.deskdata.com.br')) ??
+      pages.find((page) => this.hasHostname(page.url(), 'deskdata.com.br'))
 
     const cpiEvidence = await this.inspectPage(cpiPage)
     const deskDataEvidence = await this.inspectPage(deskDataPage)

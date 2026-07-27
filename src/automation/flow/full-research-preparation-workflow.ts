@@ -1,4 +1,4 @@
-import type { BrowserContext, Page } from 'playwright'
+﻿import type { BrowserContext, Page } from 'playwright'
 import type {
   DeskDataClassification,
   DeskDataResult
@@ -19,6 +19,7 @@ import {
 } from '../deskdata/deskdata-pdf-download-controller'
 import { DeskDataPdfProcessReader } from '../deskdata/deskdata-pdf-process-reader'
 import { DeskDataResultReadyWaiter } from '../deskdata/deskdata-result-ready-waiter'
+import { DeskDataSearchResultPageResolver } from '../deskdata/deskdata-search-result-page-resolver'
 import { DeskDataSearchSubmitController } from '../deskdata/deskdata-search-submit-controller'
 
 export type CpiDeskDataClassification = Extract<
@@ -34,6 +35,7 @@ export interface FullResearchPreparationDependencies {
   cpfForm: Pick<DeskDataCpfFormController, 'fillCpf'>
   dataset: Pick<DeskDataDatasetController, 'applyApprovedDatasets'>
   submit: Pick<DeskDataSearchSubmitController, 'submitOnce'>
+  resultPageResolver: Pick<DeskDataSearchResultPageResolver, 'resolve'>
   resultReady: Pick<DeskDataResultReadyWaiter, 'waitUntilReady'>
   pdfDownloader: Pick<DeskDataPdfDownloadController, 'downloadOnce'>
   pdfProcessReader: Pick<DeskDataPdfProcessReader, 'read'>
@@ -47,6 +49,8 @@ export interface FullResearchPreparationResult {
   pdf: DeskDataPdfDownloadResult
   cpi: CpiResearchPdfPreparationResult
   detailFrame: CpiResearchPdfPreparationFrame
+  deskDataResultPage?: Page
+  closeDeskDataResultPageAfterSave?: boolean
 }
 
 export function mapDeskDataResultToResearchClassification(
@@ -60,6 +64,7 @@ function createDefaultDependencies(): FullResearchPreparationDependencies {
     cpfForm: new DeskDataCpfFormController(),
     dataset: new DeskDataDatasetController(),
     submit: new DeskDataSearchSubmitController(),
+    resultPageResolver: new DeskDataSearchResultPageResolver(),
     resultReady: new DeskDataResultReadyWaiter(),
     pdfDownloader: new DeskDataPdfDownloadController(),
     pdfProcessReader: new DeskDataPdfProcessReader(),
@@ -84,9 +89,16 @@ export class FullResearchPreparationWorkflow {
 
     await this.dependencies.submit.submitOnce(deskDataPage)
 
-    await this.dependencies.resultReady.waitUntilReady(deskDataPage)
+    const resolvedResult = await this.dependencies.resultPageResolver.resolve(
+      deskDataPage,
+      identity.cpf
+    )
 
-    const pdf = await this.dependencies.pdfDownloader.downloadOnce(context, deskDataPage)
+    const resultPage = resolvedResult.page
+
+    await this.dependencies.resultReady.waitUntilReady(resultPage)
+
+    const pdf = await this.dependencies.pdfDownloader.downloadOnce(context, resultPage)
 
     const processes = await this.dependencies.pdfProcessReader.read(pdf.filePath)
 
@@ -109,7 +121,9 @@ export class FullResearchPreparationWorkflow {
       classification,
       pdf,
       cpi,
-      detailFrame
+      detailFrame,
+      deskDataResultPage: resultPage,
+      closeDeskDataResultPageAfterSave: resolvedResult.closeAfterConfirmedSave
     }
   }
 }

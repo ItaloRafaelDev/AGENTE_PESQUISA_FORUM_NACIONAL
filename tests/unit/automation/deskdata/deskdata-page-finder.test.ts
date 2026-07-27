@@ -14,7 +14,7 @@ function createPage(url: string): FakePage {
 describe('findDeskDataPeoplePage', () => {
   it('deve localizar a página de consulta de pessoas da DeskData', () => {
     const cpiPage = createPage('https://cliente.cpicentral.com.br/fila')
-    const deskDataPage = createPage('https://deskdata.com.br/pessoas/')
+    const deskDataPage = createPage('https://app.deskdata.com.br/pessoas/')
     const unrelatedPage = createPage('about:blank')
 
     const result = findDeskDataPeoplePage([cpiPage, unrelatedPage, deskDataPage])

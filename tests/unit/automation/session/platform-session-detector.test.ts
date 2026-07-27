@@ -46,7 +46,7 @@ describe('detectDeskDataSession', () => {
   it('deve identificar /pessoas/ como autenticada', () => {
     expect(
       detectDeskDataSession({
-        url: 'https://deskdata.com.br/pessoas/',
+        url: 'https://app.deskdata.com.br/pessoas/',
         hasVisiblePasswordInput: false
       })
     ).toBe('AUTHENTICATED')

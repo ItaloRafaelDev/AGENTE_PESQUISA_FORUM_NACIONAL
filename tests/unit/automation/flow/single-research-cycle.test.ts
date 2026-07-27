@@ -68,7 +68,7 @@ function createPages(): {
   } as unknown as Page
 
   const deskDataPage = {
-    url: () => 'https://deskdata.com.br/pessoas/'
+    url: () => 'https://app.deskdata.com.br/pessoas/'
   } as unknown as Page
 
   return {

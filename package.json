@@ -46,7 +46,6 @@
     "deskdata:test-datasets": "tsx scripts/test-deskdata-approved-datasets.ts",
     "flow:test-submit": "tsx scripts/test-cpi-to-deskdata-submit.ts",
     "flow:run-supervised": "tsx scripts/run-full-supervised-research.ts",
-    "deskdata:inspect-result": "tsx scripts/inspect-deskdata-process-result.ts",
     "flow:run-continuous": "tsx scripts/run-continuous-auto-research.ts",
     "rebuild:native": "electron-rebuild --force --which-module better-sqlite3 --arch x64 --sequential"
   },

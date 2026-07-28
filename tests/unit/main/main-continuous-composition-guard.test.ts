@@ -1,58 +1,72 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
-const source = readFileSync('src/main/index.ts', 'utf8')
+const mainSource = readFileSync('src/main/index.ts', 'utf8')
+
+const runtimeSource = readFileSync('src/main/main-application-runtime.ts', 'utf8')
+
+const productionMainSource = `${mainSource}\n${runtimeSource}`
 
 describe('composição contínua do processo principal', () => {
+  it('mantém o ciclo de vida Electron separado da composição da aplicação', () => {
+    expect(mainSource).toContain('new MainApplicationRuntime()')
+
+    expect(mainSource).toContain('mainRuntime.initialize()')
+
+    expect(mainSource).toContain('mainRuntime.shutdown()')
+
+    expect(mainSource).not.toContain('new ContinuousAgentRuntimeService')
+  })
+
   it('usa o banco SQLite dentro de userData', () => {
-    expect(source).toContain("app.getPath('userData')")
+    expect(runtimeSource).toContain("app.getPath('userData')")
 
-    expect(source).toContain("'agente-cpi.sqlite'")
+    expect(runtimeSource).toContain("'agente-cpi.sqlite'")
 
-    expect(source).toContain('ResearchHistoryRepository.open')
+    expect(runtimeSource).toContain('ResearchHistoryRepository.open')
 
-    expect(source).toContain('markUnfinishedAsInterrupted')
+    expect(runtimeSource).toContain('markUnfinishedAsInterrupted')
   })
 
   it('compõe o runner contínuo e o runtime público', () => {
-    expect(source).toContain('new ContinuousResearchRunner()')
+    expect(runtimeSource).toContain('new ContinuousResearchRunner()')
 
-    expect(source).toContain('new AgentPublicStateStore()')
+    expect(runtimeSource).toContain('new AgentPublicStateStore()')
 
-    expect(source).toContain('new ContinuousAgentRuntimeService')
+    expect(runtimeSource).toContain('new ContinuousAgentRuntimeService')
   })
 
   it('registra IPC do agente, histórico e PDF', () => {
-    expect(source).toContain('registerContinuousAgentIpcHandlers')
+    expect(runtimeSource).toContain('registerContinuousAgentIpcHandlers')
 
-    expect(source).toContain('registerHistoryIpcHandlers')
+    expect(runtimeSource).toContain('registerHistoryIpcHandlers')
 
-    expect(source).toContain('registerPdfIpcHandlers')
+    expect(runtimeSource).toContain('registerPdfIpcHandlers')
   })
 
   it('mantém o renderer isolado de Node.js', () => {
-    expect(source).toMatch(/contextIsolation:\s*true/)
+    expect(mainSource).toMatch(/contextIsolation:\s*true/)
 
-    expect(source).toMatch(/nodeIntegration:\s*false/)
+    expect(mainSource).toMatch(/nodeIntegration:\s*false/)
   })
 
   it('não executa PowerShell, pnpm ou child_process', () => {
-    expect(source).not.toContain('child_process')
+    expect(productionMainSource).not.toContain('child_process')
 
-    expect(source).not.toMatch(/\bexec\s*\(/)
+    expect(productionMainSource).not.toMatch(/\bexec\s*\(/)
 
-    expect(source).not.toMatch(/\bspawn\s*\(/)
+    expect(productionMainSource).not.toMatch(/\bspawn\s*\(/)
 
-    expect(source).not.toContain('powershell')
+    expect(productionMainSource).not.toContain('powershell')
 
-    expect(source).not.toContain('pnpm')
+    expect(productionMainSource).not.toContain('pnpm')
   })
 
   it('encerra runtime, navegador e banco ao sair do aplicativo', () => {
-    expect(source).toContain('agentRuntimeService?.shutdown()')
+    expect(runtimeSource).toContain('agentRuntimeService?.shutdown()')
 
-    expect(source).toContain('browserService?.stop()')
+    expect(runtimeSource).toContain('await this.browserService.stop()')
 
-    expect(source).toContain('historyRepository?.close()')
+    expect(runtimeSource).toContain('historyRepository?.close()')
   })
 })

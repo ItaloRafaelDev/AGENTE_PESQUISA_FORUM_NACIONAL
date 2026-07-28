@@ -3,6 +3,10 @@ import { describe, expect, it } from 'vitest'
 
 const mainSource = readFileSync('src/main/index.ts', 'utf8')
 
+const runtimeSource = readFileSync('src/main/main-application-runtime.ts', 'utf8')
+
+const productionMainSource = `${mainSource}\n${runtimeSource}`
+
 const preloadSource = readFileSync('src/preload/index.ts', 'utf8')
 
 const dashboardSource = readFileSync('src/renderer/src/components/AgentDashboard.tsx', 'utf8')
@@ -15,7 +19,7 @@ describe('dashboard production guard', () => {
   it('mantém início exclusivamente manual', () => {
     expect(dashboardSource).not.toMatch(/control\.start\s*\(/)
 
-    expect(mainSource).not.toMatch(/agentRuntimeService\s*\.\s*start\s*\(/)
+    expect(productionMainSource).not.toMatch(/agentRuntimeService\s*\.\s*start\s*\(/)
   })
 
   it('usa eventos em tempo real sem polling do agente', () => {
@@ -31,7 +35,12 @@ describe('dashboard production guard', () => {
 
     expect(mainSource).toMatch(/nodeIntegration:\s*false/)
 
-    const productionSources = [mainSource, preloadSource, dashboardSource, historySource].join('\n')
+    const productionSources = [
+      productionMainSource,
+      preloadSource,
+      dashboardSource,
+      historySource
+    ].join('\n')
 
     expect(productionSources).not.toContain('child_process')
 
@@ -41,7 +50,7 @@ describe('dashboard production guard', () => {
   })
 
   it('mantém SQLite, histórico e PDF integrados', () => {
-    expect(mainSource).toContain('agente-cpi.sqlite')
+    expect(runtimeSource).toContain('agente-cpi.sqlite')
 
     expect(dashboardSource).toContain('ResearchHistoryPanel')
 

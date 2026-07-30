@@ -8,6 +8,8 @@ import {
 
 class FakeLocator implements DeskDataSearchLocator {
   public readonly filledValues: string[] = []
+  public fillTimeoutMs: number | undefined
+  public readTimeoutMs: number | undefined
   private currentValue: string
 
   constructor(
@@ -21,12 +23,15 @@ class FakeLocator implements DeskDataSearchLocator {
     return Promise.resolve(this.elementCount)
   }
 
-  async fill(value: string): Promise<void> {
+  async fill(value: string, options?: { timeout?: number }): Promise<void> {
     this.filledValues.push(value)
+    this.fillTimeoutMs = options?.timeout
     this.currentValue = value
   }
 
-  inputValue(): Promise<string> {
+  inputValue(options?: { timeout?: number }): Promise<string> {
+    this.readTimeoutMs = options?.timeout
+
     return Promise.resolve(this.currentValue)
   }
 }
@@ -45,7 +50,10 @@ describe('DeskDataCpfFormController', () => {
 
     const page = new FakePage(new Map([[DESKDATA_SEARCH_SELECTORS.cpfInput, cpfInput]]))
 
-    const controller = new DeskDataCpfFormController()
+    const controller = new DeskDataCpfFormController({
+      actionTimeoutMs: 12_345,
+      readTimeoutMs: 4_321
+    })
 
     await expect(controller.fillCpf(page, '529.982.247-25')).resolves.toEqual({
       cpf: '52998224725',
@@ -53,6 +61,8 @@ describe('DeskDataCpfFormController', () => {
     })
 
     expect(cpfInput.filledValues).toEqual(['52998224725'])
+    expect(cpfInput.fillTimeoutMs).toBe(12_345)
+    expect(cpfInput.readTimeoutMs).toBe(4_321)
   })
 
   it('deve rejeitar um CPF inválido', async () => {

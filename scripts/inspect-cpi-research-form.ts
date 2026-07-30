@@ -1,13 +1,13 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
-import { join } from 'node:path'
 import { chromium, type Frame, type Page } from 'playwright'
 import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
 import { CpiQueueAvailabilityReader } from '../src/automation/cpi/cpi-queue-availability'
 import { CpiFirstResearchOpener } from '../src/automation/cpi/cpi-first-research-opener'
 import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
-import { CpiQueueMonitor } from '../src/automation/cpi/cpi-queue-monitor'
+import { CpiQueueMonitor, NodeQueueDelay } from '../src/automation/cpi/cpi-queue-monitor'
 import { evaluateCpiFieldStructures } from '../src/automation/cpi/cpi-field-structure-evaluator'
+import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 interface RawForm {
   id: string
@@ -234,29 +234,26 @@ async function inspectFieldStructures(frame: Frame): Promise<RawFieldStructure[]
   return frame.locator('body').evaluate(evaluateCpiFieldStructures, FIELD_LABELS)
 }
 async function main(): Promise<void> {
-  const appData = process.env.APPDATA
-
-  if (!appData) {
-    throw new Error('Variável APPDATA não encontrada.')
-  }
+  const { config, paths } = resolveWindowsOperationalConfig()
+  const profilePath = paths.browserProfileDir
 
   const terminal = createInterface({
     input: stdin,
     output: stdout
   })
 
-  const context = await chromium.launchPersistentContext(
-    join(appData, 'AgenteCPI', 'browser-profile'),
-    {
-      headless: false,
-      viewport: null,
-      acceptDownloads: true,
-      args: ['--start-maximized']
-    }
-  )
+  const context = await chromium.launchPersistentContext(profilePath, {
+    headless: false,
+    viewport: null,
+    acceptDownloads: true,
+    args: ['--start-maximized']
+  })
 
   try {
-    const pageManager = new PlatformPageManager()
+    const pageManager = new PlatformPageManager(
+      config.platform,
+      config.timing.platformPageNavigationTimeoutMs
+    )
 
     await pageManager.ensurePages(context)
 
@@ -280,9 +277,19 @@ async function main(): Promise<void> {
 
     await cpiPage.bringToFront()
 
-    const filterController = new CpiQueueFilterController()
+    const filterController = new CpiQueueFilterController({
+      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      settleDelayMs: config.timing.queueFilterSettleDelayMs
+    })
 
-    const monitor = new CpiQueueMonitor(filterController, new CpiQueueAvailabilityReader())
+    const monitor = new CpiQueueMonitor(
+      filterController,
+      new CpiQueueAvailabilityReader(config.timing.readTimeoutMs),
+      new NodeQueueDelay(),
+      config.timing.queueCheckIntervalMs
+    )
 
     console.log('Aplicando filtro 29...')
 
@@ -296,7 +303,11 @@ async function main(): Promise<void> {
       throw new Error('Nenhuma pesquisa disponível foi confirmada.')
     }
 
-    const opener = new CpiFirstResearchOpener()
+    const opener = new CpiFirstResearchOpener({
+      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs
+    })
 
     await opener.openFirst(cpiPage)
 

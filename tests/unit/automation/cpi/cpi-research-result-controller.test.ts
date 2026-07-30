@@ -12,11 +12,13 @@ interface FrameOptions {
 interface FrameContext {
   frame: CpiResearchResultFrame
   callOrder: string[]
+  readTimeouts: number[]
   getPrimaryResearcher(): string
 }
 
 function createFrame(options: FrameOptions = {}): FrameContext {
   const callOrder: string[] = []
+  const readTimeouts: number[] = []
 
   const state = {
     researcher: '* Indefinido *',
@@ -49,7 +51,11 @@ function createFrame(options: FrameOptions = {}): FrameContext {
       if (selector === 'select[name="id_pesq_status"] option:checked') {
         return {
           count: async () => 1,
-          innerText: async () => state.status
+          innerText: async (innerTextOptions?: { timeout?: number }) => {
+            readTimeouts.push(innerTextOptions?.timeout ?? -1)
+
+            return state.status
+          }
         }
       }
 
@@ -66,7 +72,11 @@ function createFrame(options: FrameOptions = {}): FrameContext {
       if (selector === 'select[name="id_pesquisador"] option:checked') {
         return {
           count: async () => 1,
-          innerText: async () => state.researcher
+          innerText: async (innerTextOptions?: { timeout?: number }) => {
+            readTimeouts.push(innerTextOptions?.timeout ?? -1)
+
+            return state.researcher
+          }
         }
       }
 
@@ -83,7 +93,11 @@ function createFrame(options: FrameOptions = {}): FrameContext {
       if (selector === 'select[name="id_pesquisador_prim"] option:checked') {
         return {
           count: async () => 1,
-          innerText: async () => state.primaryResearcher
+          innerText: async (innerTextOptions?: { timeout?: number }) => {
+            readTimeouts.push(innerTextOptions?.timeout ?? -1)
+
+            return state.primaryResearcher
+          }
         }
       }
 
@@ -116,6 +130,7 @@ function createFrame(options: FrameOptions = {}): FrameContext {
   return {
     frame,
     callOrder,
+    readTimeouts,
     getPrimaryResearcher: () => state.primaryResearcher
   }
 }
@@ -125,7 +140,8 @@ describe('CpiResearchResultController', () => {
     const context = createFrame()
 
     const result = await new CpiResearchResultController({
-      resultSearchIntervalMs: 0
+      resultSearchIntervalMs: 0,
+      readTimeoutMs: 4_567
     }).prepare(context.frame, 'HA_INFORMACOES')
 
     expect(context.callOrder).toEqual([
@@ -137,6 +153,7 @@ describe('CpiResearchResultController', () => {
 
     expect(result.primaryResearcherLabel).toBe('Desk Data')
     expect(context.getPrimaryResearcher()).toBe('Desk Data')
+    expect(context.readTimeouts).toEqual([4_567, 4_567, 4_567])
   })
 
   it('deve reaplicar os campos quando a renderização restaurar o segundo pesquisador', async () => {

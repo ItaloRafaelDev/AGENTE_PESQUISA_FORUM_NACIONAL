@@ -48,14 +48,14 @@ export class DeskDataPdfTextExtractor {
       if (!text) {
         throw new DeskDataPdfTextExtractionError(
           'PDF_TEXT_EMPTY',
-          'O PDF da DeskData nÃ£o possui texto extraÃ­vel.'
+          'O PDF da DeskData não possui texto extraível.'
         )
       }
 
       if (result.total < 1 || pages.length !== result.total) {
         throw new DeskDataPdfTextExtractionError(
           'PDF_PAGE_COUNT_MISMATCH',
-          'A extraÃ§Ã£o do PDF da DeskData nÃ£o retornou todas as pÃ¡ginas.'
+          'A extração do PDF da DeskData não retornou todas as páginas.'
         )
       }
 
@@ -71,7 +71,7 @@ export class DeskDataPdfTextExtractor {
 
       throw new DeskDataPdfTextExtractionError(
         'PDF_TEXT_EXTRACTION_FAILED',
-        'NÃ£o foi possÃ­vel extrair o texto do PDF da DeskData.',
+        'Não foi possível extrair o texto do PDF da DeskData.',
         {
           cause: error
         }

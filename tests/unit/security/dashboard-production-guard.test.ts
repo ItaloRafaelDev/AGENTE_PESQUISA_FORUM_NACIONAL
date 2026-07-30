@@ -5,6 +5,8 @@ const mainSource = readFileSync('src/main/index.ts', 'utf8')
 
 const runtimeSource = readFileSync('src/main/main-application-runtime.ts', 'utf8')
 
+const appConfigSource = readFileSync('src/infrastructure/config/app-config.ts', 'utf8')
+
 const productionMainSource = `${mainSource}\n${runtimeSource}`
 
 const preloadSource = readFileSync('src/preload/index.ts', 'utf8')
@@ -50,7 +52,9 @@ describe('dashboard production guard', () => {
   })
 
   it('mantém SQLite, histórico e PDF integrados', () => {
-    expect(runtimeSource).toContain('agente-cpi.sqlite')
+    expect(appConfigSource).toContain('agente-cpi.sqlite')
+    expect(runtimeSource).toContain('resolveApplicationPaths')
+    expect(runtimeSource).toContain('runtimePaths.databaseFile')
 
     expect(dashboardSource).toContain('ResearchHistoryPanel')
 

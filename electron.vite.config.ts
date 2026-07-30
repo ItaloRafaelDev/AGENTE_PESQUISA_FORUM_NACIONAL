@@ -1,6 +1,8 @@
-import { resolve } from 'path'
 import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
+import { createSourceAliases } from './source-aliases'
+
+const sourceAliases = createSourceAliases(__dirname)
 
 export default defineConfig({
   main: {},
@@ -8,7 +10,7 @@ export default defineConfig({
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src')
+        '@renderer': sourceAliases['@renderer']
       }
     },
     plugins: [react()]

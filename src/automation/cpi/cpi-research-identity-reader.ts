@@ -34,16 +34,20 @@ export interface CpiResearchIdentity {
 export interface CpiResearchIdentityReaderOptions {
   searchAttempts?: number
   searchIntervalMs?: number
+  readTimeoutMs?: number
 }
 
 export class CpiResearchIdentityReader {
   private readonly searchAttempts: number
   private readonly searchIntervalMs: number
+  private readonly readTimeoutMs: number
 
   constructor(options: CpiResearchIdentityReaderOptions = {}) {
     this.searchAttempts = options.searchAttempts ?? 40
 
     this.searchIntervalMs = options.searchIntervalMs ?? 250
+
+    this.readTimeoutMs = options.readTimeoutMs ?? 5_000
 
     if (this.searchAttempts < 1) {
       throw new Error('Número de tentativas deve ser maior que zero')
@@ -74,7 +78,7 @@ export class CpiResearchIdentityReader {
         }
 
         const rawCpf = await cpfField.first().innerText({
-          timeout: 5_000
+          timeout: this.readTimeoutMs
         })
 
         const cpf = rawCpf.replace(/\D/g, '')

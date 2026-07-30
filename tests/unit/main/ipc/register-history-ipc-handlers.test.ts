@@ -5,12 +5,12 @@ import {
   type HistoryIpcMainRegistrar,
   type HistoryReadWriteService
 } from '@/main/ipc/register-history-ipc-handlers'
-import type { ResearchHistoryEvent } from '@/automation/history/research-history-service'
-import {
-  HISTORY_IPC_CHANNELS,
-  type ResearchHistoryPage,
-  type ResearchHistoryRecord
-} from '@/shared/types/history-api'
+import type {
+  ResearchHistoryEvent,
+  ResearchHistoryPage,
+  ResearchHistoryRecord
+} from '@/application/history/research-history-model'
+import { HISTORY_IPC_CHANNELS } from '@/shared/types/history-api'
 
 type IpcHandler = (event: unknown, ...args: unknown[]) => unknown | Promise<unknown>
 
@@ -133,12 +133,13 @@ describe('registerHistoryIpcHandlers', () => {
 
     registerHistoryIpcHandlers(ipcMain, service, new FakeEventSender())
 
-    await expect(
-      ipcMain.invoke(HISTORY_IPC_CHANNELS.list, {
-        page: 1,
-        pageSize: 50
-      })
-    ).resolves.toEqual(page)
+    const result = await ipcMain.invoke(HISTORY_IPC_CHANNELS.list, {
+      page: 1,
+      pageSize: 50
+    })
+
+    expect(result).toEqual(page)
+    expect(result).not.toBe(page)
 
     expect(service.listInputs).toEqual([
       {
@@ -243,6 +244,8 @@ describe('registerHistoryIpcHandlers', () => {
         payload: undefined
       }
     ])
+    expect(sender.events[0]?.payload).not.toBe(record)
+    expect(sender.events[1]?.payload).not.toBe(record)
   })
 
   it('descarta inscrição e handlers ao finalizar', () => {

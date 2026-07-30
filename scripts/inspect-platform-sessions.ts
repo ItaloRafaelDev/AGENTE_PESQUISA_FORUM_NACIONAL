@@ -1,8 +1,8 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
-import { join } from 'node:path'
 import { chromium, type Page } from 'playwright'
 import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
+import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 interface RawElement {
   tag: string
@@ -111,13 +111,8 @@ async function inspectPage(platform: string, page: Page): Promise<Record<string,
 }
 
 async function main(): Promise<void> {
-  const appData = process.env.APPDATA
-
-  if (!appData) {
-    throw new Error('Variável APPDATA não encontrada.')
-  }
-
-  const profilePath = join(appData, 'AgenteCPI', 'browser-profile')
+  const { config, paths } = resolveWindowsOperationalConfig()
+  const profilePath = paths.browserProfileDir
 
   const context = await chromium.launchPersistentContext(profilePath, {
     headless: false,
@@ -132,7 +127,10 @@ async function main(): Promise<void> {
   })
 
   try {
-    const pageManager = new PlatformPageManager()
+    const pageManager = new PlatformPageManager(
+      config.platform,
+      config.timing.platformPageNavigationTimeoutMs
+    )
 
     await pageManager.ensurePages(context)
 

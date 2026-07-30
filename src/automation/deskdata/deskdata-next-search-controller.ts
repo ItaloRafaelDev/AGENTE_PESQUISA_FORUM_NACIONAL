@@ -46,16 +46,38 @@ export interface DeskDataNextSearchResult {
   cpfCleared: true
 }
 
+export interface DeskDataNextSearchControllerOptions {
+  peopleUrl?: string
+  formReadyAttempts?: number
+  pollingIntervalMs?: number
+  navigationTimeoutMs?: number
+  actionTimeoutMs?: number
+  readTimeoutMs?: number
+}
+
 interface DeskDataSearchFormControls {
   cpfInput: DeskDataNextSearchLocator
   searchButton: DeskDataNextSearchLocator
   available: boolean
 }
 
-const FORM_READY_ATTEMPTS = 40
-const FORM_READY_INTERVAL_MS = 250
-
 export class DeskDataNextSearchController {
+  private readonly peopleUrl: string
+  private readonly formReadyAttempts: number
+  private readonly pollingIntervalMs: number
+  private readonly navigationTimeoutMs: number
+  private readonly actionTimeoutMs: number
+  private readonly readTimeoutMs: number
+
+  constructor(options: DeskDataNextSearchControllerOptions = {}) {
+    this.peopleUrl = options.peopleUrl ?? DESKDATA_PEOPLE_URL
+    this.formReadyAttempts = options.formReadyAttempts ?? 40
+    this.pollingIntervalMs = options.pollingIntervalMs ?? 250
+    this.navigationTimeoutMs = options.navigationTimeoutMs ?? 30_000
+    this.actionTimeoutMs = options.actionTimeoutMs ?? 10_000
+    this.readTimeoutMs = options.readTimeoutMs ?? 5_000
+  }
+
   async prepare(page: DeskDataNextSearchPage): Promise<DeskDataNextSearchResult> {
     if (page.isClosed()) {
       throw new Error('A aba da DeskData esta fechada.')
@@ -70,9 +92,9 @@ export class DeskDataNextSearchController {
       await this.clickConsultPeople(page)
       form = await this.waitForSearchForm(page)
     } else if (!this.isSearchPage(page.url()) || !form.available) {
-      await page.goto(DESKDATA_PEOPLE_URL, {
+      await page.goto(this.peopleUrl, {
         waitUntil: 'domcontentloaded',
-        timeout: 30_000
+        timeout: this.navigationTimeoutMs
       })
 
       form = await this.waitForSearchForm(page)
@@ -91,11 +113,11 @@ export class DeskDataNextSearchController {
     }
 
     await form.cpfInput.fill('', {
-      timeout: 10_000
+      timeout: this.actionTimeoutMs
     })
 
     const persistedValue = await form.cpfInput.inputValue({
-      timeout: 5_000
+      timeout: this.readTimeoutMs
     })
 
     if (persistedValue.trim() !== '') {
@@ -131,7 +153,7 @@ export class DeskDataNextSearchController {
     }
 
     await link.click({
-      timeout: 10_000
+      timeout: this.actionTimeoutMs
     })
   }
 
@@ -140,13 +162,13 @@ export class DeskDataNextSearchController {
   ): Promise<DeskDataSearchFormControls> {
     let form = await this.inspectSearchForm(page)
 
-    for (let attempt = 0; attempt < FORM_READY_ATTEMPTS && !form.available; attempt += 1) {
+    for (let attempt = 0; attempt < this.formReadyAttempts && !form.available; attempt += 1) {
       if (page.isClosed()) {
         throw new Error('A aba da DeskData foi fechada durante a preparacao.')
       }
 
-      if (attempt < FORM_READY_ATTEMPTS - 1) {
-        await page.waitForTimeout(FORM_READY_INTERVAL_MS)
+      if (attempt < this.formReadyAttempts - 1) {
+        await page.waitForTimeout(this.pollingIntervalMs)
         form = await this.inspectSearchForm(page)
       }
     }

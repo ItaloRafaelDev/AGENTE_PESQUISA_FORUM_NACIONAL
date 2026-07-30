@@ -11,12 +11,21 @@ export interface CpiResearchSaveResult {
   saved: true
 }
 
+export interface CpiResearchResultSaverOptions {
+  actionTimeoutMs?: number
+}
+
 type SaveState = 'IDLE' | 'SAVING' | 'SAVED'
 
 const SAVE_SELECTOR = 'form[name="form_cad"] a.button[onclick*="upd_pesq"]'
 
 export class CpiResearchResultSaver {
   private state: SaveState = 'IDLE'
+  private readonly actionTimeoutMs: number
+
+  constructor(options: CpiResearchResultSaverOptions = {}) {
+    this.actionTimeoutMs = options.actionTimeoutMs ?? 10_000
+  }
 
   async saveOnce(frame: CpiResearchSaveFrame): Promise<CpiResearchSaveResult> {
     if (this.state !== 'IDLE') {
@@ -36,7 +45,7 @@ export class CpiResearchResultSaver {
 
     try {
       await saveControl.click({
-        timeout: 10_000
+        timeout: this.actionTimeoutMs
       })
 
       this.state = 'SAVED'

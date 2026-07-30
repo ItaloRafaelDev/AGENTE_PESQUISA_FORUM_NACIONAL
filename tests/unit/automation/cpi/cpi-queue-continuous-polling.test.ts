@@ -34,9 +34,12 @@ describe('CpiQueueMonitor polling contínuo', () => {
       wait
     }
 
-    const result = await new CpiQueueMonitor(refresher, availabilitySource, delay).waitForResearch(
-      page
-    )
+    const result = await new CpiQueueMonitor(
+      refresher,
+      availabilitySource,
+      delay,
+      60_000
+    ).waitForResearch(page)
 
     expect(refreshQueue).toHaveBeenCalledTimes(1)
     expect(read).toHaveBeenCalledTimes(1)
@@ -83,7 +86,8 @@ describe('CpiQueueMonitor polling contínuo', () => {
       },
       {
         wait
-      }
+      },
+      60_000
     )
 
     const result = await monitor.waitForResearch(page)
@@ -135,7 +139,8 @@ describe('CpiQueueMonitor polling contínuo', () => {
       },
       {
         wait: vi.fn(async (): Promise<void> => undefined)
-      }
+      },
+      60_000
     )
 
     await monitor.waitForResearch(page, {
@@ -183,7 +188,8 @@ describe('CpiQueueMonitor polling contínuo', () => {
       },
       {
         wait
-      }
+      },
+      60_000
     )
 
     const result = await monitor.waitForResearch(page, {

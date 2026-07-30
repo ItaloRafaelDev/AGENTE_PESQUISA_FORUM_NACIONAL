@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.web.json",
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": true,
+    "types": ["node", "vitest/globals", "@testing-library/jest-dom"],
+    "paths": {
+      "@/*": ["src/*"],
+      "@renderer": ["src/renderer/src/index.ts"],
+      "@renderer/*": ["src/renderer/src/*"]
+    }
+  },
+  "include": ["tests/**/*.test-d.ts"]
+}

@@ -11,9 +11,9 @@ class FakeLocator implements DeskDataNextSearchLocator {
   constructor(
     private readonly getCount: () => number,
     private readonly actions: {
-      fill?: (value: string) => void
-      inputValue?: () => string
-      click?: () => void
+      fill?: (value: string, options?: { timeout?: number }) => void
+      inputValue?: (options?: { timeout?: number }) => string
+      click?: (options?: { timeout?: number }) => void
     } = {}
   ) {}
 
@@ -21,28 +21,28 @@ class FakeLocator implements DeskDataNextSearchLocator {
     return Promise.resolve(this.getCount())
   }
 
-  async fill(value: string): Promise<void> {
+  async fill(value: string, options?: { timeout?: number }): Promise<void> {
     if (!this.actions.fill) {
       throw new Error('Fill nao configurado')
     }
 
-    this.actions.fill(value)
+    this.actions.fill(value, options)
   }
 
-  inputValue(): Promise<string> {
+  inputValue(options?: { timeout?: number }): Promise<string> {
     if (!this.actions.inputValue) {
       return Promise.reject(new Error('InputValue nao configurado'))
     }
 
-    return Promise.resolve(this.actions.inputValue())
+    return Promise.resolve(this.actions.inputValue(options))
   }
 
-  async click(): Promise<void> {
+  async click(options?: { timeout?: number }): Promise<void> {
     if (!this.actions.click) {
       throw new Error('Click nao configurado')
     }
 
-    this.actions.click()
+    this.actions.click(options)
   }
 }
 
@@ -52,6 +52,7 @@ interface PageOptions {
   similarQueriesVisible?: boolean
   consultPeopleLinkAvailable?: boolean
   gotoRestoresForm?: boolean
+  formAvailableAfterWaits?: number
 }
 
 function createPage(options: PageOptions): {
@@ -59,6 +60,9 @@ function createPage(options: PageOptions): {
   goto: ReturnType<typeof vi.fn>
   bringToFront: ReturnType<typeof vi.fn>
   consultPeopleClick: ReturnType<typeof vi.fn>
+  cpfFill: ReturnType<typeof vi.fn>
+  cpfInputValue: ReturnType<typeof vi.fn>
+  waitForTimeout: ReturnType<typeof vi.fn>
   getCpfValue(): string
   isFormAvailable(): boolean
   isSimilarQueriesVisible(): boolean
@@ -67,6 +71,7 @@ function createPage(options: PageOptions): {
   let formAvailable = options.formAvailable
   let similarQueriesVisible = options.similarQueriesVisible ?? false
   let cpfValue = '12345678900'
+  let waitCalls = 0
 
   const goto = vi.fn(async (url: string) => {
     currentUrl = url
@@ -85,19 +90,31 @@ function createPage(options: PageOptions): {
     similarQueriesVisible = false
   })
 
+  const cpfFill = vi.fn((value: string) => {
+    cpfValue = value
+  })
+
+  const cpfInputValue = vi.fn(() => cpfValue)
+
+  const waitForTimeout = vi.fn(async () => {
+    waitCalls += 1
+
+    if (waitCalls >= (options.formAvailableAfterWaits ?? Number.POSITIVE_INFINITY)) {
+      formAvailable = true
+    }
+  })
+
   const page: DeskDataNextSearchPage = {
     url: () => currentUrl,
     isClosed: () => false,
     bringToFront,
     goto,
-    waitForTimeout: vi.fn(async () => undefined),
+    waitForTimeout,
     locator: vi.fn((selector: string) => {
       if (selector === DESKDATA_NEXT_SEARCH_SELECTORS.cpfInput) {
         return new FakeLocator(() => (formAvailable ? 1 : 0), {
-          fill: (value) => {
-            cpfValue = value
-          },
-          inputValue: () => cpfValue
+          fill: cpfFill,
+          inputValue: cpfInputValue
         })
       }
 
@@ -124,6 +141,9 @@ function createPage(options: PageOptions): {
     goto,
     bringToFront,
     consultPeopleClick,
+    cpfFill,
+    cpfInputValue,
+    waitForTimeout,
     getCpfValue: () => cpfValue,
     isFormAvailable: () => formAvailable,
     isSimilarQueriesVisible: () => similarQueriesVisible
@@ -169,19 +189,32 @@ describe('DeskDataNextSearchController', () => {
   })
 
   it('uses direct navigation when coming from a result page', async () => {
+    const configuredPeopleUrl = 'https://config.deskdata.com.br/pessoas/'
     const context = createPage({
       initialUrl: 'https://app.deskdata.com.br/pessoas/resultado/teste',
       formAvailable: false,
-      gotoRestoresForm: true
+      gotoRestoresForm: false,
+      formAvailableAfterWaits: 2
     })
 
-    await new DeskDataNextSearchController().prepare(context.page)
+    await new DeskDataNextSearchController({
+      peopleUrl: configuredPeopleUrl,
+      formReadyAttempts: 3,
+      pollingIntervalMs: 617,
+      navigationTimeoutMs: 31_234,
+      actionTimeoutMs: 12_345,
+      readTimeoutMs: 4_321
+    }).prepare(context.page)
 
-    expect(context.goto).toHaveBeenCalledWith(DESKDATA_PEOPLE_URL, {
+    expect(context.goto).toHaveBeenCalledWith(configuredPeopleUrl, {
       waitUntil: 'domcontentloaded',
-      timeout: 30_000
+      timeout: 31_234
     })
     expect(context.consultPeopleClick).not.toHaveBeenCalled()
+    expect(context.waitForTimeout).toHaveBeenNthCalledWith(1, 617)
+    expect(context.waitForTimeout).toHaveBeenNthCalledWith(2, 617)
+    expect(context.cpfFill).toHaveBeenCalledWith('', { timeout: 12_345 })
+    expect(context.cpfInputValue).toHaveBeenCalledWith({ timeout: 4_321 })
     expect(context.getCpfValue()).toBe('')
   })
 

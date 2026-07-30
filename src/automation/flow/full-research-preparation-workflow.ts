@@ -8,19 +8,43 @@ import type { ResearchClassification } from '../../domain/research/research-clas
 import type { CpiResearchIdentity } from '../cpi/cpi-research-identity-reader'
 import {
   CpiResearchPdfPreparationWorkflow,
+  type CpiResearchPdfAttachmentPort,
   type CpiResearchPdfPreparationFrame,
-  type CpiResearchPdfPreparationResult
+  type CpiResearchPdfPreparationResult,
+  type CpiResearchResultPreparationPort
 } from '../cpi/cpi-research-pdf-preparation-workflow'
-import { DeskDataCpfFormController } from '../deskdata/deskdata-cpf-form-controller'
+import {
+  CpiResearchPdfAttachmentController,
+  type CpiResearchPdfAttachmentControllerOptions
+} from '../cpi/cpi-research-pdf-attachment-controller'
+import {
+  CpiResearchResultController,
+  type CpiResearchResultControllerOptions
+} from '../cpi/cpi-research-result-controller'
+import {
+  DeskDataCpfFormController,
+  type DeskDataCpfFormControllerOptions
+} from '../deskdata/deskdata-cpf-form-controller'
 import { DeskDataDatasetController } from '../deskdata/deskdata-dataset-controller'
 import {
   DeskDataPdfDownloadController,
+  type DeskDataPdfDownloadControllerOptions,
   type DeskDataPdfDownloadResult
 } from '../deskdata/deskdata-pdf-download-controller'
 import { DeskDataPdfProcessReader } from '../deskdata/deskdata-pdf-process-reader'
-import { DeskDataResultReadyWaiter } from '../deskdata/deskdata-result-ready-waiter'
-import { DeskDataSearchResultPageResolver } from '../deskdata/deskdata-search-result-page-resolver'
-import { DeskDataSearchSubmitController } from '../deskdata/deskdata-search-submit-controller'
+import {
+  DeskDataResultReadyWaiter,
+  type DeskDataResultReadyWaiterOptions
+} from '../deskdata/deskdata-result-ready-waiter'
+import {
+  DeskDataSearchResultPageResolver,
+  type DeskDataSearchResultPageResolverOptions
+} from '../deskdata/deskdata-search-result-page-resolver'
+import {
+  DeskDataSearchSubmitController,
+  type DeskDataSearchSubmitControllerOptions
+} from '../deskdata/deskdata-search-submit-controller'
+import type { ResearchCycleRuntimeConfig } from './single-research-cycle'
 
 export type CpiDeskDataClassification = Extract<
   ResearchClassification,
@@ -42,6 +66,30 @@ export interface FullResearchPreparationDependencies {
   cpiPreparation: Pick<CpiResearchPdfPreparationWorkflow, 'prepareWithAttachment'>
 }
 
+export interface FullResearchPreparationFactorySeam {
+  createCpfForm(
+    options: DeskDataCpfFormControllerOptions
+  ): FullResearchPreparationDependencies['cpfForm']
+  createSubmit(
+    options: DeskDataSearchSubmitControllerOptions
+  ): FullResearchPreparationDependencies['submit']
+  createResultPageResolver(
+    options: DeskDataSearchResultPageResolverOptions
+  ): FullResearchPreparationDependencies['resultPageResolver']
+  createResultReady(
+    options: DeskDataResultReadyWaiterOptions
+  ): FullResearchPreparationDependencies['resultReady']
+  createPdfDownloader(
+    options: DeskDataPdfDownloadControllerOptions
+  ): FullResearchPreparationDependencies['pdfDownloader']
+  createCpiResultController(
+    options: CpiResearchResultControllerOptions
+  ): CpiResearchResultPreparationPort
+  createCpiAttachmentController(
+    options: CpiResearchPdfAttachmentControllerOptions
+  ): CpiResearchPdfAttachmentPort
+}
+
 export interface FullResearchPreparationResult {
   maskedCpf: string
   selectedDatasetCount: number
@@ -59,16 +107,74 @@ export function mapDeskDataResultToResearchClassification(
   return result === 'SIM_CONSTA_RESTRICAO' ? 'CONSTA_RESTRICAO' : 'HA_INFORMACOES'
 }
 
-function createDefaultDependencies(): FullResearchPreparationDependencies {
+const DEFAULT_FACTORY_SEAM: FullResearchPreparationFactorySeam = {
+  createCpfForm: (options) => new DeskDataCpfFormController(options),
+  createSubmit: (options) => new DeskDataSearchSubmitController(options),
+  createResultPageResolver: (options) => new DeskDataSearchResultPageResolver(options),
+  createResultReady: (options) => new DeskDataResultReadyWaiter(options),
+  createPdfDownloader: (options) => new DeskDataPdfDownloadController(options),
+  createCpiResultController: (options) => new CpiResearchResultController(options),
+  createCpiAttachmentController: (options) => new CpiResearchPdfAttachmentController(options)
+}
+
+function createDefaultDependencies(
+  config?: ResearchCycleRuntimeConfig,
+  factorySeam: FullResearchPreparationFactorySeam = DEFAULT_FACTORY_SEAM
+): FullResearchPreparationDependencies {
+  if (!config) {
+    return {
+      cpfForm: new DeskDataCpfFormController(),
+      dataset: new DeskDataDatasetController(),
+      submit: new DeskDataSearchSubmitController(),
+      resultPageResolver: new DeskDataSearchResultPageResolver(),
+      resultReady: new DeskDataResultReadyWaiter(),
+      pdfDownloader: new DeskDataPdfDownloadController(),
+      pdfProcessReader: new DeskDataPdfProcessReader(),
+      cpiPreparation: new CpiResearchPdfPreparationWorkflow()
+    }
+  }
+
   return {
-    cpfForm: new DeskDataCpfFormController(),
+    cpfForm: factorySeam.createCpfForm({
+      actionTimeoutMs: config.actionTimeoutMs,
+      readTimeoutMs: config.readTimeoutMs
+    }),
     dataset: new DeskDataDatasetController(),
-    submit: new DeskDataSearchSubmitController(),
-    resultPageResolver: new DeskDataSearchResultPageResolver(),
-    resultReady: new DeskDataResultReadyWaiter(),
-    pdfDownloader: new DeskDataPdfDownloadController(),
+    submit: factorySeam.createSubmit({
+      actionTimeoutMs: config.actionTimeoutMs,
+      navigationTimeoutMs: config.navigationTimeoutMs,
+      submitSettleDelayMs: config.submitSettleDelayMs
+    }),
+    resultPageResolver: factorySeam.createResultPageResolver({
+      searchAttempts: config.deskDataResultSearchAttempts,
+      searchIntervalMs: config.deskDataResultPollingIntervalMs,
+      navigationTimeoutMs: config.navigationTimeoutMs,
+      historyNavigationAttempts: config.deskDataHistoryNavigationAttempts,
+      historyNavigationIntervalMs: config.deskDataHistoryNavigationIntervalMs,
+      actionTimeoutMs: config.actionTimeoutMs
+    }),
+    resultReady: factorySeam.createResultReady({
+      searchAttempts: config.deskDataResultSearchAttempts,
+      searchIntervalMs: config.deskDataResultPollingIntervalMs
+    }),
+    pdfDownloader: factorySeam.createPdfDownloader({
+      outputDirectory: config.pdfOutputDirectory,
+      downloadTimeoutMs: config.downloadStartTimeoutMs,
+      actionTimeoutMs: config.actionTimeoutMs
+    }),
     pdfProcessReader: new DeskDataPdfProcessReader(),
-    cpiPreparation: new CpiResearchPdfPreparationWorkflow()
+    cpiPreparation: new CpiResearchPdfPreparationWorkflow(
+      factorySeam.createCpiResultController({
+        resultSearchAttempts: config.cpiResultSearchAttempts,
+        resultSearchIntervalMs: config.cpiSearchPollingIntervalMs,
+        stabilizationAttempts: config.cpiResultStabilizationAttempts,
+        readTimeoutMs: config.readTimeoutMs
+      }),
+      factorySeam.createCpiAttachmentController({
+        controlSearchAttempts: config.cpiAttachmentSearchAttempts,
+        controlSearchIntervalMs: config.cpiSearchPollingIntervalMs
+      })
+    )
   }
 }
 
@@ -126,4 +232,11 @@ export class FullResearchPreparationWorkflow {
       closeDeskDataResultPageAfterSave: resolvedResult.closeAfterConfirmedSave
     }
   }
+}
+
+export function createFullResearchPreparationWorkflow(
+  config: ResearchCycleRuntimeConfig,
+  factorySeam: FullResearchPreparationFactorySeam = DEFAULT_FACTORY_SEAM
+): FullResearchPreparationWorkflow {
+  return new FullResearchPreparationWorkflow(createDefaultDependencies(config, factorySeam))
 }

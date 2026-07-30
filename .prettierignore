@@ -1,13 +1,17 @@
+node_modules
 out
 dist
+coverage
 pnpm-lock.yaml
 LICENSE.md
 tsconfig.json
 tsconfig.*.json
+
+# Immutable historical and local execution evidence
+docs/superpowers/evidence/
+.superpowers/sdd/
 artifacts/deskdata-inspection/
 
-# Generated agent backups
+# Generated local backups
 .agent-backups/
-
-# Generated agent backups
 .agent-config-backups/

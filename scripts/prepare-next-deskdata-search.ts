@@ -1,9 +1,9 @@
-import { join } from 'node:path'
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Page } from 'playwright'
 import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
 import { DeskDataNextSearchController } from '../src/automation/deskdata/deskdata-next-search-controller'
+import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 function findDeskDataPage(pages: Page[]): Page | undefined {
   return [...pages].reverse().find((page) => {
@@ -22,29 +22,26 @@ function findDeskDataPage(pages: Page[]): Page | undefined {
 }
 
 async function main(): Promise<void> {
-  const appData = process.env.APPDATA
-
-  if (!appData) {
-    throw new Error('Variável APPDATA não encontrada.')
-  }
+  const { config, paths } = resolveWindowsOperationalConfig()
+  const profilePath = paths.browserProfileDir
 
   const terminal = createInterface({
     input: stdin,
     output: stdout
   })
 
-  const context = await chromium.launchPersistentContext(
-    join(appData, 'AgenteCPI', 'browser-profile'),
-    {
-      headless: false,
-      viewport: null,
-      acceptDownloads: true,
-      args: ['--start-maximized']
-    }
-  )
+  const context = await chromium.launchPersistentContext(profilePath, {
+    headless: false,
+    viewport: null,
+    acceptDownloads: true,
+    args: ['--start-maximized']
+  })
 
   try {
-    await new PlatformPageManager().ensurePages(context)
+    await new PlatformPageManager(
+      config.platform,
+      config.timing.platformPageNavigationTimeoutMs
+    ).ensurePages(context)
 
     let deskDataPage = findDeskDataPage(context.pages())
 
@@ -64,7 +61,14 @@ async function main(): Promise<void> {
       throw new Error('A página autenticada da DeskData não foi confirmada.')
     }
 
-    const result = await new DeskDataNextSearchController().prepare(deskDataPage)
+    const result = await new DeskDataNextSearchController({
+      peopleUrl: config.platform.deskDataPeopleUrl,
+      formReadyAttempts: config.limits.deskDataFormReadyAttempts,
+      pollingIntervalMs: config.timing.deskDataFormPollingIntervalMs,
+      navigationTimeoutMs: config.timing.navigationTimeoutMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      readTimeoutMs: config.timing.readTimeoutMs
+    }).prepare(deskDataPage)
 
     console.log('')
     console.log('DeskData preparada para a próxima consulta.')

@@ -28,10 +28,25 @@ export interface DeskDataSubmitSnapshot {
   resultPath: string
 }
 
+export interface DeskDataSearchSubmitControllerOptions {
+  actionTimeoutMs?: number
+  navigationTimeoutMs?: number
+  submitSettleDelayMs?: number
+}
+
 type SubmissionState = 'IDLE' | 'SUBMITTING' | 'SUBMITTED'
 
 export class DeskDataSearchSubmitController {
   private state: SubmissionState = 'IDLE'
+  private readonly actionTimeoutMs: number
+  private readonly navigationTimeoutMs: number
+  private readonly submitSettleDelayMs: number
+
+  constructor(options: DeskDataSearchSubmitControllerOptions = {}) {
+    this.actionTimeoutMs = options.actionTimeoutMs ?? 10_000
+    this.navigationTimeoutMs = options.navigationTimeoutMs ?? 30_000
+    this.submitSettleDelayMs = options.submitSettleDelayMs ?? 1_000
+  }
 
   async submitOnce(page: DeskDataSubmitPage): Promise<DeskDataSubmitSnapshot> {
     if (this.state !== 'IDLE') {
@@ -52,16 +67,16 @@ export class DeskDataSearchSubmitController {
 
     try {
       await searchButton.click({
-        timeout: 10_000
+        timeout: this.actionTimeoutMs
       })
 
       await page
         .waitForLoadState('domcontentloaded', {
-          timeout: 30_000
+          timeout: this.navigationTimeoutMs
         })
         .catch(() => undefined)
 
-      await page.waitForTimeout(1_000)
+      await page.waitForTimeout(this.submitSettleDelayMs)
 
       this.state = 'SUBMITTED'
 

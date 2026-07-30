@@ -1,8 +1,6 @@
 import { mkdir, open, readdir, stat } from 'node:fs/promises'
 import { extname, join } from 'node:path'
 
-const DEFAULT_PDF_DIRECTORY = 'E:\\PDF-AGENTE-CPI'
-
 export interface DeskDataPdfFile {
   filePath: string
   fileName: string
@@ -11,7 +9,7 @@ export interface DeskDataPdfFile {
 }
 
 export class DeskDataLatestPdfLocator {
-  constructor(private readonly directory = DEFAULT_PDF_DIRECTORY) {}
+  constructor(private readonly directory: string) {}
 
   async findLatestValid(): Promise<DeskDataPdfFile> {
     await mkdir(this.directory, {

@@ -1,4 +1,3 @@
-import { join } from 'node:path'
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type BrowserContext, type Page } from 'playwright'
@@ -6,10 +5,12 @@ import { PlatformPageManager } from '../src/automation/browser/platform-page-man
 import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
 import { ContinuousResearchStageError } from '../src/automation/flow/continuous-research-stage'
 import {
-  ContinuousResearchRunner,
+  createContinuousResearchRunner,
   type ContinuousResearchRunnerState
 } from '../src/automation/flow/continuous-research-runner'
 import { SafeResearchLogger } from '../src/automation/logging/safe-research-logger'
+import { resolvePdfOutputDirectory } from '../src/infrastructure/filesystem/pdf-output-directory-resolver'
+import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 const CPI_QUEUE_PATH = '/zpersespecial/pesquisas/aguardando/mod_t_aguardando.aspx'
 
@@ -71,9 +72,10 @@ async function hasVisiblePasswordField(page: Page): Promise<boolean> {
 async function ensureAuthenticatedPages(
   context: BrowserContext,
   terminal: TerminalInterface,
-  logger: SafeResearchLogger
+  logger: SafeResearchLogger,
+  pageManager: PlatformPageManager
 ): Promise<AuthenticatedPages> {
-  await new PlatformPageManager().ensurePages(context)
+  await pageManager.ensurePages(context)
 
   let cpiPage = findPage(context.pages(), 'adm.cpicentral.com.br')
 
@@ -154,11 +156,12 @@ function logRunnerState(logger: SafeResearchLogger, state: ContinuousResearchRun
 }
 
 async function main(): Promise<void> {
-  const appData = process.env.APPDATA
-
-  if (!appData) {
-    throw new Error('Variável APPDATA não encontrada.')
-  }
+  const { config, paths } = resolveWindowsOperationalConfig()
+  const profilePath = paths.browserProfileDir
+  const pdfOutputDirectory = await resolvePdfOutputDirectory({
+    preferredDirectory: config.paths.preferredPdfDirectory,
+    fallbackDirectory: paths.downloadsDir
+  })
 
   const logger = new SafeResearchLogger()
 
@@ -184,24 +187,31 @@ async function main(): Promise<void> {
     abortController.abort()
   }
 
-  const context = await chromium.launchPersistentContext(
-    join(appData, 'AgenteCPI', 'browser-profile'),
-    {
-      headless: false,
-      viewport: null,
-      acceptDownloads: true,
-      args: ['--start-maximized']
-    }
-  )
+  const context = await chromium.launchPersistentContext(profilePath, {
+    headless: false,
+    viewport: null,
+    acceptDownloads: true,
+    args: ['--start-maximized']
+  })
 
   try {
-    const { cpiPage, deskDataPage } = await ensureAuthenticatedPages(context, terminal, logger)
+    const { cpiPage, deskDataPage } = await ensureAuthenticatedPages(
+      context,
+      terminal,
+      logger,
+      new PlatformPageManager(config.platform, config.timing.platformPageNavigationTimeoutMs)
+    )
 
     await cpiPage.bringToFront()
 
     logger.info('Aplicando filtro 29 na CPI.')
 
-    await new CpiQueueFilterController().applyCriminalForumFilter(cpiPage)
+    await new CpiQueueFilterController({
+      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      settleDelayMs: config.timing.queueFilterSettleDelayMs
+    }).applyCriminalForumFilter(cpiPage)
 
     logger.info('Modo automático contínuo iniciado.')
 
@@ -211,7 +221,30 @@ async function main(): Promise<void> {
 
     sigintRegistered = true
 
-    const result = await new ContinuousResearchRunner().run({
+    const result = await createContinuousResearchRunner({
+      queueCheckIntervalMs: config.timing.queueCheckIntervalMs,
+      queueFilterSettleDelayMs: config.timing.queueFilterSettleDelayMs,
+      cpiFrameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+      deskDataPeopleUrl: config.platform.deskDataPeopleUrl,
+      navigationTimeoutMs: config.timing.navigationTimeoutMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      readTimeoutMs: config.timing.readTimeoutMs,
+      downloadStartTimeoutMs: config.timing.downloadStartTimeoutMs,
+      cpiSearchPollingIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      deskDataFormPollingIntervalMs: config.timing.deskDataFormPollingIntervalMs,
+      deskDataResultPollingIntervalMs: config.timing.deskDataResultPollingIntervalMs,
+      deskDataHistoryNavigationIntervalMs: config.timing.deskDataHistoryNavigationIntervalMs,
+      submitSettleDelayMs: config.timing.submitSettleDelayMs,
+      queueReturnDelayMs: config.timing.queueReturnDelayMs,
+      cpiIdentitySearchAttempts: config.limits.cpiIdentitySearchAttempts,
+      cpiAttachmentSearchAttempts: config.limits.cpiAttachmentSearchAttempts,
+      cpiResultSearchAttempts: config.limits.cpiResultSearchAttempts,
+      cpiResultStabilizationAttempts: config.limits.cpiResultStabilizationAttempts,
+      deskDataFormReadyAttempts: config.limits.deskDataFormReadyAttempts,
+      deskDataResultSearchAttempts: config.limits.deskDataResultSearchAttempts,
+      deskDataHistoryNavigationAttempts: config.limits.deskDataHistoryNavigationAttempts,
+      pdfOutputDirectory
+    }).run({
       context,
       cpiPage,
       deskDataPage,

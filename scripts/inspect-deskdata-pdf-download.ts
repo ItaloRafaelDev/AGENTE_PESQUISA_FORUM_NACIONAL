@@ -1,12 +1,14 @@
-import { join } from 'node:path'
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Page } from 'playwright'
+import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
 import { prepareDeskDataInspectionPages } from '../src/automation/deskdata/deskdata-inspection-page-preparer'
 import {
   DESKDATA_PDF_EXPORT_SELECTOR,
   DeskDataPdfDownloadController
 } from '../src/automation/deskdata/deskdata-pdf-download-controller'
+import { resolvePdfOutputDirectory } from '../src/infrastructure/filesystem/pdf-output-directory-resolver'
+import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 function isDeskDataPage(page: Page): boolean {
   try {
@@ -33,29 +35,30 @@ async function findExportPage(pages: Page[]): Promise<Page | undefined> {
 }
 
 async function main(): Promise<void> {
-  const appData = process.env.APPDATA
-
-  if (!appData) {
-    throw new Error('Variável APPDATA não encontrada.')
-  }
+  const { config, paths } = resolveWindowsOperationalConfig()
+  const profilePath = paths.browserProfileDir
+  const pdfOutputDirectory = await resolvePdfOutputDirectory({
+    preferredDirectory: config.paths.preferredPdfDirectory,
+    fallbackDirectory: paths.downloadsDir
+  })
 
   const terminal = createInterface({
     input: stdin,
     output: stdout
   })
 
-  const context = await chromium.launchPersistentContext(
-    join(appData, 'AgenteCPI', 'browser-profile'),
-    {
-      headless: false,
-      viewport: null,
-      acceptDownloads: true,
-      args: ['--start-maximized']
-    }
-  )
+  const context = await chromium.launchPersistentContext(profilePath, {
+    headless: false,
+    viewport: null,
+    acceptDownloads: true,
+    args: ['--start-maximized']
+  })
 
   try {
-    await prepareDeskDataInspectionPages(context)
+    await prepareDeskDataInspectionPages(
+      context,
+      new PlatformPageManager(config.platform, config.timing.platformPageNavigationTimeoutMs)
+    )
 
     await terminal.question(
       'Faça o login na DeskData, deixe o resultado com o botão Exportar aberto e pressione ENTER...'
@@ -72,7 +75,10 @@ async function main(): Promise<void> {
     console.log('Botão Exportar localizado.')
     console.log('Iniciando captura supervisionada do PDF...')
 
-    const result = await new DeskDataPdfDownloadController().downloadOnce(context, exportPage)
+    const result = await new DeskDataPdfDownloadController({
+      outputDirectory: pdfOutputDirectory,
+      downloadTimeoutMs: config.timing.downloadStartTimeoutMs
+    }).downloadOnce(context, exportPage)
 
     console.log('')
     console.log('PDF baixado e validado com sucesso.')

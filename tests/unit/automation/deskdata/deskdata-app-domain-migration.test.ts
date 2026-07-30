@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_PLATFORM_URLS } from '@/automation/browser/platform-urls'
 import {
   DESKDATA_NEXT_SEARCH_SELECTORS,
   DESKDATA_PEOPLE_URL
 } from '@/automation/deskdata/deskdata-next-search-controller'
 import { detectDeskDataSession } from '@/automation/session/platform-session-detector'
+import { parseAppConfig } from '@/infrastructure/config/app-config'
 
 const APP_ORIGIN = 'https://app.deskdata.com.br'
 
 describe('DeskData app domain migration', () => {
   it('uses the new Consultar pessoas URL', () => {
-    expect(DEFAULT_PLATFORM_URLS.deskDataPeopleUrl).toBe(APP_ORIGIN + '/pessoas/')
+    expect(parseAppConfig().platform.deskDataPeopleUrl).toBe(APP_ORIGIN + '/pessoas/')
 
     expect(DESKDATA_PEOPLE_URL).toBe(APP_ORIGIN + '/pessoas/')
   })

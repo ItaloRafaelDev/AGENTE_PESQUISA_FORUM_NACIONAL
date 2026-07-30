@@ -1,12 +1,12 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
-import { join } from 'node:path'
 import { chromium, type Page } from 'playwright'
 import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
 import {
   APPROVED_DESKDATA_DATASET_IDS,
   DeskDataDatasetController
 } from '../src/automation/deskdata/deskdata-dataset-controller'
+import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 function findDeskDataPage(pages: Page[]): Page | undefined {
   return pages.find((page) => {
@@ -24,29 +24,26 @@ function findDeskDataPage(pages: Page[]): Page | undefined {
 }
 
 async function main(): Promise<void> {
-  const appData = process.env.APPDATA
-
-  if (!appData) {
-    throw new Error('Variável APPDATA não encontrada.')
-  }
+  const { config, paths } = resolveWindowsOperationalConfig()
+  const profilePath = paths.browserProfileDir
 
   const terminal = createInterface({
     input: stdin,
     output: stdout
   })
 
-  const context = await chromium.launchPersistentContext(
-    join(appData, 'AgenteCPI', 'browser-profile'),
-    {
-      headless: false,
-      viewport: null,
-      acceptDownloads: true,
-      args: ['--start-maximized']
-    }
-  )
+  const context = await chromium.launchPersistentContext(profilePath, {
+    headless: false,
+    viewport: null,
+    acceptDownloads: true,
+    args: ['--start-maximized']
+  })
 
   try {
-    const pageManager = new PlatformPageManager()
+    const pageManager = new PlatformPageManager(
+      config.platform,
+      config.timing.platformPageNavigationTimeoutMs
+    )
 
     await pageManager.ensurePages(context)
 

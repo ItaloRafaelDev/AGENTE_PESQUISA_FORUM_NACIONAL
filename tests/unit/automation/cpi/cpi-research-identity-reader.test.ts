@@ -8,6 +8,7 @@ import {
 } from '@/automation/cpi/cpi-research-identity-reader'
 
 class FakeLocator implements ResearchDataLocator {
+  public innerTextTimeoutMs: number | undefined
   private countIndex = 0
 
   constructor(
@@ -27,7 +28,9 @@ class FakeLocator implements ResearchDataLocator {
     return this
   }
 
-  innerText(): Promise<string> {
+  innerText(options?: { timeout?: number }): Promise<string> {
+    this.innerTextTimeoutMs = options?.timeout
+
     return Promise.resolve(this.text)
   }
 }
@@ -58,10 +61,11 @@ class FakePage implements ResearchDataPage {
 const detailUrl =
   'https://adm.cpicentral.com.br/zpersEspecial/pesquisas/upd_cad/mod_tt_pesq_upd.aspx?id_cadastro=123'
 
-function createReader(): CpiResearchIdentityReader {
+function createReader(readTimeoutMs = 4_321): CpiResearchIdentityReader {
   return new CpiResearchIdentityReader({
     searchAttempts: 3,
-    searchIntervalMs: 1
+    searchIntervalMs: 1,
+    readTimeoutMs
   })
 }
 
@@ -71,12 +75,15 @@ describe('CpiResearchIdentityReader', () => {
       detailUrl,
       new Map([[CPI_RESEARCH_DATA_SELECTORS.cpfValue, new FakeLocator([1], '529.982.247-25')]])
     )
+    const cpfLocator = frame.locator(CPI_RESEARCH_DATA_SELECTORS.cpfValue) as FakeLocator
 
     await expect(createReader().read(new FakePage([frame]))).resolves.toEqual({
       cpf: '52998224725',
       maskedCpf: '***.***.***-25',
       detailFramePath: '/zpersEspecial/pesquisas/upd_cad/mod_tt_pesq_upd.aspx'
     })
+
+    expect(cpfLocator.innerTextTimeoutMs).toBe(4_321)
   })
 
   it('deve aguardar o campo CPF terminar de renderizar', async () => {

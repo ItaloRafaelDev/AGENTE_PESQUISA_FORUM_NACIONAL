@@ -34,7 +34,7 @@ describe('DeskDataResultReadyWaiter', () => {
     await expect(
       new DeskDataResultReadyWaiter({
         searchAttempts: 4,
-        searchIntervalMs: 0
+        searchIntervalMs: 617
       }).waitUntilReady(page)
     ).resolves.toEqual({
       status: 'READY',
@@ -42,6 +42,8 @@ describe('DeskDataResultReadyWaiter', () => {
     })
 
     expect(waitForTimeout).toHaveBeenCalledTimes(2)
+    expect(waitForTimeout).toHaveBeenNthCalledWith(1, 617)
+    expect(waitForTimeout).toHaveBeenNthCalledWith(2, 617)
   })
 
   it('accepts the historical result route with a trailing slash', async () => {

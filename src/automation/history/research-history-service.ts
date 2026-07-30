@@ -3,44 +3,18 @@ import type { SingleResearchCycleResult } from '../flow/single-research-cycle'
 import { mapResearchClassificationToCpiResult } from '../cpi/cpi-research-result-mapper'
 import { SafeResearchLogger } from '../logging/safe-research-logger'
 import type {
+  ResearchHistoryEvent,
+  ResearchHistoryEventListener,
   ResearchHistoryListInput,
   ResearchHistoryPage,
   ResearchHistoryRecord
-} from '../../shared/types/history-api'
-import type {
-  CompleteResearchHistoryInput,
-  CreateResearchHistoryInput,
-  FailResearchHistoryInput
-} from '../../infrastructure/database/research-history-repository'
+} from '../../application/history/research-history-model'
+import type { ResearchHistoryRepositoryPort } from '../../application/ports/research-history-repository-port'
 
-export interface ResearchHistoryRepositoryPort {
-  create(input: CreateResearchHistoryInput): ResearchHistoryRecord
-
-  setMaskedCpf(id: string, maskedCpf: string): ResearchHistoryRecord
-
-  complete(input: CompleteResearchHistoryInput): ResearchHistoryRecord
-
-  fail(input: FailResearchHistoryInput): ResearchHistoryRecord
-
-  list(input: ResearchHistoryListInput): ResearchHistoryPage
-
-  clear(): void
-}
-
-export type ResearchHistoryEvent =
-  | {
-      type: 'CREATED'
-      record: ResearchHistoryRecord
-    }
-  | {
-      type: 'UPDATED'
-      record: ResearchHistoryRecord
-    }
-  | {
-      type: 'CLEARED'
-    }
-
-export type ResearchHistoryEventListener = (event: ResearchHistoryEvent) => void
+export type {
+  ResearchHistoryEvent,
+  ResearchHistoryEventListener
+} from '../../application/history/research-history-model'
 
 export interface ResearchHistoryServiceOptions {
   idFactory?: () => string

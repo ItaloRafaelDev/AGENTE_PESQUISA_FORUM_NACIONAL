@@ -1,24 +1,34 @@
 ﻿import type { BrowserContext, Frame, Page } from 'playwright'
 import {
   CpiFirstResearchOpener,
+  type CpiFirstResearchOpenerOptions,
   type OpenedResearchSnapshot
 } from '../cpi/cpi-first-research-opener'
 import {
   CpiResearchIdentityReader,
+  type CpiResearchIdentityReaderOptions,
   type CpiResearchIdentity
 } from '../cpi/cpi-research-identity-reader'
 import {
   CpiResearchConfirmedSaveController,
+  type CpiResearchConfirmedSaveOptions,
+  type CpiResearchSavePort,
   type CpiResearchConfirmedSaveResult
 } from '../cpi/cpi-research-confirmed-save-controller'
 import type { CpiResearchPdfPreparationFrame } from '../cpi/cpi-research-pdf-preparation-workflow'
-import type { CpiResearchSaveFrame } from '../cpi/cpi-research-result-saver'
+import {
+  CpiResearchResultSaver,
+  type CpiResearchResultSaverOptions,
+  type CpiResearchSaveFrame
+} from '../cpi/cpi-research-result-saver'
 import {
   DeskDataNextSearchController,
+  type DeskDataNextSearchControllerOptions,
   type DeskDataNextSearchPage,
   type DeskDataNextSearchResult
 } from '../deskdata/deskdata-next-search-controller'
 import {
+  createFullResearchPreparationWorkflow,
   FullResearchPreparationWorkflow,
   type FullResearchPreparationResult
 } from './full-research-preparation-workflow'
@@ -93,9 +103,50 @@ export interface SingleResearchCycleDependencies {
   queueReturnController: CpiQueueReturnPort
 }
 
+export interface ResearchCycleRuntimeConfig {
+  navigationTimeoutMs: number
+  actionTimeoutMs: number
+  readTimeoutMs: number
+  downloadStartTimeoutMs: number
+  cpiSearchPollingIntervalMs: number
+  deskDataFormPollingIntervalMs: number
+  deskDataResultPollingIntervalMs: number
+  deskDataHistoryNavigationIntervalMs: number
+  submitSettleDelayMs: number
+  queueReturnDelayMs: number
+  cpiIdentitySearchAttempts: number
+  cpiAttachmentSearchAttempts: number
+  cpiResultSearchAttempts: number
+  cpiResultStabilizationAttempts: number
+  deskDataFormReadyAttempts: number
+  deskDataResultSearchAttempts: number
+  deskDataHistoryNavigationAttempts: number
+  pdfOutputDirectory: string
+}
+
+export interface SingleResearchCycleConfig extends ResearchCycleRuntimeConfig {
+  cpiFrameSearchAttempts: number
+  deskDataPeopleUrl: string
+}
+
+export interface SingleResearchCycleFactorySeam {
+  createOpener(options: CpiFirstResearchOpenerOptions): CpiResearchOpenPort
+  createIdentityReader(options: CpiResearchIdentityReaderOptions): CpiResearchIdentityPort
+  createNextSearchController(options: DeskDataNextSearchControllerOptions): DeskDataNextSearchPort
+  createPreparationWorkflow(config: ResearchCycleRuntimeConfig): FullResearchPreparationPort
+  createResultSaver(options: CpiResearchResultSaverOptions): CpiResearchSavePort
+  createSaveController(
+    saver: CpiResearchSavePort,
+    options: CpiResearchConfirmedSaveOptions
+  ): CpiConfirmedSavePort
+  createQueueReturnController(delayMs: number): CpiQueueReturnPort
+}
+
 class DefaultCpiQueueReturnController implements CpiQueueReturnPort {
+  constructor(private readonly delayMs = 3_000) {}
+
   async returnToQueue(page: Page): Promise<void> {
-    await page.waitForTimeout(3_000)
+    await page.waitForTimeout(this.delayMs)
     await page.bringToFront()
 
     let pathname: string
@@ -112,14 +163,86 @@ class DefaultCpiQueueReturnController implements CpiQueueReturnPort {
   }
 }
 
-function createDefaultDependencies(): SingleResearchCycleDependencies {
+const DEFAULT_FACTORY_SEAM: SingleResearchCycleFactorySeam = {
+  createOpener: (options) => new CpiFirstResearchOpener(options),
+  createIdentityReader: (options) => new CpiResearchIdentityReader(options),
+  createNextSearchController: (options) => new DeskDataNextSearchController(options),
+  createPreparationWorkflow: createFullResearchPreparationWorkflow,
+  createResultSaver: (options) => new CpiResearchResultSaver(options),
+  createSaveController: (saver, options) => new CpiResearchConfirmedSaveController(saver, options),
+  createQueueReturnController: (delayMs) => new DefaultCpiQueueReturnController(delayMs)
+}
+
+function toResearchCycleRuntimeConfig(
+  config: SingleResearchCycleConfig
+): ResearchCycleRuntimeConfig {
   return {
-    opener: new CpiFirstResearchOpener(),
-    identityReader: new CpiResearchIdentityReader(),
-    nextSearchController: new DeskDataNextSearchController(),
-    preparationWorkflow: new FullResearchPreparationWorkflow(),
-    saveController: new CpiResearchConfirmedSaveController(),
-    queueReturnController: new DefaultCpiQueueReturnController()
+    navigationTimeoutMs: config.navigationTimeoutMs,
+    actionTimeoutMs: config.actionTimeoutMs,
+    readTimeoutMs: config.readTimeoutMs,
+    downloadStartTimeoutMs: config.downloadStartTimeoutMs,
+    cpiSearchPollingIntervalMs: config.cpiSearchPollingIntervalMs,
+    deskDataFormPollingIntervalMs: config.deskDataFormPollingIntervalMs,
+    deskDataResultPollingIntervalMs: config.deskDataResultPollingIntervalMs,
+    deskDataHistoryNavigationIntervalMs: config.deskDataHistoryNavigationIntervalMs,
+    submitSettleDelayMs: config.submitSettleDelayMs,
+    queueReturnDelayMs: config.queueReturnDelayMs,
+    cpiIdentitySearchAttempts: config.cpiIdentitySearchAttempts,
+    cpiAttachmentSearchAttempts: config.cpiAttachmentSearchAttempts,
+    cpiResultSearchAttempts: config.cpiResultSearchAttempts,
+    cpiResultStabilizationAttempts: config.cpiResultStabilizationAttempts,
+    deskDataFormReadyAttempts: config.deskDataFormReadyAttempts,
+    deskDataResultSearchAttempts: config.deskDataResultSearchAttempts,
+    deskDataHistoryNavigationAttempts: config.deskDataHistoryNavigationAttempts,
+    pdfOutputDirectory: config.pdfOutputDirectory
+  }
+}
+
+function createDefaultDependencies(
+  config?: SingleResearchCycleConfig,
+  factorySeam: SingleResearchCycleFactorySeam = DEFAULT_FACTORY_SEAM
+): SingleResearchCycleDependencies {
+  if (!config) {
+    return {
+      opener: new CpiFirstResearchOpener(),
+      identityReader: new CpiResearchIdentityReader(),
+      nextSearchController: new DeskDataNextSearchController(),
+      preparationWorkflow: new FullResearchPreparationWorkflow(),
+      saveController: new CpiResearchConfirmedSaveController(),
+      queueReturnController: new DefaultCpiQueueReturnController()
+    }
+  }
+
+  const saver = factorySeam.createResultSaver({
+    actionTimeoutMs: config.actionTimeoutMs
+  })
+
+  return {
+    opener: factorySeam.createOpener({
+      frameSearchAttempts: config.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: config.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: config.actionTimeoutMs
+    }),
+    identityReader: factorySeam.createIdentityReader({
+      searchAttempts: config.cpiIdentitySearchAttempts,
+      searchIntervalMs: config.cpiSearchPollingIntervalMs,
+      readTimeoutMs: config.readTimeoutMs
+    }),
+    nextSearchController: factorySeam.createNextSearchController({
+      peopleUrl: config.deskDataPeopleUrl,
+      formReadyAttempts: config.deskDataFormReadyAttempts,
+      pollingIntervalMs: config.deskDataFormPollingIntervalMs,
+      navigationTimeoutMs: config.navigationTimeoutMs,
+      actionTimeoutMs: config.actionTimeoutMs,
+      readTimeoutMs: config.readTimeoutMs
+    }),
+    preparationWorkflow: factorySeam.createPreparationWorkflow(
+      toResearchCycleRuntimeConfig(config)
+    ),
+    saveController: factorySeam.createSaveController(saver, {
+      dialogTimeoutMs: config.actionTimeoutMs
+    }),
+    queueReturnController: factorySeam.createQueueReturnController(config.queueReturnDelayMs)
   }
 }
 
@@ -327,4 +450,11 @@ export class SingleResearchCycle {
       throw new ContinuousResearchStageError(stage, error)
     }
   }
+}
+
+export function createSingleResearchCycle(
+  config: SingleResearchCycleConfig,
+  factorySeam: SingleResearchCycleFactorySeam = DEFAULT_FACTORY_SEAM
+): SingleResearchCycle {
+  return new SingleResearchCycle(createDefaultDependencies(config, factorySeam))
 }

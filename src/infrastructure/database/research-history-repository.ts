@@ -3,11 +3,16 @@ import { dirname } from 'node:path'
 import Database from 'better-sqlite3'
 import type { ResearchClassification } from '../../domain/research/research-classification'
 import type {
+  CompleteResearchHistoryInput,
+  CreateResearchHistoryInput,
+  FailResearchHistoryInput,
   ResearchHistoryListInput,
   ResearchHistoryPage,
   ResearchHistoryRecord,
   ResearchHistoryStatus
-} from '../../shared/types/history-api'
+} from '../../application/history/research-history-model'
+import type { ResearchHistoryRepositoryPort } from '../../application/ports/research-history-repository-port'
+import { runResearchHistoryMigrations } from './research-history-migrations'
 
 type SqliteDatabase = InstanceType<typeof Database>
 
@@ -34,60 +39,7 @@ interface ColumnInfoRow {
   name: string
 }
 
-export interface CreateResearchHistoryInput {
-  id: string
-  maskedCpf: string
-  status: ResearchHistoryStatus
-  startedAt: string
-  createdAt: string
-}
-
-export interface CompleteResearchHistoryInput {
-  id: string
-  maskedCpf: string
-  classification: ResearchClassification
-  cpiResult: string
-  finishedAt: string
-  durationMs: number
-  pdfPath: string
-}
-
-export interface FailResearchHistoryInput {
-  id: string
-  maskedCpf: string
-  finishedAt: string
-  durationMs: number
-  errorStage: string
-  errorMessage: string
-}
-
 const MASKED_CPF_PATTERN = /^\*{3}\.\*{3}\.\*{3}-\d{2}$/
-
-const DATABASE_SCHEMA = `
-  CREATE TABLE IF NOT EXISTS research_history (
-    id TEXT PRIMARY KEY,
-    masked_cpf TEXT NOT NULL,
-    classification TEXT,
-    cpi_result TEXT,
-    status TEXT NOT NULL,
-    started_at TEXT NOT NULL,
-    finished_at TEXT,
-    duration_ms INTEGER,
-    pdf_path TEXT,
-    error_stage TEXT,
-    error_message TEXT,
-    created_at TEXT NOT NULL
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_research_history_started_at
-  ON research_history(started_at DESC);
-
-  CREATE INDEX IF NOT EXISTS idx_research_history_status
-  ON research_history(status);
-
-  CREATE INDEX IF NOT EXISTS idx_research_history_classification
-  ON research_history(classification);
-`
 
 function mapRow(row: ResearchHistoryRow): ResearchHistoryRecord {
   return {
@@ -106,13 +58,13 @@ function mapRow(row: ResearchHistoryRow): ResearchHistoryRecord {
   }
 }
 
-export class ResearchHistoryRepository {
+export class ResearchHistoryRepository implements ResearchHistoryRepositoryPort {
   private closed = false
 
   private constructor(private readonly database: SqliteDatabase) {
-    this.database.pragma('journal_mode = WAL')
     this.database.pragma('foreign_keys = ON')
-    this.migrate()
+    runResearchHistoryMigrations(this.database)
+    this.database.pragma('journal_mode = WAL')
   }
 
   static open(filePath: string): ResearchHistoryRepository {
@@ -124,11 +76,11 @@ export class ResearchHistoryRepository {
       recursive: true
     })
 
-    return new ResearchHistoryRepository(new Database(filePath))
+    return ResearchHistoryRepository.initialize(new Database(filePath))
   }
 
   static inMemory(): ResearchHistoryRepository {
-    return new ResearchHistoryRepository(new Database(':memory:'))
+    return ResearchHistoryRepository.initialize(new Database(':memory:'))
   }
 
   create(input: CreateResearchHistoryInput): ResearchHistoryRecord {
@@ -350,10 +302,6 @@ export class ResearchHistoryRepository {
     this.closed = true
   }
 
-  private migrate(): void {
-    this.database.exec(DATABASE_SCHEMA)
-  }
-
   private getRequired(id: string): ResearchHistoryRecord {
     const row = this.database
       .prepare(
@@ -403,6 +351,18 @@ export class ResearchHistoryRepository {
   private assertUpdated(changes: number, id: string): void {
     if (changes !== 1) {
       throw new Error(`Registro de histórico não encontrado: ${id}`)
+    }
+  }
+
+  private static initialize(database: SqliteDatabase): ResearchHistoryRepository {
+    try {
+      return new ResearchHistoryRepository(database)
+    } catch (error) {
+      if (database.open) {
+        database.close()
+      }
+
+      throw error
     }
   }
 }

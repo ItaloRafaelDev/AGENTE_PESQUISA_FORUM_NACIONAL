@@ -20,15 +20,8 @@ $ pnpm install
 $ pnpm dev
 ```
 
-### Build
+### Build for Windows
 
-```bash
-# For windows
-$ pnpm build:win
-
-# For macOS
-$ pnpm build:mac
-
-# For Linux
-$ pnpm build:linux
+```powershell
+pnpm build:win
 ```

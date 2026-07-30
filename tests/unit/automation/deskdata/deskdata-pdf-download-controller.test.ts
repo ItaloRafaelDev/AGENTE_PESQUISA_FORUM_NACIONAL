@@ -115,6 +115,12 @@ afterEach(async () => {
 })
 
 describe('DeskDataPdfDownloadController', () => {
+  it('deve rejeitar tempo limite de ação igual a zero', () => {
+    expect(() => new DeskDataPdfDownloadController({ actionTimeoutMs: 0 })).toThrowError(
+      new Error('O tempo limite da ação deve ser maior que zero.')
+    )
+  })
+
   it('deve capturar o download iniciado na nova aba', async () => {
     const outputDirectory = await createTemporaryDirectory()
     const source = createTestPage()
@@ -130,12 +136,13 @@ describe('DeskDataPdfDownloadController', () => {
 
     const result = await new DeskDataPdfDownloadController({
       outputDirectory,
-      downloadTimeoutMs: 1_000
+      downloadTimeoutMs: 1_000,
+      actionTimeoutMs: 12_345
     }).downloadOnce(browser.context, source.page)
 
     expect(source.click).toHaveBeenCalledTimes(1)
     expect(source.click).toHaveBeenCalledWith({
-      timeout: 10_000
+      timeout: 12_345
     })
     expect(result.filePath).toMatch(/deskdata-\d{8}-\d{6}-[a-f0-9]{8}\.pdf$/)
     expect(result.sizeBytes).toBeGreaterThan(5)

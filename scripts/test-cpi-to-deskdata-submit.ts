@@ -1,16 +1,16 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
-import { join } from 'node:path'
 import { chromium, type Page } from 'playwright'
 import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
 import { CpiQueueAvailabilityReader } from '../src/automation/cpi/cpi-queue-availability'
 import { CpiFirstResearchOpener } from '../src/automation/cpi/cpi-first-research-opener'
 import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
-import { CpiQueueMonitor } from '../src/automation/cpi/cpi-queue-monitor'
+import { CpiQueueMonitor, NodeQueueDelay } from '../src/automation/cpi/cpi-queue-monitor'
 import { CpiResearchIdentityReader } from '../src/automation/cpi/cpi-research-identity-reader'
 import { DeskDataCpfFormController } from '../src/automation/deskdata/deskdata-cpf-form-controller'
 import { DeskDataDatasetController } from '../src/automation/deskdata/deskdata-dataset-controller'
 import { DeskDataSearchSubmitController } from '../src/automation/deskdata/deskdata-search-submit-controller'
+import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 function findPage(pages: Page[], hostname: string): Page | undefined {
   return pages.find((page) => {
@@ -45,29 +45,26 @@ function isDeskDataPeoplePage(page: Page): boolean {
 }
 
 async function main(): Promise<void> {
-  const appData = process.env.APPDATA
-
-  if (!appData) {
-    throw new Error('Variável APPDATA não encontrada.')
-  }
+  const { config, paths } = resolveWindowsOperationalConfig()
+  const profilePath = paths.browserProfileDir
 
   const terminal = createInterface({
     input: stdin,
     output: stdout
   })
 
-  const context = await chromium.launchPersistentContext(
-    join(appData, 'AgenteCPI', 'browser-profile'),
-    {
-      headless: false,
-      viewport: null,
-      acceptDownloads: true,
-      args: ['--start-maximized']
-    }
-  )
+  const context = await chromium.launchPersistentContext(profilePath, {
+    headless: false,
+    viewport: null,
+    acceptDownloads: true,
+    args: ['--start-maximized']
+  })
 
   try {
-    const pageManager = new PlatformPageManager()
+    const pageManager = new PlatformPageManager(
+      config.platform,
+      config.timing.platformPageNavigationTimeoutMs
+    )
 
     await pageManager.ensurePages(context)
 
@@ -106,7 +103,12 @@ async function main(): Promise<void> {
       throw new Error('A página Consultar pessoas da DeskData não foi confirmada.')
     }
 
-    const queueFilterController = new CpiQueueFilterController()
+    const queueFilterController = new CpiQueueFilterController({
+      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      settleDelayMs: config.timing.queueFilterSettleDelayMs
+    })
 
     await cpiPage.bringToFront()
 
@@ -114,7 +116,12 @@ async function main(): Promise<void> {
 
     await queueFilterController.applyCriminalForumFilter(cpiPage)
 
-    const monitor = new CpiQueueMonitor(queueFilterController, new CpiQueueAvailabilityReader())
+    const monitor = new CpiQueueMonitor(
+      queueFilterController,
+      new CpiQueueAvailabilityReader(config.timing.readTimeoutMs),
+      new NodeQueueDelay(),
+      config.timing.queueCheckIntervalMs
+    )
 
     console.log('Aguardando pesquisa disponível...')
 
@@ -124,13 +131,24 @@ async function main(): Promise<void> {
       throw new Error('Nenhuma pesquisa disponível foi confirmada.')
     }
 
-    await new CpiFirstResearchOpener().openFirst(cpiPage)
+    await new CpiFirstResearchOpener({
+      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs
+    }).openFirst(cpiPage)
 
-    const identity = await new CpiResearchIdentityReader().read(cpiPage)
+    const identity = await new CpiResearchIdentityReader({
+      searchAttempts: config.limits.cpiIdentitySearchAttempts,
+      searchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      readTimeoutMs: config.timing.readTimeoutMs
+    }).read(cpiPage)
 
     console.log(`CPF capturado na CPI: ${identity.maskedCpf}`)
 
-    const filledCpf = await new DeskDataCpfFormController().fillCpf(deskDataPage, identity.cpf)
+    const filledCpf = await new DeskDataCpfFormController({
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      readTimeoutMs: config.timing.readTimeoutMs
+    }).fillCpf(deskDataPage, identity.cpf)
 
     const datasets = await new DeskDataDatasetController().applyApprovedDatasets(deskDataPage)
 
@@ -154,7 +172,11 @@ async function main(): Promise<void> {
       return
     }
 
-    const submitController = new DeskDataSearchSubmitController()
+    const submitController = new DeskDataSearchSubmitController({
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      navigationTimeoutMs: config.timing.navigationTimeoutMs,
+      submitSettleDelayMs: config.timing.submitSettleDelayMs
+    })
 
     const submitResult = await submitController.submitOnce(deskDataPage)
 

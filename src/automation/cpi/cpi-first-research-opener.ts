@@ -27,6 +27,7 @@ export interface ResearchPage {
 export interface CpiFirstResearchOpenerOptions {
   frameSearchAttempts?: number
   frameSearchIntervalMs?: number
+  actionTimeoutMs?: number
 }
 
 export interface OpenedResearchSnapshot {
@@ -37,11 +38,14 @@ export interface OpenedResearchSnapshot {
 export class CpiFirstResearchOpener {
   private readonly frameSearchAttempts: number
   private readonly frameSearchIntervalMs: number
+  private readonly actionTimeoutMs: number
 
   constructor(options: CpiFirstResearchOpenerOptions = {}) {
     this.frameSearchAttempts = options.frameSearchAttempts ?? 40
 
     this.frameSearchIntervalMs = options.frameSearchIntervalMs ?? 250
+
+    this.actionTimeoutMs = options.actionTimeoutMs ?? 10_000
   }
 
   async openFirst(page: ResearchPage): Promise<OpenedResearchSnapshot> {
@@ -62,7 +66,7 @@ export class CpiFirstResearchOpener {
     }
 
     await responderAction.click({
-      timeout: 10_000
+      timeout: this.actionTimeoutMs
     })
 
     const detailFramePath = await this.waitForDetailFrame(page)

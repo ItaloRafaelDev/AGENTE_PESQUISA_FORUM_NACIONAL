@@ -1,8 +1,8 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
-import { join } from 'node:path'
 import { chromium, type Frame, type Page } from 'playwright'
 import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
+import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 interface InspectedControl {
   tag: string
@@ -262,18 +262,13 @@ function findCpiPage(pages: Page[]): Page | undefined {
 }
 
 async function main(): Promise<void> {
-  const appData = process.env.APPDATA
-
-  if (!appData) {
-    throw new Error('Variável APPDATA não encontrada.')
-  }
+  const { config, paths } = resolveWindowsOperationalConfig()
+  const profilePath = paths.browserProfileDir
 
   const terminal = createInterface({
     input: stdin,
     output: stdout
   })
-
-  const profilePath = join(appData, 'AgenteCPI', 'browser-profile')
 
   const context = await chromium.launchPersistentContext(profilePath, {
     headless: false,
@@ -283,7 +278,10 @@ async function main(): Promise<void> {
   })
 
   try {
-    const pageManager = new PlatformPageManager()
+    const pageManager = new PlatformPageManager(
+      config.platform,
+      config.timing.platformPageNavigationTimeoutMs
+    )
 
     await pageManager.ensurePages(context)
 

@@ -5,6 +5,7 @@ import type { CpiResearchPdfPreparationFrame } from '@/automation/cpi/cpi-resear
 import type { FullResearchPreparationResult } from '@/automation/flow/full-research-preparation-workflow'
 import {
   SingleResearchCycle,
+  createSingleResearchCycle,
   type SingleResearchCycleDependencies
 } from '@/automation/flow/single-research-cycle'
 
@@ -87,6 +88,149 @@ function createIdentity(): CpiResearchIdentity {
 }
 
 describe('SingleResearchCycle', () => {
+  it('compõe o ciclo produtivo com a configuração validada sem seam de teste', () => {
+    const cycle = createSingleResearchCycle({
+      cpiFrameSearchAttempts: 40,
+      cpiSearchPollingIntervalMs: 250,
+      actionTimeoutMs: 10_000,
+      deskDataPeopleUrl: 'https://app.deskdata.com.br/pessoas/',
+      navigationTimeoutMs: 30_000,
+      readTimeoutMs: 5_000,
+      downloadStartTimeoutMs: 30_000,
+      deskDataFormPollingIntervalMs: 250,
+      deskDataResultPollingIntervalMs: 500,
+      deskDataHistoryNavigationIntervalMs: 250,
+      submitSettleDelayMs: 1_000,
+      queueReturnDelayMs: 3_000,
+      cpiIdentitySearchAttempts: 40,
+      cpiAttachmentSearchAttempts: 40,
+      cpiResultSearchAttempts: 40,
+      cpiResultStabilizationAttempts: 3,
+      deskDataFormReadyAttempts: 40,
+      deskDataResultSearchAttempts: 180,
+      deskDataHistoryNavigationAttempts: 120,
+      pdfOutputDirectory: 'E:\\PDF-AGENTE-CPI'
+    })
+
+    expect(cycle).toBeInstanceOf(SingleResearchCycle)
+  })
+
+  it('deve propagar a configuração explícita para as dependências produtivas', () => {
+    const captured: Record<string, unknown> = {}
+
+    createSingleResearchCycle(
+      {
+        cpiFrameSearchAttempts: 19,
+        cpiSearchPollingIntervalMs: 432,
+        actionTimeoutMs: 13_579,
+        deskDataPeopleUrl: 'https://config.deskdata.com.br/pessoas/',
+        navigationTimeoutMs: 31_579,
+        readTimeoutMs: 4_579,
+        downloadStartTimeoutMs: 32_579,
+        deskDataFormPollingIntervalMs: 543,
+        deskDataResultPollingIntervalMs: 654,
+        deskDataHistoryNavigationIntervalMs: 765,
+        submitSettleDelayMs: 1_579,
+        queueReturnDelayMs: 3_579,
+        cpiIdentitySearchAttempts: 20,
+        cpiAttachmentSearchAttempts: 21,
+        cpiResultSearchAttempts: 22,
+        cpiResultStabilizationAttempts: 4,
+        deskDataFormReadyAttempts: 23,
+        deskDataResultSearchAttempts: 24,
+        deskDataHistoryNavigationAttempts: 25,
+        pdfOutputDirectory: 'E:\\resolved-cycle-output'
+      },
+      {
+        createOpener: (options) => {
+          captured.opener = options
+
+          return {
+            openFirst: vi.fn()
+          }
+        },
+        createIdentityReader: (options) => {
+          captured.identity = options
+          return {} as never
+        },
+        createNextSearchController: (options) => {
+          captured.nextSearch = options
+          return {} as never
+        },
+        createPreparationWorkflow: (config) => {
+          captured.preparationConfig = config
+          return {} as never
+        },
+        createResultSaver: (options) => {
+          captured.resultSaver = options
+          return {} as never
+        },
+        createSaveController: (saver, options) => {
+          captured.saveController = {
+            saver,
+            options
+          }
+          return {} as never
+        },
+        createQueueReturnController: (delayMs) => {
+          captured.queueReturnDelayMs = delayMs
+          return {} as never
+        }
+      }
+    )
+
+    expect(captured).toEqual({
+      opener: {
+        frameSearchAttempts: 19,
+        frameSearchIntervalMs: 432,
+        actionTimeoutMs: 13_579
+      },
+      identity: {
+        searchAttempts: 20,
+        searchIntervalMs: 432,
+        readTimeoutMs: 4_579
+      },
+      nextSearch: {
+        peopleUrl: 'https://config.deskdata.com.br/pessoas/',
+        formReadyAttempts: 23,
+        pollingIntervalMs: 543,
+        navigationTimeoutMs: 31_579,
+        actionTimeoutMs: 13_579,
+        readTimeoutMs: 4_579
+      },
+      preparationConfig: {
+        navigationTimeoutMs: 31_579,
+        actionTimeoutMs: 13_579,
+        readTimeoutMs: 4_579,
+        downloadStartTimeoutMs: 32_579,
+        cpiSearchPollingIntervalMs: 432,
+        deskDataFormPollingIntervalMs: 543,
+        deskDataResultPollingIntervalMs: 654,
+        deskDataHistoryNavigationIntervalMs: 765,
+        submitSettleDelayMs: 1_579,
+        queueReturnDelayMs: 3_579,
+        cpiIdentitySearchAttempts: 20,
+        cpiAttachmentSearchAttempts: 21,
+        cpiResultSearchAttempts: 22,
+        cpiResultStabilizationAttempts: 4,
+        deskDataFormReadyAttempts: 23,
+        deskDataResultSearchAttempts: 24,
+        deskDataHistoryNavigationAttempts: 25,
+        pdfOutputDirectory: 'E:\\resolved-cycle-output'
+      },
+      resultSaver: {
+        actionTimeoutMs: 13_579
+      },
+      saveController: {
+        saver: {},
+        options: {
+          dialogTimeoutMs: 13_579
+        }
+      },
+      queueReturnDelayMs: 3_579
+    })
+  })
+
   it('deve executar uma pesquisa automática completa na ordem correta', async () => {
     const callOrder: string[] = []
     const pages = createPages()

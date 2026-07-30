@@ -9,6 +9,7 @@ import {
 
 class FakeLocator implements ResearchLocator {
   public clickCalls = 0
+  public readonly clickTimeouts: Array<number | undefined> = []
 
   constructor(
     private readonly elementCount: number,
@@ -33,8 +34,9 @@ class FakeLocator implements ResearchLocator {
     return child
   }
 
-  async click(): Promise<void> {
+  async click(options?: { timeout?: number }): Promise<void> {
     this.clickCalls += 1
+    this.clickTimeouts.push(options?.timeout)
   }
 }
 
@@ -48,6 +50,7 @@ class FakeFrame implements ResearchFrame {
 
 class FakePage implements ResearchPage {
   public waitCalls = 0
+  public readonly waitDurations: number[] = []
 
   constructor(
     private readonly rows: FakeLocator,
@@ -66,8 +69,9 @@ class FakePage implements ResearchPage {
     return this.frameList
   }
 
-  async waitForTimeout(): Promise<void> {
+  async waitForTimeout(milliseconds: number): Promise<void> {
     this.waitCalls += 1
+    this.waitDurations.push(milliseconds)
   }
 }
 
@@ -133,11 +137,15 @@ describe('CpiFirstResearchOpener', () => {
 
     const opener = new CpiFirstResearchOpener({
       frameSearchAttempts: 2,
-      frameSearchIntervalMs: 1
+      frameSearchIntervalMs: 123,
+      actionTimeoutMs: 456
     })
 
     await expect(opener.openFirst(page)).rejects.toThrow(
       'Formulário da pesquisa não foi aberto pela CPI'
     )
+
+    expect(responderAction.clickTimeouts).toEqual([456])
+    expect(page.waitDurations).toEqual([123, 123])
   })
 })

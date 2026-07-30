@@ -13,6 +13,7 @@ type DownloadState = 'IDLE' | 'DOWNLOADING' | 'DOWNLOADED'
 export interface DeskDataPdfDownloadControllerOptions {
   outputDirectory?: string
   downloadTimeoutMs?: number
+  actionTimeoutMs?: number
 }
 
 export interface DeskDataPdfDownloadResult {
@@ -23,14 +24,20 @@ export interface DeskDataPdfDownloadResult {
 export class DeskDataPdfDownloadController {
   private readonly outputDirectory: string
   private readonly downloadTimeoutMs: number
+  private readonly actionTimeoutMs: number
   private state: DownloadState = 'IDLE'
 
   constructor(options: DeskDataPdfDownloadControllerOptions = {}) {
     this.outputDirectory = options.outputDirectory ?? DEFAULT_OUTPUT_DIRECTORY
     this.downloadTimeoutMs = options.downloadTimeoutMs ?? 30_000
+    this.actionTimeoutMs = options.actionTimeoutMs ?? 10_000
 
     if (this.downloadTimeoutMs < 1) {
       throw new Error('O tempo limite do download deve ser maior que zero.')
+    }
+
+    if (this.actionTimeoutMs < 1) {
+      throw new Error('O tempo limite da ação deve ser maior que zero.')
     }
   }
 
@@ -102,7 +109,7 @@ export class DeskDataPdfDownloadController {
       })
 
       await exportControl.click({
-        timeout: 10_000
+        timeout: this.actionTimeoutMs
       })
 
       const download = await Promise.race([downloadPromise, timeoutPromise])

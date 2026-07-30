@@ -36,20 +36,22 @@ describe('classifyCpiQueueText', () => {
 
 describe('CpiQueueAvailabilityReader', () => {
   it('deve procurar o rodapé em todos os frames', async () => {
+    const firstInnerText = vi.fn(async () => 'Sem informações')
     const firstFrame = {
       locator: vi.fn(
         () =>
           ({
-            innerText: vi.fn(async () => 'Sem informações')
+            innerText: firstInnerText
           }) as unknown as Locator
       )
     } as unknown as Frame
 
+    const secondInnerText = vi.fn(async () => 'Mostrando: 0 à 0 ( de 0 registro )')
     const secondFrame = {
       locator: vi.fn(
         () =>
           ({
-            innerText: vi.fn(async () => 'Mostrando: 0 à 0 ( de 0 registro )')
+            innerText: secondInnerText
           }) as unknown as Locator
       )
     } as unknown as Frame
@@ -58,8 +60,15 @@ describe('CpiQueueAvailabilityReader', () => {
       frames: vi.fn(() => [firstFrame, secondFrame])
     } as unknown as Page
 
-    const reader = new CpiQueueAvailabilityReader()
+    const reader = new CpiQueueAvailabilityReader(4_321)
 
     await expect(reader.read(page)).resolves.toBe('EMPTY')
+
+    expect(firstInnerText).toHaveBeenCalledWith({
+      timeout: 4_321
+    })
+    expect(secondInnerText).toHaveBeenCalledWith({
+      timeout: 4_321
+    })
   })
 })

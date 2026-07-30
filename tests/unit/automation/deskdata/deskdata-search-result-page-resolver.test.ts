@@ -10,6 +10,7 @@ import { DESKDATA_PDF_EXPORT_SELECTOR } from '@/automation/deskdata/deskdata-pdf
 
 class FakeLocator implements DeskDataSimilarQueryLocator {
   clickCalls = 0
+  clickTimeoutMs: number | undefined
 
   constructor(
     private readonly options: {
@@ -42,8 +43,9 @@ class FakeLocator implements DeskDataSimilarQueryLocator {
     return Promise.resolve(name === 'href' ? (this.options.href ?? null) : null)
   }
 
-  async click(): Promise<void> {
+  async click(options?: { timeout?: number }): Promise<void> {
     this.clickCalls += 1
+    this.clickTimeoutMs = options?.timeout
     this.options.onClick?.()
   }
 }
@@ -52,6 +54,9 @@ class FakePage implements DeskDataSimilarQueryPage {
   public waitCalls = 0
   public loadCalls = 0
   public closeCalls = 0
+  public readonly waitDurations: number[] = []
+  public popupTimeoutMs: number | undefined
+  public loadTimeoutMs: number | undefined
 
   constructor(
     private currentUrl: string,
@@ -72,12 +77,20 @@ class FakePage implements DeskDataSimilarQueryPage {
     return this.locators[selector] ?? new FakeLocator()
   }
 
-  async waitForTimeout(): Promise<void> {
+  async waitForTimeout(milliseconds: number): Promise<void> {
     this.waitCalls += 1
+    this.waitDurations.push(milliseconds)
     this.onWaitForTimeout?.()
   }
 
-  waitForEvent(event: 'popup'): Promise<DeskDataSimilarQueryPage> {
+  waitForEvent(
+    event: 'popup',
+    options?: {
+      timeout?: number
+    }
+  ): Promise<DeskDataSimilarQueryPage> {
+    this.popupTimeoutMs = options?.timeout
+
     if (event !== 'popup' || !this.popup) {
       return Promise.reject(new Error('Popup nao configurado'))
     }
@@ -85,8 +98,14 @@ class FakePage implements DeskDataSimilarQueryPage {
     return Promise.resolve(this.popup)
   }
 
-  async waitForLoadState(): Promise<void> {
+  async waitForLoadState(
+    _state: 'domcontentloaded',
+    options?: {
+      timeout?: number
+    }
+  ): Promise<void> {
     this.loadCalls += 1
+    this.loadTimeoutMs = options?.timeout
   }
 
   isClosed(): boolean {
@@ -194,7 +213,9 @@ describe('DeskDataSearchResultPageResolver', () => {
 
     const result = await new DeskDataSearchResultPageResolver({
       searchAttempts: 1,
-      searchIntervalMs: 0
+      searchIntervalMs: 0,
+      navigationTimeoutMs: 31_234,
+      actionTimeoutMs: 12_345
     }).resolve(page as unknown as Page, '12345678901')
 
     expect(result).toEqual({
@@ -207,6 +228,12 @@ describe('DeskDataSearchResultPageResolver', () => {
     expect(oldLinkClick).not.toHaveBeenCalled()
     expect(incompleteLinkClick).not.toHaveBeenCalled()
     expect(latestLinkClick).toHaveBeenCalledTimes(1)
+    expect(page.popupTimeoutMs).toBe(31_234)
+    expect(popup.loadTimeoutMs).toBe(31_234)
+    expect(
+      (rows.nth(2).locator(DESKDATA_SIMILAR_QUERY_SELECTORS.historyLink) as FakeLocator)
+        .clickTimeoutMs
+    ).toBe(12_345)
   })
 
   it('waits for delayed popup navigation and accepts a trailing slash', async () => {

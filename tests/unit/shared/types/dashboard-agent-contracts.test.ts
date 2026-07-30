@@ -5,8 +5,10 @@ import {
   AGENT_RUNTIME_IPC_CHANNELS,
   createInitialAgentPublicState
 } from '@/shared/types/agent-runtime-api'
+import { BROWSER_IPC_CHANNELS, BROWSER_MANAGER_STATES } from '@/shared/types/browser-api'
 import { HISTORY_IPC_CHANNELS, RESEARCH_HISTORY_STATUSES } from '@/shared/types/history-api'
-import { PDF_IPC_CHANNELS } from '@/shared/types/pdf-api'
+import { PDF_ACTION_STATUSES, PDF_IPC_CHANNELS } from '@/shared/types/pdf-api'
+import { PLATFORM_SESSION_STATES, SESSION_IPC_CHANNELS } from '@/shared/types/session-api'
 
 describe('contratos públicos do dashboard contínuo', () => {
   it('expõe somente os estados públicos aprovados', () => {
@@ -68,9 +70,27 @@ describe('contratos públicos do dashboard contínuo', () => {
   })
 
   it('define somente as ações permitidas para PDF', () => {
+    expect(PDF_ACTION_STATUSES).toEqual(['OPENED', 'REVEALED', 'NOT_FOUND'])
+
     expect(PDF_IPC_CHANNELS).toEqual({
       open: 'pdf:open',
       reveal: 'pdf:reveal'
+    })
+  })
+
+  it('preserva estados e canais públicos do navegador', () => {
+    expect(BROWSER_MANAGER_STATES).toEqual(['STOPPED', 'STARTING', 'RUNNING', 'STOPPING'])
+    expect(BROWSER_IPC_CHANNELS).toEqual({
+      start: 'browser:start',
+      stop: 'browser:stop',
+      status: 'browser:status'
+    })
+  })
+
+  it('preserva estados e canal público das sessões', () => {
+    expect(PLATFORM_SESSION_STATES).toEqual(['AUTHENTICATED', 'WAITING_LOGIN', 'INDETERMINATE'])
+    expect(SESSION_IPC_CHANNELS).toEqual({
+      status: 'sessions:status'
     })
   })
 })

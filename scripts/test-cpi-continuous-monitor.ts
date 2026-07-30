@@ -1,22 +1,19 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
-import { join } from 'node:path'
 import { chromium, type Page } from 'playwright'
 import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
 import { CpiQueueAvailabilityReader } from '../src/automation/cpi/cpi-queue-availability'
 import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
-import { CpiQueueMonitor } from '../src/automation/cpi/cpi-queue-monitor'
+import { CpiQueueMonitor, NodeQueueDelay } from '../src/automation/cpi/cpi-queue-monitor'
+import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 function findCpiPage(pages: Page[]): Page | undefined {
   return pages.find((page) => page.url().includes('adm.cpicentral.com.br'))
 }
 
 async function main(): Promise<void> {
-  const appData = process.env.APPDATA
-
-  if (!appData) {
-    throw new Error('Variável APPDATA não encontrada.')
-  }
+  const { config, paths } = resolveWindowsOperationalConfig()
+  const profilePath = paths.browserProfileDir
 
   const terminal = createInterface({
     input: stdin,
@@ -33,18 +30,18 @@ async function main(): Promise<void> {
 
   process.once('SIGINT', handleSigint)
 
-  const context = await chromium.launchPersistentContext(
-    join(appData, 'AgenteCPI', 'browser-profile'),
-    {
-      headless: false,
-      viewport: null,
-      acceptDownloads: true,
-      args: ['--start-maximized']
-    }
-  )
+  const context = await chromium.launchPersistentContext(profilePath, {
+    headless: false,
+    viewport: null,
+    acceptDownloads: true,
+    args: ['--start-maximized']
+  })
 
   try {
-    const pageManager = new PlatformPageManager()
+    const pageManager = new PlatformPageManager(
+      config.platform,
+      config.timing.platformPageNavigationTimeoutMs
+    )
 
     await pageManager.ensurePages(context)
 
@@ -68,11 +65,21 @@ async function main(): Promise<void> {
 
     await cpiPage.bringToFront()
 
-    const filterController = new CpiQueueFilterController()
+    const filterController = new CpiQueueFilterController({
+      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      settleDelayMs: config.timing.queueFilterSettleDelayMs
+    })
 
-    const availabilityReader = new CpiQueueAvailabilityReader()
+    const availabilityReader = new CpiQueueAvailabilityReader(config.timing.readTimeoutMs)
 
-    const monitor = new CpiQueueMonitor(filterController, availabilityReader)
+    const monitor = new CpiQueueMonitor(
+      filterController,
+      availabilityReader,
+      new NodeQueueDelay(),
+      config.timing.queueCheckIntervalMs
+    )
 
     console.log('Aplicando filtro PROCESSOS JUDICIAIS CRIMINAL FÓRUM NACIONAL CPF...')
 

@@ -43,7 +43,7 @@ describe('CpiQueueMonitor', () => {
     const source = new FakeAvailabilitySource(['EMPTY', 'HAS_RESEARCH'])
     const delay = new FakeDelay()
 
-    const monitor = new CpiQueueMonitor(refresher, source, delay)
+    const monitor = new CpiQueueMonitor(refresher, source, delay, 60_000)
 
     const result = await monitor.waitForResearch({} as Page)
 
@@ -61,7 +61,7 @@ describe('CpiQueueMonitor', () => {
     const source = new FakeAvailabilitySource(['HAS_RESEARCH'])
     const delay = new FakeDelay()
 
-    const monitor = new CpiQueueMonitor(refresher, source, delay)
+    const monitor = new CpiQueueMonitor(refresher, source, delay, 60_000)
 
     await expect(monitor.waitForResearch({} as Page)).resolves.toEqual({
       status: 'RESEARCH_AVAILABLE',
@@ -76,7 +76,7 @@ describe('CpiQueueMonitor', () => {
     const source = new FakeAvailabilitySource(['HAS_RESEARCH'])
     const delay = new FakeDelay()
 
-    const monitor = new CpiQueueMonitor(refresher, source, delay)
+    const monitor = new CpiQueueMonitor(refresher, source, delay, 60_000)
 
     await expect(
       monitor.waitForResearch({} as Page, {
@@ -96,7 +96,7 @@ describe('CpiQueueMonitor', () => {
     const delay = new FakeDelay()
     const reportedStates: string[] = []
 
-    const monitor = new CpiQueueMonitor(refresher, source, delay)
+    const monitor = new CpiQueueMonitor(refresher, source, delay, 60_000)
 
     await expect(
       monitor.waitForResearch({} as Page, {

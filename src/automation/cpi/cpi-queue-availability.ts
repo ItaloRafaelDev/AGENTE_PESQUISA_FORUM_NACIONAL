@@ -39,12 +39,14 @@ export function classifyCpiQueueText(pageText: string): CpiQueueAvailabilityStat
 }
 
 export class CpiQueueAvailabilityReader {
+  constructor(private readonly readTimeoutMs = 5_000) {}
+
   async read(page: Page): Promise<CpiQueueAvailabilityState> {
     for (const frame of page.frames()) {
       const bodyText = await frame
         .locator('body')
         .innerText({
-          timeout: 5_000
+          timeout: this.readTimeoutMs
         })
         .catch(() => '')
 

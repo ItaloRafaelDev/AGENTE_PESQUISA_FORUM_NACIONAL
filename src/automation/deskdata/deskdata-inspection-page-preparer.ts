@@ -1,5 +1,4 @@
 import type { BrowserContext } from 'playwright'
-import { PlatformPageManager } from '../browser/platform-page-manager'
 
 export interface DeskDataInspectionPageManager {
   ensurePages(context: BrowserContext): Promise<unknown>
@@ -7,7 +6,7 @@ export interface DeskDataInspectionPageManager {
 
 export async function prepareDeskDataInspectionPages(
   context: BrowserContext,
-  pageManager: DeskDataInspectionPageManager = new PlatformPageManager()
+  pageManager: DeskDataInspectionPageManager
 ): Promise<void> {
   await pageManager.ensurePages(context)
 }

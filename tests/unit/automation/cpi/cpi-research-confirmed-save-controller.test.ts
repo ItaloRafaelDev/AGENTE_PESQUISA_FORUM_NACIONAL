@@ -48,11 +48,13 @@ describe('CpiResearchConfirmedSaveController', () => {
 
     const frame = {} as CpiResearchSaveFrame
 
-    const result = await new CpiResearchConfirmedSaveController(saver).saveOnce(page, frame)
+    const result = await new CpiResearchConfirmedSaveController(saver, {
+      dialogTimeoutMs: 12_345
+    }).saveOnce(page, frame)
 
     expect(callOrder).toEqual(['WAIT_DIALOG', 'CLICK_ALTERAR', 'ACCEPT_DIALOG'])
 
-    expect(waitForEvent).toHaveBeenCalledWith('dialog', { timeout: 10_000 })
+    expect(waitForEvent).toHaveBeenCalledWith('dialog', { timeout: 12_345 })
     expect(accept).toHaveBeenCalledTimes(1)
     expect(dismiss).not.toHaveBeenCalled()
     expect(saveOnce).toHaveBeenCalledTimes(1)

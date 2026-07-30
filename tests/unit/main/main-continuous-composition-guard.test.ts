@@ -8,6 +8,12 @@ const runtimeSource = readFileSync('src/main/main-application-runtime.ts', 'utf8
 const productionMainSource = `${mainSource}\n${runtimeSource}`
 
 describe('composição contínua do processo principal', () => {
+  it('injeta a configuração central de plataforma e intervalo da fila', () => {
+    expect(runtimeSource).toContain('parseAppConfig()')
+    expect(runtimeSource).toContain('config.platform')
+    expect(runtimeSource).toContain('config.timing.queueCheckIntervalMs')
+  })
+
   it('mantém o ciclo de vida Electron separado da composição da aplicação', () => {
     expect(mainSource).toContain('new MainApplicationRuntime()')
 
@@ -21,15 +27,15 @@ describe('composição contínua do processo principal', () => {
   it('usa o banco SQLite dentro de userData', () => {
     expect(runtimeSource).toContain("app.getPath('userData')")
 
-    expect(runtimeSource).toContain("'agente-cpi.sqlite'")
+    expect(runtimeSource).toContain('resolveApplicationPaths')
 
-    expect(runtimeSource).toContain('ResearchHistoryRepository.open')
+    expect(runtimeSource).toContain('ResearchHistoryRepository.open(runtimePaths.databaseFile)')
 
     expect(runtimeSource).toContain('markUnfinishedAsInterrupted')
   })
 
   it('compõe o runner contínuo e o runtime público', () => {
-    expect(runtimeSource).toContain('new ContinuousResearchRunner()')
+    expect(runtimeSource).toContain('createContinuousResearchRunner')
 
     expect(runtimeSource).toContain('new AgentPublicStateStore()')
 

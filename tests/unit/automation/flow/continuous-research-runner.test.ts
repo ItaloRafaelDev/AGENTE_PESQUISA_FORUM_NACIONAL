@@ -1,13 +1,17 @@
+import { readFileSync } from 'node:fs'
 import type { BrowserContext, Page } from 'playwright'
 import { describe, expect, it, vi } from 'vitest'
 import type { CpiQueueMonitorOptions } from '@/automation/cpi/cpi-queue-monitor'
 import {
   ContinuousResearchRunner,
+  createContinuousResearchRunner,
   type ContinuousResearchRunnerDependencies,
   type ContinuousResearchRunnerInput,
   type ContinuousResearchRunnerState
 } from '@/automation/flow/continuous-research-runner'
 import type { SingleResearchCycleResult } from '@/automation/flow/single-research-cycle'
+
+const runtimeSource = readFileSync('src/main/main-application-runtime.ts', 'utf8')
 
 function createCycleResult(cycle: number): SingleResearchCycleResult {
   return {
@@ -35,6 +39,155 @@ function createRunnerInput(
 }
 
 describe('ContinuousResearchRunner', () => {
+  it('resolve uma vez o diretório PDF preferido ou operacional antes de compor o runner', () => {
+    expect(runtimeSource).toContain('resolvePdfOutputDirectory')
+    expect(runtimeSource).toMatch(
+      /const pdfOutputDirectory = await resolvePdfOutputDirectory\(\{\s*preferredDirectory: runtimePaths\.preferredPdfDirectory,\s*fallbackDirectory: runtimePaths\.downloadsDir\s*\}\)/
+    )
+    expect(runtimeSource).toMatch(
+      /createContinuousResearchRunner\(\{[\s\S]*?pdfOutputDirectory[\s\S]*?\}\)/
+    )
+  })
+
+  it('deve propagar a configuração explícita para as dependências produtivas', async () => {
+    const config = {
+      queueCheckIntervalMs: 61_111,
+      cpiSearchPollingIntervalMs: 321,
+      actionTimeoutMs: 12_345,
+      readTimeoutMs: 4_321,
+      queueFilterSettleDelayMs: 876,
+      cpiFrameSearchAttempts: 17,
+      deskDataPeopleUrl: 'https://config.deskdata.com.br/pessoas/',
+      navigationTimeoutMs: 31_234,
+      downloadStartTimeoutMs: 32_345,
+      deskDataFormPollingIntervalMs: 432,
+      deskDataResultPollingIntervalMs: 543,
+      deskDataHistoryNavigationIntervalMs: 654,
+      submitSettleDelayMs: 1_234,
+      queueReturnDelayMs: 3_210,
+      cpiIdentitySearchAttempts: 18,
+      cpiAttachmentSearchAttempts: 19,
+      cpiResultSearchAttempts: 20,
+      cpiResultStabilizationAttempts: 4,
+      deskDataFormReadyAttempts: 21,
+      deskDataResultSearchAttempts: 22,
+      deskDataHistoryNavigationAttempts: 23,
+      pdfOutputDirectory: 'E:\\resolved-runner-output'
+    }
+
+    const captured: {
+      filterOptions?: unknown
+      availabilityTimeoutMs?: number
+      monitor?: {
+        refresher: unknown
+        availabilitySource: unknown
+        intervalMs: number
+      }
+      cycleConfig?: unknown
+    } = {}
+
+    const filterController = {
+      refreshQueue: vi.fn(async () => undefined)
+    }
+
+    const availabilityReader = {
+      read: vi.fn(async () => 'HAS_RESEARCH' as const)
+    }
+
+    const abortController = new AbortController()
+    const states: ContinuousResearchRunnerState[] = []
+
+    const runner = createContinuousResearchRunner(config, {
+      createFilterController: (options) => {
+        captured.filterOptions = options
+
+        return filterController
+      },
+
+      createAvailabilityReader: (readTimeoutMs) => {
+        captured.availabilityTimeoutMs = readTimeoutMs
+
+        return availabilityReader
+      },
+
+      createQueueMonitor: (refresher, availabilitySource, _delay, intervalMs) => {
+        captured.monitor = {
+          refresher,
+          availabilitySource,
+          intervalMs
+        }
+
+        return {
+          waitForResearch: async (_page, options) => {
+            options?.onState?.('EMPTY', 1)
+
+            return {
+              status: 'RESEARCH_AVAILABLE',
+              checks: 2
+            }
+          }
+        }
+      },
+
+      createSingleResearchCycle: (cycleConfig) => {
+        captured.cycleConfig = cycleConfig
+
+        return {
+          run: async () => {
+            abortController.abort()
+
+            return createCycleResult(1)
+          }
+        }
+      }
+    })
+
+    await runner.run(
+      createRunnerInput(abortController.signal, (state) => {
+        states.push(state)
+      })
+    )
+
+    expect(captured.filterOptions).toEqual({
+      frameSearchAttempts: 17,
+      frameSearchIntervalMs: 321,
+      actionTimeoutMs: 12_345,
+      settleDelayMs: 876
+    })
+    expect(captured.availabilityTimeoutMs).toBe(4_321)
+    expect(captured.monitor).toEqual({
+      refresher: filterController,
+      availabilitySource: availabilityReader,
+      intervalMs: 61_111
+    })
+    expect(captured.cycleConfig).toEqual({
+      cpiFrameSearchAttempts: 17,
+      cpiSearchPollingIntervalMs: 321,
+      actionTimeoutMs: 12_345,
+      deskDataPeopleUrl: 'https://config.deskdata.com.br/pessoas/',
+      navigationTimeoutMs: 31_234,
+      readTimeoutMs: 4_321,
+      downloadStartTimeoutMs: 32_345,
+      deskDataFormPollingIntervalMs: 432,
+      deskDataResultPollingIntervalMs: 543,
+      deskDataHistoryNavigationIntervalMs: 654,
+      submitSettleDelayMs: 1_234,
+      queueReturnDelayMs: 3_210,
+      cpiIdentitySearchAttempts: 18,
+      cpiAttachmentSearchAttempts: 19,
+      cpiResultSearchAttempts: 20,
+      cpiResultStabilizationAttempts: 4,
+      deskDataFormReadyAttempts: 21,
+      deskDataResultSearchAttempts: 22,
+      deskDataHistoryNavigationAttempts: 23,
+      pdfOutputDirectory: 'E:\\resolved-runner-output'
+    })
+    expect(states).toContainEqual({
+      type: 'IDLE',
+      nextCheckInMs: 61_111
+    })
+  })
+
   it('deve executar duas pesquisas estritamente em sequência', async () => {
     const abortController = new AbortController()
     const callOrder: string[] = []

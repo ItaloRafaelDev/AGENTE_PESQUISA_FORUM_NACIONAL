@@ -15,16 +15,24 @@ export const CPI_QUEUE_SELECTORS = {
 export interface CpiQueueFilterControllerOptions {
   frameSearchAttempts?: number
   frameSearchIntervalMs?: number
+  actionTimeoutMs?: number
+  settleDelayMs?: number
 }
 
 export class CpiQueueFilterController {
   private readonly frameSearchAttempts: number
   private readonly frameSearchIntervalMs: number
+  private readonly actionTimeoutMs: number
+  private readonly settleDelayMs: number
 
   constructor(options: CpiQueueFilterControllerOptions = {}) {
     this.frameSearchAttempts = options.frameSearchAttempts ?? 40
 
     this.frameSearchIntervalMs = options.frameSearchIntervalMs ?? 250
+
+    this.actionTimeoutMs = options.actionTimeoutMs ?? 10_000
+
+    this.settleDelayMs = options.settleDelayMs ?? 700
   }
 
   async applyCriminalForumFilter(page: Page): Promise<void> {
@@ -35,7 +43,7 @@ export class CpiQueueFilterController {
     )
 
     await advancedFilterButton.click({
-      timeout: 10_000
+      timeout: this.actionTimeoutMs
     })
 
     const filterFrame = await this.findAdvancedFilterFrame(page)
@@ -49,10 +57,10 @@ export class CpiQueueFilterController {
     )
 
     await selectButton.click({
-      timeout: 10_000
+      timeout: this.actionTimeoutMs
     })
 
-    await page.waitForTimeout(700)
+    await page.waitForTimeout(this.settleDelayMs)
   }
 
   async refreshQueue(page: Page): Promise<void> {
@@ -63,16 +71,16 @@ export class CpiQueueFilterController {
     )
 
     await showAllButton.click({
-      timeout: 10_000
+      timeout: this.actionTimeoutMs
     })
 
     await page
       .waitForLoadState('domcontentloaded', {
-        timeout: 10_000
+        timeout: this.actionTimeoutMs
       })
       .catch(() => undefined)
 
-    await page.waitForTimeout(700)
+    await page.waitForTimeout(this.settleDelayMs)
   }
 
   private async selectOnlyTargetFilter(frame: Frame): Promise<void> {

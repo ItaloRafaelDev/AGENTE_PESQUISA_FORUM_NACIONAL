@@ -35,6 +35,13 @@ const sessionsAuthenticated = {
   checkedAt: '2026-07-14T10:00:00.000Z'
 }
 
+function agentState(status: AgentPublicState['status']): AgentPublicState {
+  return {
+    ...createInitialAgentPublicState(),
+    status
+  }
+}
+
 const browserStart = vi.fn()
 const browserStop = vi.fn()
 const browserGetStatus = vi.fn()
@@ -195,11 +202,14 @@ describe('AgentDashboard contínuo', () => {
 
     render(<AgentDashboard />)
 
-    expect(
-      await screen.findByRole('button', {
-        name: 'Login concluído — continuar'
-      })
-    ).toBeEnabled()
+    const user = userEvent.setup()
+    const button = await screen.findByRole('button', {
+      name: 'Login concluído — continuar'
+    })
+
+    expect(button).toBeEnabled()
+    await user.click(button)
+    expect(loginCompleted).toHaveBeenCalledOnce()
   })
 
   it('recebe atualizações em tempo real sem polling do agente', async () => {
@@ -237,5 +247,57 @@ describe('AgentDashboard contínuo', () => {
     render(<AgentDashboard />)
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Falha com CPF ***.***.***-44')
+  })
+
+  it('abre e fecha o navegador somente pelos botões correspondentes', async () => {
+    const user = userEvent.setup()
+    const view = render(<AgentDashboard />)
+
+    await screen.findByTestId('agent-state')
+    await user.click(screen.getByRole('button', { name: 'Abrir navegador' }))
+    expect(browserStart).toHaveBeenCalledOnce()
+    expect(browserStop).not.toHaveBeenCalled()
+
+    view.unmount()
+    browserGetStatus.mockResolvedValue(browserRunning)
+    render(<AgentDashboard />)
+
+    await screen.findByTestId('agent-state')
+    await user.click(screen.getByRole('button', { name: 'Fechar navegador' }))
+    expect(browserStop).toHaveBeenCalledOnce()
+    expect(browserStart).toHaveBeenCalledOnce()
+  })
+
+  it.each([
+    {
+      status: 'OCIOSO' as const,
+      button: 'Pausar',
+      command: agentPause
+    },
+    {
+      status: 'PAUSADO' as const,
+      button: 'Continuar',
+      command: agentResume
+    },
+    {
+      status: 'EXECUTANDO' as const,
+      button: 'Parar',
+      command: agentStop
+    }
+  ])('executa $button quando o agente está $status', async ({ status, button, command }) => {
+    agentGetState.mockResolvedValue(agentState(status))
+    const user = userEvent.setup()
+
+    render(<AgentDashboard />)
+    await screen.findByTestId('agent-state')
+    await user.click(screen.getByRole('button', { name: button }))
+
+    expect(command).toHaveBeenCalledOnce()
+
+    for (const otherCommand of [agentPause, agentResume, agentStop]) {
+      if (otherCommand !== command) {
+        expect(otherCommand).not.toHaveBeenCalled()
+      }
+    }
   })
 })

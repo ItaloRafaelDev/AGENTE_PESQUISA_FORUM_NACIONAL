@@ -7,6 +7,7 @@ import {
 
 class FakePage implements ManagedPage {
   public readonly navigations: string[] = []
+  public readonly navigationTimeouts: Array<number | undefined> = []
   public bringToFrontCalls = 0
   private closed = false
 
@@ -20,9 +21,10 @@ class FakePage implements ManagedPage {
     return this.closed
   }
 
-  async goto(url: string): Promise<null> {
+  async goto(url: string, options?: { timeout?: number }): Promise<null> {
     this.currentUrl = url
     this.navigations.push(url)
+    this.navigationTimeouts.push(options?.timeout)
 
     return null
   }
@@ -54,14 +56,18 @@ class FakeContext implements ManagedBrowserContext {
 
 const urls = {
   cpiQueueUrl: 'https://cpi.example.test/fila',
-  deskDataPeopleUrl: 'https://deskdata.example.test/pessoas'
+  deskDataPeopleUrl: 'https://deskdata.example.test/pessoas/'
 }
 
 describe('PlatformPageManager', () => {
+  it('deve exigir URLs de plataforma configuradas', () => {
+    expect(() => new PlatformPageManager(undefined as never, 45_000)).toThrow()
+  })
+
   it('deve reutilizar a aba em branco para a CPI e criar uma aba para a DeskData', async () => {
     const blankPage = new FakePage('about:blank')
     const context = new FakeContext([blankPage])
-    const manager = new PlatformPageManager(urls)
+    const manager = new PlatformPageManager(urls, 47_321)
 
     const snapshot = await manager.ensurePages(context)
 
@@ -71,6 +77,7 @@ describe('PlatformPageManager', () => {
       cpiPageUrl: urls.cpiQueueUrl,
       deskDataPageUrl: urls.deskDataPeopleUrl
     })
+    expect(context.pageList.flatMap((page) => page.navigationTimeouts)).toEqual([47_321, 47_321])
     expect(blankPage.bringToFrontCalls).toBe(1)
   })
 
@@ -79,7 +86,7 @@ describe('PlatformPageManager', () => {
     const deskDataPage = new FakePage('https://deskdata.example.test/dashboard')
 
     const context = new FakeContext([cpiPage, deskDataPage])
-    const manager = new PlatformPageManager(urls)
+    const manager = new PlatformPageManager(urls, 45_000)
 
     await manager.ensurePages(context)
 
@@ -91,7 +98,7 @@ describe('PlatformPageManager', () => {
 
   it('não deve criar abas duplicadas em uma segunda execução', async () => {
     const context = new FakeContext([new FakePage('about:blank')])
-    const manager = new PlatformPageManager(urls)
+    const manager = new PlatformPageManager(urls, 45_000)
 
     await manager.ensurePages(context)
     await manager.ensurePages(context)

@@ -1,20 +1,21 @@
 import { stat } from 'node:fs/promises'
-import { join } from 'node:path'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { BrowserManager } from '../automation/browser/browser-manager'
 import { BrowserWorkspaceService } from '../automation/browser/browser-workspace-service'
 import { PlatformPageManager } from '../automation/browser/platform-page-manager'
 import { PlaywrightBrowserLauncher } from '../automation/browser/playwright-browser-launcher'
 import { CpiQueueFilterController } from '../automation/cpi/cpi-queue-filter-controller'
-import { ContinuousResearchRunner } from '../automation/flow/continuous-research-runner'
+import { createContinuousResearchRunner } from '../automation/flow/continuous-research-runner'
 import { ResearchHistoryService } from '../automation/history/research-history-service'
 import { PlatformSessionService } from '../automation/session/platform-session-service'
 import { AgentPublicStateStore } from '../automation/workflow/agent-public-state-store'
 import { ContinuousAgentRuntimeService } from '../automation/workflow/continuous-agent-runtime-service'
+import { parseAppConfig } from '../infrastructure/config/app-config'
 import { ResearchHistoryRepository } from '../infrastructure/database/research-history-repository'
+import { resolvePdfOutputDirectory } from '../infrastructure/filesystem/pdf-output-directory-resolver'
 import {
-  ensureRuntimeDirectories,
-  resolveRuntimePaths
+  ensureOperationalDirectories,
+  resolveApplicationPaths
 } from '../infrastructure/filesystem/runtime-paths'
 import { registerBrowserIpcHandlers } from './ipc/register-browser-ipc-handlers'
 import { registerContinuousAgentIpcHandlers } from './ipc/register-continuous-agent-ipc-handlers'
@@ -45,24 +46,42 @@ export class MainApplicationRuntime {
   private disposeHistoryIpc: (() => void) | null = null
 
   async initialize(): Promise<void> {
-    const runtimePaths = resolveRuntimePaths(join(app.getPath('appData'), 'AgenteCPI'))
+    const config = parseAppConfig()
+    const runtimePaths = resolveApplicationPaths(
+      {
+        appDataDir: app.getPath('appData'),
+        userDataDir: app.getPath('userData')
+      },
+      config.paths
+    )
 
-    await ensureRuntimeDirectories(runtimePaths)
+    await ensureOperationalDirectories(runtimePaths)
+
+    const pdfOutputDirectory = await resolvePdfOutputDirectory({
+      preferredDirectory: runtimePaths.preferredPdfDirectory,
+      fallbackDirectory: runtimePaths.downloadsDir
+    })
 
     const browserManager = new BrowserManager(
       new PlaywrightBrowserLauncher(),
       runtimePaths.browserProfileDir
     )
 
-    this.browserService = new BrowserWorkspaceService(browserManager, new PlatformPageManager())
+    this.browserService = new BrowserWorkspaceService(
+      browserManager,
+      new PlatformPageManager(config.platform, config.timing.platformPageNavigationTimeoutMs)
+    )
 
     const sessionService = new PlatformSessionService(browserManager)
 
-    const queueFilterController = new CpiQueueFilterController()
+    const queueFilterController = new CpiQueueFilterController({
+      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      settleDelayMs: config.timing.queueFilterSettleDelayMs
+    })
 
-    this.historyRepository = ResearchHistoryRepository.open(
-      join(app.getPath('userData'), 'agente-cpi.sqlite')
-    )
+    this.historyRepository = ResearchHistoryRepository.open(runtimePaths.databaseFile)
 
     this.historyRepository.markUnfinishedAsInterrupted(new Date().toISOString())
 
@@ -75,7 +94,30 @@ export class MainApplicationRuntime {
       browser: this.browserService,
       sessions: sessionService,
       filter: queueFilterController,
-      runner: new ContinuousResearchRunner(),
+      runner: createContinuousResearchRunner({
+        queueCheckIntervalMs: config.timing.queueCheckIntervalMs,
+        cpiSearchPollingIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+        actionTimeoutMs: config.timing.actionTimeoutMs,
+        readTimeoutMs: config.timing.readTimeoutMs,
+        queueFilterSettleDelayMs: config.timing.queueFilterSettleDelayMs,
+        cpiFrameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+        deskDataPeopleUrl: config.platform.deskDataPeopleUrl,
+        navigationTimeoutMs: config.timing.navigationTimeoutMs,
+        downloadStartTimeoutMs: config.timing.downloadStartTimeoutMs,
+        deskDataFormPollingIntervalMs: config.timing.deskDataFormPollingIntervalMs,
+        deskDataResultPollingIntervalMs: config.timing.deskDataResultPollingIntervalMs,
+        deskDataHistoryNavigationIntervalMs: config.timing.deskDataHistoryNavigationIntervalMs,
+        submitSettleDelayMs: config.timing.submitSettleDelayMs,
+        queueReturnDelayMs: config.timing.queueReturnDelayMs,
+        cpiIdentitySearchAttempts: config.limits.cpiIdentitySearchAttempts,
+        cpiAttachmentSearchAttempts: config.limits.cpiAttachmentSearchAttempts,
+        cpiResultSearchAttempts: config.limits.cpiResultSearchAttempts,
+        cpiResultStabilizationAttempts: config.limits.cpiResultStabilizationAttempts,
+        deskDataFormReadyAttempts: config.limits.deskDataFormReadyAttempts,
+        deskDataResultSearchAttempts: config.limits.deskDataResultSearchAttempts,
+        deskDataHistoryNavigationAttempts: config.limits.deskDataHistoryNavigationAttempts,
+        pdfOutputDirectory
+      }),
       history: historyService
     })
 

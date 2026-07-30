@@ -1,14 +1,14 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
-import { join } from 'node:path'
 import { chromium, type Page } from 'playwright'
 import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
 import { CpiQueueAvailabilityReader } from '../src/automation/cpi/cpi-queue-availability'
 import { CpiFirstResearchOpener } from '../src/automation/cpi/cpi-first-research-opener'
 import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
-import { CpiQueueMonitor } from '../src/automation/cpi/cpi-queue-monitor'
+import { CpiQueueMonitor, NodeQueueDelay } from '../src/automation/cpi/cpi-queue-monitor'
 import { CpiResearchIdentityReader } from '../src/automation/cpi/cpi-research-identity-reader'
 import { DeskDataCpfFormController } from '../src/automation/deskdata/deskdata-cpf-form-controller'
+import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 function findPage(pages: Page[], hostname: string): Page | undefined {
   return pages.find((page) => {
@@ -43,29 +43,26 @@ function isDeskDataPeoplePage(page: Page): boolean {
 }
 
 async function main(): Promise<void> {
-  const appData = process.env.APPDATA
-
-  if (!appData) {
-    throw new Error('Variável APPDATA não encontrada.')
-  }
+  const { config, paths } = resolveWindowsOperationalConfig()
+  const profilePath = paths.browserProfileDir
 
   const terminal = createInterface({
     input: stdin,
     output: stdout
   })
 
-  const context = await chromium.launchPersistentContext(
-    join(appData, 'AgenteCPI', 'browser-profile'),
-    {
-      headless: false,
-      viewport: null,
-      acceptDownloads: true,
-      args: ['--start-maximized']
-    }
-  )
+  const context = await chromium.launchPersistentContext(profilePath, {
+    headless: false,
+    viewport: null,
+    acceptDownloads: true,
+    args: ['--start-maximized']
+  })
 
   try {
-    const pageManager = new PlatformPageManager()
+    const pageManager = new PlatformPageManager(
+      config.platform,
+      config.timing.platformPageNavigationTimeoutMs
+    )
 
     await pageManager.ensurePages(context)
 
@@ -106,9 +103,19 @@ async function main(): Promise<void> {
 
     await cpiPage.bringToFront()
 
-    const filterController = new CpiQueueFilterController()
+    const filterController = new CpiQueueFilterController({
+      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      settleDelayMs: config.timing.queueFilterSettleDelayMs
+    })
 
-    const monitor = new CpiQueueMonitor(filterController, new CpiQueueAvailabilityReader())
+    const monitor = new CpiQueueMonitor(
+      filterController,
+      new CpiQueueAvailabilityReader(config.timing.readTimeoutMs),
+      new NodeQueueDelay(),
+      config.timing.queueCheckIntervalMs
+    )
 
     console.log('Aplicando filtro 29 na CPI...')
 
@@ -122,17 +129,28 @@ async function main(): Promise<void> {
       throw new Error('Nenhuma pesquisa disponível foi confirmada.')
     }
 
-    const opener = new CpiFirstResearchOpener()
+    const opener = new CpiFirstResearchOpener({
+      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: config.timing.actionTimeoutMs
+    })
 
     await opener.openFirst(cpiPage)
 
-    const identityReader = new CpiResearchIdentityReader()
+    const identityReader = new CpiResearchIdentityReader({
+      searchAttempts: config.limits.cpiIdentitySearchAttempts,
+      searchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+      readTimeoutMs: config.timing.readTimeoutMs
+    })
 
     const identity = await identityReader.read(cpiPage)
 
     console.log(`CPF capturado na CPI: ${identity.maskedCpf}`)
 
-    const deskDataController = new DeskDataCpfFormController()
+    const deskDataController = new DeskDataCpfFormController({
+      actionTimeoutMs: config.timing.actionTimeoutMs,
+      readTimeoutMs: config.timing.readTimeoutMs
+    })
 
     const filledCpf = await deskDataController.fillCpf(deskDataPage, identity.cpf)
 

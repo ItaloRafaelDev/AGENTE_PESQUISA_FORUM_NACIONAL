@@ -18,6 +18,7 @@ export interface CpiResearchResultControllerOptions {
   resultSearchAttempts?: number
   resultSearchIntervalMs?: number
   stabilizationAttempts?: number
+  readTimeoutMs?: number
 }
 
 export interface PreparedCpiResearchResult {
@@ -43,6 +44,7 @@ export class CpiResearchResultController {
   private readonly resultSearchAttempts: number
   private readonly resultSearchIntervalMs: number
   private readonly stabilizationAttempts: number
+  private readonly readTimeoutMs: number
 
   constructor(options: CpiResearchResultControllerOptions = {}) {
     this.resultSearchAttempts = options.resultSearchAttempts ?? 40
@@ -50,6 +52,8 @@ export class CpiResearchResultController {
     this.resultSearchIntervalMs = options.resultSearchIntervalMs ?? 250
 
     this.stabilizationAttempts = options.stabilizationAttempts ?? 3
+
+    this.readTimeoutMs = options.readTimeoutMs ?? 5_000
 
     if (this.resultSearchAttempts < 1) {
       throw new Error('Número de tentativas deve ser maior que zero.')
@@ -192,7 +196,7 @@ export class CpiResearchResultController {
 
     const selectedLabel = this.normalizeLabel(
       await selectedOption.innerText({
-        timeout: 5_000
+        timeout: this.readTimeoutMs
       })
     )
 

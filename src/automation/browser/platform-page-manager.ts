@@ -1,4 +1,7 @@
-import { parsePlatformUrls, type PlatformUrls } from './platform-urls'
+export interface PlatformUrls {
+  cpiQueueUrl: string
+  deskDataPeopleUrl: string
+}
 
 export interface ManagedPage {
   url(): string
@@ -24,10 +27,13 @@ export interface PlatformPagesSnapshot {
 }
 
 export class PlatformPageManager {
-  private readonly urls: PlatformUrls
-
-  constructor(urlInput: unknown = undefined) {
-    this.urls = urlInput === undefined ? parsePlatformUrls() : parsePlatformUrls(urlInput)
+  constructor(
+    private readonly urls: PlatformUrls,
+    private readonly navigationTimeoutMs: number
+  ) {
+    if (!urls) {
+      throw new Error('URLs das plataformas não informadas')
+    }
   }
 
   async ensurePages(context: ManagedBrowserContext): Promise<PlatformPagesSnapshot> {
@@ -65,7 +71,7 @@ export class PlatformPageManager {
     if (page.url() !== targetUrl) {
       await page.goto(targetUrl, {
         waitUntil: 'domcontentloaded',
-        timeout: 45_000
+        timeout: this.navigationTimeoutMs
       })
     }
 

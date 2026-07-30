@@ -3,13 +3,149 @@ import { describe, expect, it, vi } from 'vitest'
 import type { CpiResearchIdentity } from '@/automation/cpi/cpi-research-identity-reader'
 import type { CpiResearchPdfPreparationFrame } from '@/automation/cpi/cpi-research-pdf-preparation-workflow'
 import {
+  createFullResearchPreparationWorkflow,
   FullResearchPreparationWorkflow,
   mapDeskDataResultToResearchClassification,
   type FullResearchPreparationDependencies
 } from '@/automation/flow/full-research-preparation-workflow'
+import * as fullResearchWorkflowModule from '@/automation/flow/full-research-preparation-workflow'
+import type { ResearchCycleRuntimeConfig } from '@/automation/flow/single-research-cycle'
 import type { DeskDataProcessRecord } from '@/domain/research/deskdata-process-record'
 
 describe('FullResearchPreparationWorkflow', () => {
+  it('compõe o workflow produtivo com a configuração validada sem seam de teste', () => {
+    const workflow = createFullResearchPreparationWorkflow({
+      navigationTimeoutMs: 30_000,
+      actionTimeoutMs: 10_000,
+      readTimeoutMs: 5_000,
+      downloadStartTimeoutMs: 30_000,
+      cpiSearchPollingIntervalMs: 250,
+      deskDataFormPollingIntervalMs: 250,
+      deskDataResultPollingIntervalMs: 500,
+      deskDataHistoryNavigationIntervalMs: 250,
+      submitSettleDelayMs: 1_000,
+      queueReturnDelayMs: 3_000,
+      cpiIdentitySearchAttempts: 40,
+      cpiAttachmentSearchAttempts: 40,
+      cpiResultSearchAttempts: 40,
+      cpiResultStabilizationAttempts: 3,
+      deskDataFormReadyAttempts: 40,
+      deskDataResultSearchAttempts: 180,
+      deskDataHistoryNavigationAttempts: 120,
+      pdfOutputDirectory: 'E:\\PDF-AGENTE-CPI'
+    })
+
+    expect(workflow).toBeInstanceOf(FullResearchPreparationWorkflow)
+  })
+
+  it('propaga as sentinelas de runtime para todos os controllers configuráveis', () => {
+    const captured: Record<string, unknown> = {}
+
+    const createWorkflow = Reflect.get(
+      fullResearchWorkflowModule,
+      'createFullResearchPreparationWorkflow'
+    ) as
+      | ((
+          config: ResearchCycleRuntimeConfig,
+          seam: Record<string, (options: unknown) => never>
+        ) => FullResearchPreparationWorkflow)
+      | undefined
+
+    expect(createWorkflow).toBeTypeOf('function')
+
+    createWorkflow?.(
+      {
+        navigationTimeoutMs: 31_234,
+        actionTimeoutMs: 12_345,
+        readTimeoutMs: 4_321,
+        downloadStartTimeoutMs: 32_345,
+        cpiSearchPollingIntervalMs: 321,
+        deskDataFormPollingIntervalMs: 432,
+        deskDataResultPollingIntervalMs: 543,
+        deskDataHistoryNavigationIntervalMs: 654,
+        submitSettleDelayMs: 1_234,
+        queueReturnDelayMs: 3_210,
+        cpiIdentitySearchAttempts: 17,
+        cpiAttachmentSearchAttempts: 18,
+        cpiResultSearchAttempts: 19,
+        cpiResultStabilizationAttempts: 4,
+        deskDataFormReadyAttempts: 20,
+        deskDataResultSearchAttempts: 21,
+        deskDataHistoryNavigationAttempts: 22,
+        pdfOutputDirectory: 'E:\\resolved-output'
+      },
+      {
+        createCpfForm: (options) => {
+          captured.cpfForm = options
+          return {} as never
+        },
+        createSubmit: (options) => {
+          captured.submit = options
+          return {} as never
+        },
+        createResultPageResolver: (options) => {
+          captured.resultPageResolver = options
+          return {} as never
+        },
+        createResultReady: (options) => {
+          captured.resultReady = options
+          return {} as never
+        },
+        createPdfDownloader: (options) => {
+          captured.pdfDownloader = options
+          return {} as never
+        },
+        createCpiResultController: (options) => {
+          captured.cpiResult = options
+          return {} as never
+        },
+        createCpiAttachmentController: (options) => {
+          captured.cpiAttachment = options
+          return {} as never
+        }
+      }
+    )
+
+    expect(captured).toEqual({
+      cpfForm: {
+        actionTimeoutMs: 12_345,
+        readTimeoutMs: 4_321
+      },
+      submit: {
+        actionTimeoutMs: 12_345,
+        navigationTimeoutMs: 31_234,
+        submitSettleDelayMs: 1_234
+      },
+      resultPageResolver: {
+        searchAttempts: 21,
+        searchIntervalMs: 543,
+        navigationTimeoutMs: 31_234,
+        historyNavigationAttempts: 22,
+        historyNavigationIntervalMs: 654,
+        actionTimeoutMs: 12_345
+      },
+      resultReady: {
+        searchAttempts: 21,
+        searchIntervalMs: 543
+      },
+      pdfDownloader: {
+        outputDirectory: 'E:\\resolved-output',
+        downloadTimeoutMs: 32_345,
+        actionTimeoutMs: 12_345
+      },
+      cpiResult: {
+        resultSearchAttempts: 19,
+        resultSearchIntervalMs: 321,
+        stabilizationAttempts: 4,
+        readTimeoutMs: 4_321
+      },
+      cpiAttachment: {
+        controlSearchAttempts: 18,
+        controlSearchIntervalMs: 321
+      }
+    })
+  })
+
   it('uses the historical popup for PDF, classification and CPI preparation', async () => {
     const callOrder: string[] = []
     const filePath = 'E:\\PDF-AGENTE-CPI\\deskdata-teste.pdf'

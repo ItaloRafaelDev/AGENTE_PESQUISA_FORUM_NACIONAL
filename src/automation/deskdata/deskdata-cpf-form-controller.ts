@@ -32,7 +32,20 @@ export interface FilledDeskDataCpf {
   maskedCpf: string
 }
 
+export interface DeskDataCpfFormControllerOptions {
+  actionTimeoutMs?: number
+  readTimeoutMs?: number
+}
+
 export class DeskDataCpfFormController {
+  private readonly actionTimeoutMs: number
+  private readonly readTimeoutMs: number
+
+  constructor(options: DeskDataCpfFormControllerOptions = {}) {
+    this.actionTimeoutMs = options.actionTimeoutMs ?? 10_000
+    this.readTimeoutMs = options.readTimeoutMs ?? 5_000
+  }
+
   async fillCpf(page: DeskDataSearchPage, rawCpf: string): Promise<FilledDeskDataCpf> {
     const cpf = rawCpf.replace(/\D/g, '')
 
@@ -47,12 +60,12 @@ export class DeskDataCpfFormController {
     }
 
     await cpfInput.fill(cpf, {
-      timeout: 10_000
+      timeout: this.actionTimeoutMs
     })
 
     const persistedCpf = (
       await cpfInput.inputValue({
-        timeout: 5_000
+        timeout: this.readTimeoutMs
       })
     ).replace(/\D/g, '')
 

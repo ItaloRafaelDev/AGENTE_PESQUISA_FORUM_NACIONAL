@@ -1,13 +1,15 @@
 import { z } from 'zod'
 import type {
   ResearchHistoryEvent,
-  ResearchHistoryEventListener
-} from '../../automation/history/research-history-service'
+  ResearchHistoryEventListener,
+  ResearchHistoryListInput,
+  ResearchHistoryPage
+} from '../../application/history/research-history-model'
+import { HISTORY_IPC_CHANNELS } from '../../shared/types/history-api'
 import {
-  HISTORY_IPC_CHANNELS,
-  type ResearchHistoryListInput,
-  type ResearchHistoryPage
-} from '../../shared/types/history-api'
+  mapResearchHistoryPageToDto,
+  mapResearchHistoryRecordToDto
+} from '../mappers/research-history-ipc-mapper'
 
 type IpcHandler = (event: unknown, ...args: unknown[]) => unknown | Promise<unknown>
 
@@ -40,11 +42,11 @@ const listInputSchema = z
 function sendHistoryEvent(sender: HistoryEventSender, event: ResearchHistoryEvent): void {
   switch (event.type) {
     case 'CREATED':
-      sender.send(HISTORY_IPC_CHANNELS.recordCreated, event.record)
+      sender.send(HISTORY_IPC_CHANNELS.recordCreated, mapResearchHistoryRecordToDto(event.record))
       return
 
     case 'UPDATED':
-      sender.send(HISTORY_IPC_CHANNELS.recordUpdated, event.record)
+      sender.send(HISTORY_IPC_CHANNELS.recordUpdated, mapResearchHistoryRecordToDto(event.record))
       return
 
     case 'CLEARED':
@@ -66,7 +68,7 @@ export function registerHistoryIpcHandlers(
   ipcMain.handle(HISTORY_IPC_CHANNELS.list, (_event, rawInput) => {
     const input = listInputSchema.parse(rawInput)
 
-    return historyService.list(input)
+    return mapResearchHistoryPageToDto(historyService.list(input))
   })
 
   ipcMain.handle(HISTORY_IPC_CHANNELS.clear, () => {

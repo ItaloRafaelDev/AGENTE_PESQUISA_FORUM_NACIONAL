@@ -48,8 +48,10 @@ export interface DeskDataSearchResultPageResolverOptions {
   searchAttempts?: number
   searchIntervalMs?: number
   popupTimeoutMs?: number
+  navigationTimeoutMs?: number
   historyNavigationAttempts?: number
   historyNavigationIntervalMs?: number
+  actionTimeoutMs?: number
 }
 
 export type DeskDataResolvedResultSource = 'DIRECT_RESULT' | 'SIMILAR_QUERY'
@@ -145,21 +147,23 @@ function isDirectResultReady(pageUrl: string, exportCount: number): boolean {
 export class DeskDataSearchResultPageResolver {
   private readonly searchAttempts: number
   private readonly searchIntervalMs: number
-  private readonly popupTimeoutMs: number
+  private readonly navigationTimeoutMs: number
   private readonly historyNavigationAttempts: number
   private readonly historyNavigationIntervalMs: number
+  private readonly actionTimeoutMs: number
 
   constructor(options: DeskDataSearchResultPageResolverOptions = {}) {
     this.searchAttempts = options.searchAttempts ?? 180
     this.searchIntervalMs = options.searchIntervalMs ?? 500
-    this.popupTimeoutMs = options.popupTimeoutMs ?? 30_000
+    this.navigationTimeoutMs = options.navigationTimeoutMs ?? options.popupTimeoutMs ?? 30_000
     this.historyNavigationAttempts = options.historyNavigationAttempts ?? 120
     this.historyNavigationIntervalMs = options.historyNavigationIntervalMs ?? 250
+    this.actionTimeoutMs = options.actionTimeoutMs ?? 10_000
 
     if (
       this.searchAttempts < 1 ||
       this.searchIntervalMs < 0 ||
-      this.popupTimeoutMs < 1 ||
+      this.navigationTimeoutMs < 1 ||
       this.historyNavigationAttempts < 1 ||
       this.historyNavigationIntervalMs < 0
     ) {
@@ -304,18 +308,18 @@ export class DeskDataSearchResultPageResolver {
     const selectedLink = selectedRow.locator(DESKDATA_SIMILAR_QUERY_SELECTORS.historyLink)
 
     const popupPromise = page.waitForEvent('popup', {
-      timeout: this.popupTimeoutMs
+      timeout: this.navigationTimeoutMs
     })
 
     await selectedLink.click({
-      timeout: 10_000
+      timeout: this.actionTimeoutMs
     })
 
     const popup = await popupPromise
 
     await popup
       .waitForLoadState('domcontentloaded', {
-        timeout: 30_000
+        timeout: this.navigationTimeoutMs
       })
       .catch(() => undefined)
 

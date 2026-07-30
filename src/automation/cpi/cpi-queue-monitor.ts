@@ -25,7 +25,7 @@ export interface CpiQueueMonitorResult {
   checks: number
 }
 
-class NodeQueueDelay implements CpiQueueDelay {
+export class NodeQueueDelay implements CpiQueueDelay {
   async wait(milliseconds: number, signal?: AbortSignal): Promise<void> {
     await wait(milliseconds, undefined, {
       signal
@@ -37,8 +37,8 @@ export class CpiQueueMonitor {
   constructor(
     private readonly refresher: CpiQueueRefresher,
     private readonly availabilitySource: CpiQueueAvailabilitySource,
-    private readonly delay: CpiQueueDelay = new NodeQueueDelay(),
-    private readonly intervalMs = 60_000
+    private readonly delay: CpiQueueDelay,
+    private readonly intervalMs: number
   ) {
     if (intervalMs < 30_000) {
       throw new Error('Intervalo da fila deve ser de pelo menos 30000 ms')

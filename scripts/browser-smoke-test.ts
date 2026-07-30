@@ -3,15 +3,20 @@ import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { BrowserManager } from '../src/automation/browser/browser-manager'
 import { PlaywrightBrowserLauncher } from '../src/automation/browser/playwright-browser-launcher'
+import { parseAppConfig } from '../src/infrastructure/config/app-config'
 import {
-  ensureRuntimeDirectories,
-  resolveRuntimePaths
+  ensureOperationalDirectories,
+  resolveIsolatedOperationalPaths
 } from '../src/infrastructure/filesystem/runtime-paths'
 
 async function main(): Promise<void> {
-  const runtimePaths = resolveRuntimePaths(join(process.cwd(), 'data', 'runtime'))
+  const config = parseAppConfig()
+  const runtimePaths = resolveIsolatedOperationalPaths(
+    join(process.cwd(), 'data', 'runtime'),
+    config.paths
+  )
 
-  await ensureRuntimeDirectories(runtimePaths)
+  await ensureOperationalDirectories(runtimePaths)
 
   const manager = new BrowserManager(
     new PlaywrightBrowserLauncher(),

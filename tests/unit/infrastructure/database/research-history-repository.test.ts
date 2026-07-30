@@ -1,12 +1,15 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, renameSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import Database from 'better-sqlite3'
 import { afterEach, describe, expect, it } from 'vitest'
-import {
-  ResearchHistoryRepository,
-  type CompleteResearchHistoryInput,
-  type CreateResearchHistoryInput
-} from '@/infrastructure/database/research-history-repository'
+import type {
+  CompleteResearchHistoryInput,
+  CreateResearchHistoryInput
+} from '@/application/history/research-history-model'
+import { ResearchHistoryRepository } from '@/infrastructure/database/research-history-repository'
+import { UnsupportedDatabaseVersionError } from '@/infrastructure/database/sqlite-migration-runner'
+import { createLegacyResearchHistoryDatabase } from '../../../fixtures/database/create-legacy-research-history-database'
 
 const repositories: ResearchHistoryRepository[] = []
 const temporaryDirectories: string[] = []
@@ -17,6 +20,18 @@ function openMemoryRepository(): ResearchHistoryRepository {
   repositories.push(repository)
 
   return repository
+}
+
+function readUserVersion(filePath: string): number {
+  const database = new Database(filePath)
+
+  try {
+    return database.pragma('user_version', {
+      simple: true
+    }) as number
+  } finally {
+    database.close()
+  }
 }
 
 function createInput(
@@ -268,5 +283,70 @@ describe('ResearchHistoryRepository', () => {
         })
       )
     ).toThrow('CPF histórico precisa estar mascarado')
+  })
+
+  it('abre banco legado sem perder histórico ou caminhos de PDF', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'agente-cpi-legacy-history-'))
+    temporaryDirectories.push(directory)
+
+    const databasePath = join(directory, 'agente-cpi.sqlite')
+    createLegacyResearchHistoryDatabase(databasePath)
+
+    expect(readUserVersion(databasePath)).toBe(0)
+
+    const repository = ResearchHistoryRepository.open(databasePath)
+    repositories.push(repository)
+
+    const expectedLegacyRecord = {
+      id: 'legacy-record-1',
+      maskedCpf: '***.***.***-44',
+      classification: 'CONSTA_RESTRICAO',
+      cpiResult: 'Sim, Consta Restrições',
+      status: 'CONCLUIDO',
+      startedAt: '2026-07-14T10:00:00.000Z',
+      finishedAt: '2026-07-14T10:01:30.000Z',
+      durationMs: 90_000,
+      pdfPath: 'E:\\PDF-AGENTE-CPI\\legado.pdf',
+      errorStage: null,
+      errorMessage: null,
+      createdAt: '2026-07-14T10:00:00.000Z'
+    } as const
+
+    expect(readUserVersion(databasePath)).toBe(1)
+    expect(repository.list({ page: 1, pageSize: 50 }).items[0]).toEqual(expectedLegacyRecord)
+  })
+
+  it('recusa versão futura antes de WAL sem modificar o arquivo e fecha a conexão', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'agente-cpi-future-history-'))
+    temporaryDirectories.push(directory)
+
+    const databasePath = join(directory, 'agente-cpi.sqlite')
+    const renamedDatabasePath = join(directory, 'future-renamed.sqlite')
+    const setupDatabase = new Database(databasePath)
+
+    setupDatabase.exec('CREATE TABLE future_marker (value TEXT NOT NULL)')
+    setupDatabase.pragma('user_version = 2')
+    setupDatabase.close()
+
+    const bytesBefore = readFileSync(databasePath)
+    let openedRepository: ResearchHistoryRepository | undefined
+    let thrownError: unknown
+
+    try {
+      openedRepository = ResearchHistoryRepository.open(databasePath)
+    } catch (error) {
+      thrownError = error
+    } finally {
+      openedRepository?.close()
+    }
+
+    expect(thrownError).toBeInstanceOf(UnsupportedDatabaseVersionError)
+    expect(readFileSync(databasePath)).toEqual(bytesBefore)
+    expect(existsSync(`${databasePath}-wal`)).toBe(false)
+    expect(existsSync(`${databasePath}-shm`)).toBe(false)
+
+    renameSync(databasePath, renamedDatabasePath)
+
+    expect(readUserVersion(renamedDatabasePath)).toBe(2)
   })
 })

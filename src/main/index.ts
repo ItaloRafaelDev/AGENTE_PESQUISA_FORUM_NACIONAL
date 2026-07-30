@@ -1,7 +1,6 @@
 import { join } from 'node:path'
 import { app, BrowserWindow, shell } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
 import { MainApplicationRuntime } from './main-application-runtime'
 
 const mainRuntime = new MainApplicationRuntime()
@@ -16,7 +15,6 @@ function createWindow(): void {
     minHeight: 640,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -75,12 +73,6 @@ if (!singleInstanceLock) {
       await mainRuntime.initialize()
 
       createWindow()
-
-      app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-          createWindow()
-        }
-      })
     })
     .catch((error: unknown) => {
       console.error('Falha ao inicializar o Agente CPI:', error)
@@ -104,8 +96,6 @@ if (!singleInstanceLock) {
   })
 
   app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit()
-    }
+    app.quit()
   })
 }

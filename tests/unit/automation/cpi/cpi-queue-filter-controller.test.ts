@@ -99,15 +99,23 @@ describe('CpiQueueFilterController', () => {
       waitForTimeout: vi.fn(async () => undefined)
     } as unknown as Page
 
-    const controller = new CpiQueueFilterController()
+    const controller = new CpiQueueFilterController({
+      actionTimeoutMs: 12_345,
+      settleDelayMs: 876
+    })
 
     await controller.applyCriminalForumFilter(page)
 
     expect(targetState.checked).toBe(true)
     expect(otherState.checked).toBe(false)
 
-    expect(advancedFilterButton.click).toHaveBeenCalledTimes(1)
-    expect(selectButton.click).toHaveBeenCalledTimes(1)
+    expect(advancedFilterButton.click).toHaveBeenCalledWith({
+      timeout: 12_345
+    })
+    expect(selectButton.click).toHaveBeenCalledWith({
+      timeout: 12_345
+    })
+    expect(page.waitForTimeout).toHaveBeenCalledWith(876)
   })
 
   it('deve clicar em Mostrar Tudo para consultar novamente a fila', async () => {
@@ -126,11 +134,20 @@ describe('CpiQueueFilterController', () => {
       waitForTimeout: vi.fn(async () => undefined)
     } as unknown as Page
 
-    const controller = new CpiQueueFilterController()
+    const controller = new CpiQueueFilterController({
+      actionTimeoutMs: 23_456,
+      settleDelayMs: 987
+    })
 
     await controller.refreshQueue(page)
 
-    expect(showAllButton.click).toHaveBeenCalledTimes(1)
+    expect(showAllButton.click).toHaveBeenCalledWith({
+      timeout: 23_456
+    })
+    expect(page.waitForLoadState).toHaveBeenCalledWith('domcontentloaded', {
+      timeout: 23_456
+    })
+    expect(page.waitForTimeout).toHaveBeenCalledWith(987)
   })
 
   it('deve falhar quando o frame do filtro não for encontrado', async () => {
@@ -158,5 +175,8 @@ describe('CpiQueueFilterController', () => {
     await expect(controller.applyCriminalForumFilter(page)).rejects.toThrow(
       'Frame do filtro avançado da CPI não encontrado'
     )
+    expect(page.waitForTimeout).toHaveBeenCalledTimes(2)
+    expect(page.waitForTimeout).toHaveBeenNthCalledWith(1, 1)
+    expect(page.waitForTimeout).toHaveBeenNthCalledWith(2, 1)
   })
 })

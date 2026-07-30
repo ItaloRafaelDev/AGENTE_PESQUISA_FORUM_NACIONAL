@@ -21,12 +21,14 @@ describe('CpiResearchResultSaver', () => {
       })
     }
 
-    const saver = new CpiResearchResultSaver()
+    const saver = new CpiResearchResultSaver({
+      actionTimeoutMs: 12_345
+    })
 
     const result = await saver.saveOnce(frame)
 
     expect(saveClick).toHaveBeenCalledTimes(1)
-    expect(saveClick).toHaveBeenCalledWith({ timeout: 10_000 })
+    expect(saveClick).toHaveBeenCalledWith({ timeout: 12_345 })
     expect(result).toEqual({ saved: true })
   })
 

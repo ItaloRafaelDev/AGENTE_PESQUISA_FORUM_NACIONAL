@@ -1,20 +1,28 @@
 import type { BrowserContext, Page } from 'playwright'
-import type { CpiQueueAvailabilityState } from '../cpi/cpi-queue-availability'
-import { CpiQueueAvailabilityReader } from '../cpi/cpi-queue-availability'
-import { CpiQueueFilterController } from '../cpi/cpi-queue-filter-controller'
+import {
+  CpiQueueAvailabilityReader,
+  type CpiQueueAvailabilityState
+} from '../cpi/cpi-queue-availability'
+import {
+  CpiQueueFilterController,
+  type CpiQueueFilterControllerOptions
+} from '../cpi/cpi-queue-filter-controller'
 import {
   CpiQueueMonitor,
+  NodeQueueDelay,
+  type CpiQueueAvailabilitySource,
+  type CpiQueueDelay,
   type CpiQueueMonitorOptions,
-  type CpiQueueMonitorResult
+  type CpiQueueMonitorResult,
+  type CpiQueueRefresher
 } from '../cpi/cpi-queue-monitor'
 import type { ContinuousResearchStage } from './continuous-research-stage'
 import {
-  SingleResearchCycle,
+  createSingleResearchCycle,
+  type SingleResearchCycleConfig,
   type SingleResearchCycleInput,
   type SingleResearchCycleResult
 } from './single-research-cycle'
-
-export const CONTINUOUS_QUEUE_INTERVAL_MS = 60_000 as const
 
 export interface ContinuousResearchRunnerInput {
   context: BrowserContext
@@ -38,7 +46,7 @@ export type ContinuousResearchRunnerState =
     }
   | {
       type: 'IDLE'
-      nextCheckInMs: typeof CONTINUOUS_QUEUE_INTERVAL_MS
+      nextCheckInMs: number
     }
   | {
       type: 'RESEARCH_AVAILABLE'
@@ -75,19 +83,85 @@ export interface ContinuousResearchRunnerDependencies {
   cycleFactory: SingleResearchCycleFactory
 }
 
-function createDefaultDependencies(): ContinuousResearchRunnerDependencies {
-  const filterController = new CpiQueueFilterController()
+export interface ContinuousResearchRunnerConfig extends SingleResearchCycleConfig {
+  queueCheckIntervalMs: number
+  queueFilterSettleDelayMs: number
+}
+
+export interface ContinuousResearchRunnerFactorySeam {
+  createFilterController(options: CpiQueueFilterControllerOptions): CpiQueueRefresher
+  createAvailabilityReader(readTimeoutMs: number): CpiQueueAvailabilitySource
+  createQueueMonitor(
+    refresher: CpiQueueRefresher,
+    availabilitySource: CpiQueueAvailabilitySource,
+    delay: CpiQueueDelay,
+    intervalMs: number
+  ): ContinuousQueueMonitorPort
+  createSingleResearchCycle(config: SingleResearchCycleConfig): SingleResearchCyclePort
+}
+
+const DEFAULT_FACTORY_SEAM: ContinuousResearchRunnerFactorySeam = {
+  createFilterController: (options) => new CpiQueueFilterController(options),
+  createAvailabilityReader: (readTimeoutMs) => new CpiQueueAvailabilityReader(readTimeoutMs),
+  createQueueMonitor: (refresher, availabilitySource, delay, intervalMs) =>
+    new CpiQueueMonitor(refresher, availabilitySource, delay, intervalMs),
+  createSingleResearchCycle
+}
+
+function toSingleResearchCycleConfig(
+  config: ContinuousResearchRunnerConfig
+): SingleResearchCycleConfig {
+  return {
+    cpiFrameSearchAttempts: config.cpiFrameSearchAttempts,
+    deskDataPeopleUrl: config.deskDataPeopleUrl,
+    navigationTimeoutMs: config.navigationTimeoutMs,
+    actionTimeoutMs: config.actionTimeoutMs,
+    readTimeoutMs: config.readTimeoutMs,
+    downloadStartTimeoutMs: config.downloadStartTimeoutMs,
+    cpiSearchPollingIntervalMs: config.cpiSearchPollingIntervalMs,
+    deskDataFormPollingIntervalMs: config.deskDataFormPollingIntervalMs,
+    deskDataResultPollingIntervalMs: config.deskDataResultPollingIntervalMs,
+    deskDataHistoryNavigationIntervalMs: config.deskDataHistoryNavigationIntervalMs,
+    submitSettleDelayMs: config.submitSettleDelayMs,
+    queueReturnDelayMs: config.queueReturnDelayMs,
+    cpiIdentitySearchAttempts: config.cpiIdentitySearchAttempts,
+    cpiAttachmentSearchAttempts: config.cpiAttachmentSearchAttempts,
+    cpiResultSearchAttempts: config.cpiResultSearchAttempts,
+    cpiResultStabilizationAttempts: config.cpiResultStabilizationAttempts,
+    deskDataFormReadyAttempts: config.deskDataFormReadyAttempts,
+    deskDataResultSearchAttempts: config.deskDataResultSearchAttempts,
+    deskDataHistoryNavigationAttempts: config.deskDataHistoryNavigationAttempts,
+    pdfOutputDirectory: config.pdfOutputDirectory
+  }
+}
+
+function createDefaultDependencies(
+  config: ContinuousResearchRunnerConfig,
+  factorySeam: ContinuousResearchRunnerFactorySeam
+): ContinuousResearchRunnerDependencies {
+  const filterController = factorySeam.createFilterController({
+    frameSearchAttempts: config.cpiFrameSearchAttempts,
+    frameSearchIntervalMs: config.cpiSearchPollingIntervalMs,
+    actionTimeoutMs: config.actionTimeoutMs,
+    settleDelayMs: config.queueFilterSettleDelayMs
+  })
 
   return {
-    queueMonitor: new CpiQueueMonitor(filterController, new CpiQueueAvailabilityReader()),
+    queueMonitor: factorySeam.createQueueMonitor(
+      filterController,
+      factorySeam.createAvailabilityReader(config.readTimeoutMs),
+      new NodeQueueDelay(),
+      config.queueCheckIntervalMs
+    ),
 
-    cycleFactory: () => new SingleResearchCycle()
+    cycleFactory: () => factorySeam.createSingleResearchCycle(toSingleResearchCycleConfig(config))
   }
 }
 
 export class ContinuousResearchRunner {
   constructor(
-    private readonly dependencies: ContinuousResearchRunnerDependencies = createDefaultDependencies()
+    private readonly dependencies: ContinuousResearchRunnerDependencies,
+    private readonly queueCheckIntervalMs = 60_000
   ) {}
 
   async run(input: ContinuousResearchRunnerInput): Promise<ContinuousResearchRunResult> {
@@ -194,7 +268,17 @@ export class ContinuousResearchRunner {
 
     input.onState?.({
       type: 'IDLE',
-      nextCheckInMs: CONTINUOUS_QUEUE_INTERVAL_MS
+      nextCheckInMs: this.queueCheckIntervalMs
     })
   }
+}
+
+export function createContinuousResearchRunner(
+  config: ContinuousResearchRunnerConfig,
+  factorySeam: ContinuousResearchRunnerFactorySeam = DEFAULT_FACTORY_SEAM
+): ContinuousResearchRunner {
+  return new ContinuousResearchRunner(
+    createDefaultDependencies(config, factorySeam),
+    config.queueCheckIntervalMs
+  )
 }

@@ -1,12 +1,10 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Page } from 'playwright'
-import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
-import { prepareDeskDataInspectionPages } from '../src/automation/deskdata/deskdata-inspection-page-preparer'
-import {
-  DESKDATA_PDF_EXPORT_SELECTOR,
-  DeskDataPdfDownloadController
-} from '../src/automation/deskdata/deskdata-pdf-download-controller'
+import { PlatformPageManager } from '../src/infrastructure/automation/browser/platform-page-manager'
+import { prepareDeskDataInspectionPages } from '../src/infrastructure/automation/deskdata/deskdata-inspection-page-preparer'
+import { DESKDATA_PDF_EXPORT_SELECTOR } from '../src/infrastructure/automation/deskdata/deskdata-selectors'
+import { DeskDataPdfDownloadController } from '../src/infrastructure/automation/pdf/deskdata-pdf-download-controller'
 import { resolvePdfOutputDirectory } from '../src/infrastructure/filesystem/pdf-output-directory-resolver'
 import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 

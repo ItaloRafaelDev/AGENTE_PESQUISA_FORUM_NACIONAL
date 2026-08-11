@@ -1,20 +1,25 @@
+import { basename } from 'node:path'
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Frame, type Page } from 'playwright'
-import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
-import { CpiFirstResearchOpener } from '../src/automation/cpi/cpi-first-research-opener'
-import { CpiQueueAvailabilityReader } from '../src/automation/cpi/cpi-queue-availability'
-import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
-import { CpiQueueMonitor, NodeQueueDelay } from '../src/automation/cpi/cpi-queue-monitor'
-import { CpiResearchIdentityReader } from '../src/automation/cpi/cpi-research-identity-reader'
-import type { CpiResearchPdfPreparationFrame } from '../src/automation/cpi/cpi-research-pdf-preparation-workflow'
-import { CpiResearchConfirmedSaveController } from '../src/automation/cpi/cpi-research-confirmed-save-controller'
-import { CpiResearchResultSaver } from '../src/automation/cpi/cpi-research-result-saver'
-import { isCpiResearchSaveConfirmed } from '../src/automation/cpi/cpi-research-save-confirmation'
-import { DeskDataClassificationReportFormatter } from '../src/automation/deskdata/deskdata-classification-report-formatter'
-import { DeskDataNextSearchController } from '../src/automation/deskdata/deskdata-next-search-controller'
-import { createFullResearchPreparationWorkflow } from '../src/automation/flow/full-research-preparation-workflow'
+import { PlatformPageManager } from '../src/infrastructure/automation/browser/platform-page-manager'
+import { CpiFirstResearchOpener } from '../src/infrastructure/automation/cpi/cpi-first-research-opener'
+import { CpiQueueAvailabilityReader } from '../src/infrastructure/automation/cpi/cpi-queue-availability'
+import { CpiQueueFilterController } from '../src/infrastructure/automation/cpi/cpi-queue-filter-controller'
+import {
+  CpiQueueMonitor,
+  NodeQueueDelay
+} from '../src/infrastructure/automation/cpi/cpi-queue-monitor'
+import { CpiResearchIdentityReader } from '../src/infrastructure/automation/cpi/cpi-research-identity-reader'
+import type { CpiResearchPdfPreparationFrame } from '../src/infrastructure/automation/cpi/cpi-research-pdf-preparation-workflow'
+import { CpiResearchConfirmedSaveController } from '../src/infrastructure/automation/cpi/cpi-research-confirmed-save-controller'
+import { CpiResearchResultSaver } from '../src/infrastructure/automation/cpi/cpi-research-result-saver'
+import { isCpiResearchSaveConfirmed } from '../src/infrastructure/automation/cpi/cpi-research-save-confirmation'
+import { DeskDataNextSearchController } from '../src/infrastructure/automation/deskdata/deskdata-next-search-controller'
+import { createPlaywrightResearchPreparationAdapter } from '../src/infrastructure/automation/workflow/playwright-research-preparation-adapter'
+import { getCpiClassificationLabel } from '../src/domain/research/get-cpi-classification-label'
 import { resolvePdfOutputDirectory } from '../src/infrastructure/filesystem/pdf-output-directory-resolver'
+import { formatResearchPreparationReport } from './support/research-preparation-report-formatter'
 import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 const CPI_QUEUE_PATH = '/zpersespecial/pesquisas/aguardando/mod_t_aguardando.aspx'
@@ -173,45 +178,56 @@ async function main(): Promise<void> {
 
     await deskDataPage.bringToFront()
 
-    const flowResult = await createFullResearchPreparationWorkflow({
-      navigationTimeoutMs: config.timing.navigationTimeoutMs,
-      actionTimeoutMs: config.timing.actionTimeoutMs,
-      readTimeoutMs: config.timing.readTimeoutMs,
-      downloadStartTimeoutMs: config.timing.downloadStartTimeoutMs,
-      cpiSearchPollingIntervalMs: config.timing.cpiSearchPollingIntervalMs,
-      deskDataFormPollingIntervalMs: config.timing.deskDataFormPollingIntervalMs,
-      deskDataResultPollingIntervalMs: config.timing.deskDataResultPollingIntervalMs,
-      deskDataHistoryNavigationIntervalMs: config.timing.deskDataHistoryNavigationIntervalMs,
-      submitSettleDelayMs: config.timing.submitSettleDelayMs,
-      queueReturnDelayMs: config.timing.queueReturnDelayMs,
-      cpiIdentitySearchAttempts: config.limits.cpiIdentitySearchAttempts,
-      cpiAttachmentSearchAttempts: config.limits.cpiAttachmentSearchAttempts,
-      cpiResultSearchAttempts: config.limits.cpiResultSearchAttempts,
-      cpiResultStabilizationAttempts: config.limits.cpiResultStabilizationAttempts,
-      deskDataFormReadyAttempts: config.limits.deskDataFormReadyAttempts,
-      deskDataResultSearchAttempts: config.limits.deskDataResultSearchAttempts,
-      deskDataHistoryNavigationAttempts: config.limits.deskDataHistoryNavigationAttempts,
-      pdfOutputDirectory
-    }).prepare(context, deskDataPage, detailFrame as CpiResearchPdfPreparationFrame, identity)
+    const prepared = await createPlaywrightResearchPreparationAdapter({
+      context,
+      deskDataPage,
+      detailFrame: detailFrame as CpiResearchPdfPreparationFrame,
+      config: {
+        queueCheckIntervalMs: config.timing.queueCheckIntervalMs,
+        cpiSearchPollingIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+        actionTimeoutMs: config.timing.actionTimeoutMs,
+        readTimeoutMs: config.timing.readTimeoutMs,
+        queueFilterSettleDelayMs: config.timing.queueFilterSettleDelayMs,
+        cpiFrameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+        deskDataPeopleUrl: config.platform.deskDataPeopleUrl,
+        navigationTimeoutMs: config.timing.navigationTimeoutMs,
+        downloadStartTimeoutMs: config.timing.downloadStartTimeoutMs,
+        deskDataFormPollingIntervalMs: config.timing.deskDataFormPollingIntervalMs,
+        deskDataResultPollingIntervalMs: config.timing.deskDataResultPollingIntervalMs,
+        deskDataHistoryNavigationIntervalMs: config.timing.deskDataHistoryNavigationIntervalMs,
+        submitSettleDelayMs: config.timing.submitSettleDelayMs,
+        queueReturnDelayMs: config.timing.queueReturnDelayMs,
+        cpiIdentitySearchAttempts: config.limits.cpiIdentitySearchAttempts,
+        cpiAttachmentSearchAttempts: config.limits.cpiAttachmentSearchAttempts,
+        cpiResultSearchAttempts: config.limits.cpiResultSearchAttempts,
+        cpiResultStabilizationAttempts: config.limits.cpiResultStabilizationAttempts,
+        deskDataFormReadyAttempts: config.limits.deskDataFormReadyAttempts,
+        deskDataResultSearchAttempts: config.limits.deskDataResultSearchAttempts,
+        deskDataHistoryNavigationAttempts: config.limits.deskDataHistoryNavigationAttempts,
+        pdfOutputDirectory
+      }
+    }).execute(identity)
 
     console.log('')
     console.log('Preparação completa sem gravação.')
-    console.log('CPF processado: ' + flowResult.maskedCpf)
-    console.log('Conjuntos selecionados: ' + flowResult.selectedDatasetCount)
+    console.log('CPF processado: ' + prepared.maskedCpf)
+    console.log('Conjuntos selecionados: ' + prepared.selectedDatasetCount)
 
-    const reportLines = new DeskDataClassificationReportFormatter().format(
-      flowResult.classification
-    )
+    const reportLines = formatResearchPreparationReport({
+      classification: prepared.classification
+    })
 
     reportLines.forEach((line) => console.log(line))
 
-    console.log('PDF salvo: ' + flowResult.pdf.filePath)
-    console.log('Tamanho do PDF: ' + flowResult.pdf.sizeBytes + ' bytes')
-    console.log('PDF anexado na CPI: ' + flowResult.cpi.attachment.fileName)
-    console.log('Resultado selecionado: ' + flowResult.cpi.prepared.selectedResultLabel)
-    console.log('Pesquisador/Fonte: ' + flowResult.cpi.prepared.researcherLabel)
-    console.log('Pesquisador/Fonte 1º: ' + flowResult.cpi.prepared.primaryResearcherLabel)
-    console.log('Status: ' + flowResult.cpi.prepared.statusLabel)
+    console.log('PDF salvo: ' + prepared.report.compatibilityPath)
+    console.log('Tamanho do PDF: ' + prepared.report.sizeBytes + ' bytes')
+    console.log('PDF anexado na CPI: ' + basename(prepared.report.compatibilityPath))
+    console.log(
+      'Resultado selecionado: ' + getCpiClassificationLabel(prepared.classification.classification)
+    )
+    console.log('Pesquisador/Fonte: Desk Data')
+    console.log('Pesquisador/Fonte 1º: Desk Data')
+    console.log('Status: Respondida')
     console.log('Resposta alterada: Não')
     console.log('Pesquisa gravada: Não')
 
@@ -237,7 +253,7 @@ async function main(): Promise<void> {
       {
         dialogTimeoutMs: config.timing.actionTimeoutMs
       }
-    ).saveOnce(cpiPage, flowResult.detailFrame)
+    ).saveOnce(cpiPage, detailFrame as CpiResearchPdfPreparationFrame)
 
     console.log('Confirmação da CPI aceita: ' + (saveResult.confirmationAccepted ? 'Sim' : 'Não'))
 

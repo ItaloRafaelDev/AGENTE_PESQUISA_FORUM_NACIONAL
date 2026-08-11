@@ -1,11 +1,10 @@
 import { isBuiltin } from 'node:module'
 import type { SourceLayer } from './source-import-graph'
 
-const LAYERS_WITH_NODE_ACCESS = new Set<SourceLayer>(['automation', 'infrastructure', 'main'])
+const LAYERS_WITH_NODE_ACCESS = new Set<SourceLayer>(['infrastructure', 'main'])
 
 const ALLOWED_EXTERNAL_PACKAGES: Record<SourceLayer, ReadonlySet<string>> = {
   application: new Set(),
-  automation: new Set(['pdf-parse', 'playwright']),
   domain: new Set(),
   infrastructure: new Set(['better-sqlite3', 'pdf-parse', 'playwright', 'zod']),
   main: new Set(['@electron-toolkit/utils', 'electron', 'zod']),

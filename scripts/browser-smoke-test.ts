@@ -1,8 +1,8 @@
 import { join } from 'node:path'
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
-import { BrowserManager } from '../src/automation/browser/browser-manager'
-import { PlaywrightBrowserLauncher } from '../src/automation/browser/playwright-browser-launcher'
+import { BrowserManager } from '../src/infrastructure/automation/browser/browser-manager'
+import { PlaywrightBrowserLauncher } from '../src/infrastructure/automation/browser/playwright-browser-launcher'
 import { parseAppConfig } from '../src/infrastructure/config/app-config'
 import {
   ensureOperationalDirectories,

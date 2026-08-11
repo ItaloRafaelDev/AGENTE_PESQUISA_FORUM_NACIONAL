@@ -10,6 +10,7 @@ export default defineConfig(
     '**/node_modules/',
     '**/dist/',
     '**/out/',
+    '.worktrees/',
     'docs/superpowers/evidence/',
     '.superpowers/sdd/',
     '.agent-backups/',

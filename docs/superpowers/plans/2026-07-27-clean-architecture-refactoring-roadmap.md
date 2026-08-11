@@ -57,6 +57,28 @@ the previous stage.
 Only the current stage plan must exist before implementation. Later filenames reserve the
 agreed sequence; they do not authorize speculative implementation.
 
+## Stage 5 approval status
+
+Checkpoint final de 2026-08-10:
+
+- as Tasks 1–10 do application core concluíram revisão e gates automatizados no worktree não
+  commitado da Etapa 5;
+- o usuário informou que a validação manual no Windows foi testada e está funcionando;
+- a Etapa 5 está manualmente aprovada, sem commit ou push;
+- a Etapa 6 iniciou posteriormente no mesmo worktree, preservando o HEAD de referência.
+
+## Stage 6 accepted checkpoint
+
+Em 2026-08-11, a Etapa 6 concluiu os gates automatizados: os adapters externos canônicos
+substituíram `src/automation`, scripts operacionais foram migrados, e o contrato de importação não
+encontra caminho legado compilável. `pnpm run validate` passou com 108 arquivos/614 testes,
+`pnpm run build` passou (83 módulos main, 6 preload, 32 renderer) e `pnpm run test:coverage`
+passou com 88.12% statements, 81.12% branches, 92.19% functions e 88.32% lines.
+
+O usuário concluiu a validação manual no Windows e respondeu explicitamente
+`A — testado e funcionando`. A Etapa 6 está, portanto, registrada como
+`DONE_STAGE_6_MANUAL_ACCEPTED`. Nenhum commit ou push foi criado neste checkpoint.
+
 ## Global checkpoints
 
 Every stage ends with:

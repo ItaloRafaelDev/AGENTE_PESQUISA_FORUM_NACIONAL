@@ -1,8 +1,8 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Page } from 'playwright'
-import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
-import { DeskDataNextSearchController } from '../src/automation/deskdata/deskdata-next-search-controller'
+import { PlatformPageManager } from '../src/infrastructure/automation/browser/platform-page-manager'
+import { DeskDataNextSearchController } from '../src/infrastructure/automation/deskdata/deskdata-next-search-controller'
 import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 function findDeskDataPage(pages: Page[]): Page | undefined {

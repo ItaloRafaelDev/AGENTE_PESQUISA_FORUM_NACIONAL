@@ -1,10 +1,13 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Locator, type Page } from 'playwright'
-import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
-import { CpiQueueAvailabilityReader } from '../src/automation/cpi/cpi-queue-availability'
-import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
-import { CpiQueueMonitor, NodeQueueDelay } from '../src/automation/cpi/cpi-queue-monitor'
+import { PlatformPageManager } from '../src/infrastructure/automation/browser/platform-page-manager'
+import { CpiQueueAvailabilityReader } from '../src/infrastructure/automation/cpi/cpi-queue-availability'
+import { CpiQueueFilterController } from '../src/infrastructure/automation/cpi/cpi-queue-filter-controller'
+import {
+  CpiQueueMonitor,
+  NodeQueueDelay
+} from '../src/infrastructure/automation/cpi/cpi-queue-monitor'
 import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 interface RawElement {

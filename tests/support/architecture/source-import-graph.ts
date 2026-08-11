@@ -5,7 +5,6 @@ import { createTypeScriptSourcePaths, resolveSourceAlias } from '../../../source
 
 export const SOURCE_LAYERS = [
   'application',
-  'automation',
   'domain',
   'infrastructure',
   'main',

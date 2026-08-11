@@ -16,7 +16,22 @@ export const CONTINUOUS_RESEARCH_STAGES = [
 
 export type ContinuousResearchStage = (typeof CONTINUOUS_RESEARCH_STAGES)[number]
 
+const PUBLIC_STAGE_ERRORS = new WeakSet<ContinuousResearchStageError>()
+
 export class ContinuousResearchStageError extends Error {
+  static fromPublicMessage(
+    stage: ContinuousResearchStage,
+    message: string
+  ): ContinuousResearchStageError {
+    const error = new ContinuousResearchStageError(stage, new Error(message))
+    PUBLIC_STAGE_ERRORS.add(error)
+    return error
+  }
+
+  static isPublic(error: unknown): error is ContinuousResearchStageError {
+    return error instanceof ContinuousResearchStageError && PUBLIC_STAGE_ERRORS.has(error)
+  }
+
   constructor(
     readonly stage: ContinuousResearchStage,
     readonly cause: unknown

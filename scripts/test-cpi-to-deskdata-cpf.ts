@@ -1,13 +1,16 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Page } from 'playwright'
-import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
-import { CpiQueueAvailabilityReader } from '../src/automation/cpi/cpi-queue-availability'
-import { CpiFirstResearchOpener } from '../src/automation/cpi/cpi-first-research-opener'
-import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
-import { CpiQueueMonitor, NodeQueueDelay } from '../src/automation/cpi/cpi-queue-monitor'
-import { CpiResearchIdentityReader } from '../src/automation/cpi/cpi-research-identity-reader'
-import { DeskDataCpfFormController } from '../src/automation/deskdata/deskdata-cpf-form-controller'
+import { PlatformPageManager } from '../src/infrastructure/automation/browser/platform-page-manager'
+import { CpiQueueAvailabilityReader } from '../src/infrastructure/automation/cpi/cpi-queue-availability'
+import { CpiFirstResearchOpener } from '../src/infrastructure/automation/cpi/cpi-first-research-opener'
+import { CpiQueueFilterController } from '../src/infrastructure/automation/cpi/cpi-queue-filter-controller'
+import {
+  CpiQueueMonitor,
+  NodeQueueDelay
+} from '../src/infrastructure/automation/cpi/cpi-queue-monitor'
+import { CpiResearchIdentityReader } from '../src/infrastructure/automation/cpi/cpi-research-identity-reader'
+import { DeskDataCpfFormController } from '../src/infrastructure/automation/deskdata/deskdata-cpf-form-controller'
 import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 function findPage(pages: Page[], hostname: string): Page | undefined {

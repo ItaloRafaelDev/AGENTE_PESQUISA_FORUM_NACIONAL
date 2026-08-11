@@ -5,7 +5,10 @@ const mainSource = readFileSync('src/main/index.ts', 'utf8')
 
 const runtimeSource = readFileSync('src/main/main-application-runtime.ts', 'utf8')
 
+const viteConfigSource = readFileSync('electron.vite.config.ts', 'utf8')
+
 const productionMainSource = `${mainSource}\n${runtimeSource}`
+const oldAutomationImport = ['from ', "'../", 'automation/'].join('')
 
 describe('composição contínua do processo principal', () => {
   it('injeta a configuração central de plataforma e intervalo da fila', () => {
@@ -24,6 +27,12 @@ describe('composição contínua do processo principal', () => {
     expect(mainSource).not.toContain('new ContinuousAgentRuntimeService')
   })
 
+  it('configura o alias de runtime do processo principal a partir do catálogo canônico', () => {
+    expect(viteConfigSource).toMatch(
+      /main:\s*\{\s*resolve:\s*\{\s*alias:\s*\{\s*'@':\s*sourceAliases\['@'\]\s*\}\s*\}\s*\}/s
+    )
+  })
+
   it('usa o banco SQLite dentro de userData', () => {
     expect(runtimeSource).toContain("app.getPath('userData')")
 
@@ -34,12 +43,20 @@ describe('composição contínua do processo principal', () => {
     expect(runtimeSource).toContain('markUnfinishedAsInterrupted')
   })
 
-  it('compõe o runner contínuo e o runtime público', () => {
-    expect(runtimeSource).toContain('createContinuousResearchRunner')
-
-    expect(runtimeSource).toContain('new AgentPublicStateStore()')
-
-    expect(runtimeSource).toContain('new ContinuousAgentRuntimeService')
+  it('compõe o núcleo application e suas fronteiras concretas', () => {
+    expect(runtimeSource).toContain("from '../infrastructure/automation/")
+    expect(runtimeSource).not.toContain(oldAutomationImport)
+    expect(runtimeSource).toContain('new ResearchHistoryService({')
+    expect(runtimeSource).toContain('new AgentStateMachine()')
+    expect(runtimeSource).toContain('new ContinuousAgentCoordinator({')
+    expect(runtimeSource).toContain('new SystemClock()')
+    expect(runtimeSource).toContain('new UuidGenerator()')
+    expect(runtimeSource).toContain('new SafeMessageSanitizerAdapter()')
+    expect(runtimeSource).toContain('new PlaywrightAgentWorkspaceAdapter(')
+    expect(runtimeSource).toContain('new ContinuousAgentIpcAdapter(')
+    expect(runtimeSource).not.toContain('new AgentPublicStateStore')
+    expect(runtimeSource).not.toContain('new ContinuousAgentRuntimeService')
+    expect(runtimeSource).not.toContain('createContinuousResearchRunner')
   })
 
   it('registra IPC do agente, histórico e PDF', () => {
@@ -68,8 +85,8 @@ describe('composição contínua do processo principal', () => {
     expect(productionMainSource).not.toContain('pnpm')
   })
 
-  it('encerra runtime, navegador e banco ao sair do aplicativo', () => {
-    expect(runtimeSource).toContain('agentRuntimeService?.shutdown()')
+  it('encerra coordenador, navegador e banco ao sair do aplicativo', () => {
+    expect(runtimeSource).toContain('agentCoordinator?.shutdown()')
 
     expect(runtimeSource).toContain('await this.browserService.stop()')
 

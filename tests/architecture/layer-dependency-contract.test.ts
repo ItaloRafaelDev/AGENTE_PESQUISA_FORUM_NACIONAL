@@ -12,7 +12,6 @@ const dependencies = collectSourceDependencies(sourceRoot)
 
 const ALLOWED_INTERNAL_TARGETS: Record<SourceLayer, readonly SourceLayer[]> = {
   application: ['application', 'domain'],
-  automation: ['automation', 'application', 'domain', 'shared'],
   domain: ['domain'],
   infrastructure: ['infrastructure', 'application', 'domain'],
   main: ['main', 'application', 'infrastructure', 'shared'],
@@ -20,25 +19,6 @@ const ALLOWED_INTERNAL_TARGETS: Record<SourceLayer, readonly SourceLayer[]> = {
   renderer: ['renderer', 'shared'],
   shared: ['shared'],
   unknown: []
-}
-
-const EXPECTED_MAIN_AUTOMATION_EDGES = [
-  'main/main-application-runtime.ts->automation/browser/browser-manager.ts',
-  'main/main-application-runtime.ts->automation/browser/browser-workspace-service.ts',
-  'main/main-application-runtime.ts->automation/browser/platform-page-manager.ts',
-  'main/main-application-runtime.ts->automation/browser/playwright-browser-launcher.ts',
-  'main/main-application-runtime.ts->automation/cpi/cpi-queue-filter-controller.ts',
-  'main/main-application-runtime.ts->automation/flow/continuous-research-runner.ts',
-  'main/main-application-runtime.ts->automation/history/research-history-service.ts',
-  'main/main-application-runtime.ts->automation/session/platform-session-service.ts',
-  'main/main-application-runtime.ts->automation/workflow/agent-public-state-store.ts',
-  'main/main-application-runtime.ts->automation/workflow/continuous-agent-runtime-service.ts'
-] as const
-
-const ALLOWED_MAIN_AUTOMATION_EDGES = new Set<string>(EXPECTED_MAIN_AUTOMATION_EDGES)
-
-function edgeKey(dependency: SourceDependency): string {
-  return `${dependency.sourceFile}->${dependency.targetFile ?? dependency.moduleSpecifier}`
 }
 
 function formatViolation(dependency: SourceDependency, rule: string): string {
@@ -79,11 +59,7 @@ describe('progressive architecture boundaries', () => {
           return false
         }
 
-        return !(
-          dependency.sourceLayer === 'main' &&
-          dependency.targetLayer === 'automation' &&
-          ALLOWED_MAIN_AUTOMATION_EDGES.has(edgeKey(dependency))
-        )
+        return true
       })
       .map((dependency) => formatViolation(dependency, 'forbidden dependency direction'))
       .sort()
@@ -91,14 +67,25 @@ describe('progressive architecture boundaries', () => {
     expect(violations).toEqual([])
   })
 
-  it('congela exatamente as dez arestas temporárias de composição', () => {
-    const actualEdges = dependencies
+  it('mantém todos os contratos da aplicação livres de tipos técnicos', () => {
+    const forbidden = dependencies
+      .filter((dependency) => dependency.sourceLayer === 'application')
       .filter(
+        (dependency) =>
+          dependency.moduleSpecifier === 'electron' ||
+          dependency.moduleSpecifier === 'playwright' ||
+          dependency.moduleSpecifier === 'better-sqlite3' ||
+          dependency.moduleSpecifier.startsWith('node:')
+      )
+
+    expect(forbidden).toEqual([])
+  })
+
+  it('não permite dependências do processo principal para automation', () => {
+    expect(
+      dependencies.filter(
         (dependency) => dependency.sourceLayer === 'main' && dependency.targetLayer === 'automation'
       )
-      .map(edgeKey)
-      .sort()
-
-    expect(actualEdges).toEqual([...EXPECTED_MAIN_AUTOMATION_EDGES].sort())
+    ).toEqual([])
   })
 })

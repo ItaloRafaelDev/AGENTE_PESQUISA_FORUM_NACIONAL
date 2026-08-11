@@ -1,20 +1,23 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Frame, type Page } from 'playwright'
-import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
-import { CpiQueueAvailabilityReader } from '../src/automation/cpi/cpi-queue-availability'
-import { CpiFirstResearchOpener } from '../src/automation/cpi/cpi-first-research-opener'
-import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
-import { CpiQueueMonitor, NodeQueueDelay } from '../src/automation/cpi/cpi-queue-monitor'
-import { parseCpiResearchClassification } from '../src/automation/cpi/cpi-research-classification-parser'
-import { CpiResearchPdfAttachmentController } from '../src/automation/cpi/cpi-research-pdf-attachment-controller'
+import { PlatformPageManager } from '../src/infrastructure/automation/browser/platform-page-manager'
+import { CpiQueueAvailabilityReader } from '../src/infrastructure/automation/cpi/cpi-queue-availability'
+import { CpiFirstResearchOpener } from '../src/infrastructure/automation/cpi/cpi-first-research-opener'
+import { CpiQueueFilterController } from '../src/infrastructure/automation/cpi/cpi-queue-filter-controller'
+import {
+  CpiQueueMonitor,
+  NodeQueueDelay
+} from '../src/infrastructure/automation/cpi/cpi-queue-monitor'
+import { parseCpiResearchClassification } from '../src/infrastructure/automation/cpi/cpi-research-classification-parser'
+import { CpiResearchPdfAttachmentController } from '../src/infrastructure/automation/cpi/cpi-research-pdf-attachment-controller'
 import {
   CpiResearchPdfPreparationWorkflow,
   type CpiResearchPdfPreparationFrame
-} from '../src/automation/cpi/cpi-research-pdf-preparation-workflow'
-import { CpiResearchResultController } from '../src/automation/cpi/cpi-research-result-controller'
-import { CpiResearchResultSimulationReporter } from '../src/automation/cpi/cpi-research-result-simulation-reporter'
-import { DeskDataLatestPdfLocator } from '../src/automation/deskdata/deskdata-latest-pdf-locator'
+} from '../src/infrastructure/automation/cpi/cpi-research-pdf-preparation-workflow'
+import { CpiResearchResultController } from '../src/infrastructure/automation/cpi/cpi-research-result-controller'
+import { CpiResearchResultSimulationReporter } from '../src/infrastructure/automation/cpi/cpi-research-result-simulation-reporter'
+import { DeskDataLatestPdfLocator } from '../src/infrastructure/automation/pdf/deskdata-latest-pdf-locator'
 import { resolvePdfOutputDirectory } from '../src/infrastructure/filesystem/pdf-output-directory-resolver'
 import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 

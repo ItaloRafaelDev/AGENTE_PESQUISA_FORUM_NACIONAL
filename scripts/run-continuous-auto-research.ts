@@ -1,14 +1,13 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type BrowserContext, type Page } from 'playwright'
-import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
-import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
-import { ContinuousResearchStageError } from '../src/automation/flow/continuous-research-stage'
-import {
-  createContinuousResearchRunner,
-  type ContinuousResearchRunnerState
-} from '../src/automation/flow/continuous-research-runner'
-import { SafeResearchLogger } from '../src/automation/logging/safe-research-logger'
+import { ExecutionControl } from '../src/application/agent/execution-control'
+import { ContinuousResearchStageError } from '../src/application/agent/continuous-research-stage'
+import type { ContinuousResearchState } from '../src/application/research/run-continuous-research'
+import { PlatformPageManager } from '../src/infrastructure/automation/browser/platform-page-manager'
+import { CpiQueueFilterController } from '../src/infrastructure/automation/cpi/cpi-queue-filter-controller'
+import { createPlaywrightContinuousResearchExecutionAdapter } from '../src/infrastructure/automation/workflow/playwright-continuous-research-execution-adapter'
+import { SafeResearchLogger } from '../src/infrastructure/logging/safe-research-logger'
 import { resolvePdfOutputDirectory } from '../src/infrastructure/filesystem/pdf-output-directory-resolver'
 import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
@@ -122,7 +121,7 @@ async function ensureAuthenticatedPages(
   }
 }
 
-function logRunnerState(logger: SafeResearchLogger, state: ContinuousResearchRunnerState): void {
+function logRunnerState(logger: SafeResearchLogger, state: ContinuousResearchState): void {
   switch (state.type) {
     case 'WAITING_QUEUE':
       if (state.checks === 0) {
@@ -170,7 +169,7 @@ async function main(): Promise<void> {
     output: stdout
   })
 
-  const abortController = new AbortController()
+  const control = new ExecutionControl()
 
   let sigintReceived = false
   let sigintRegistered = false
@@ -184,7 +183,7 @@ async function main(): Promise<void> {
 
     logger.info('Interrupção solicitada. O agente será encerrado no próximo ponto seguro.')
 
-    abortController.abort()
+    control.requestStop()
   }
 
   const context = await chromium.launchPersistentContext(profilePath, {
@@ -221,34 +220,36 @@ async function main(): Promise<void> {
 
     sigintRegistered = true
 
-    const result = await createContinuousResearchRunner({
-      queueCheckIntervalMs: config.timing.queueCheckIntervalMs,
-      queueFilterSettleDelayMs: config.timing.queueFilterSettleDelayMs,
-      cpiFrameSearchAttempts: config.limits.cpiFrameSearchAttempts,
-      deskDataPeopleUrl: config.platform.deskDataPeopleUrl,
-      navigationTimeoutMs: config.timing.navigationTimeoutMs,
-      actionTimeoutMs: config.timing.actionTimeoutMs,
-      readTimeoutMs: config.timing.readTimeoutMs,
-      downloadStartTimeoutMs: config.timing.downloadStartTimeoutMs,
-      cpiSearchPollingIntervalMs: config.timing.cpiSearchPollingIntervalMs,
-      deskDataFormPollingIntervalMs: config.timing.deskDataFormPollingIntervalMs,
-      deskDataResultPollingIntervalMs: config.timing.deskDataResultPollingIntervalMs,
-      deskDataHistoryNavigationIntervalMs: config.timing.deskDataHistoryNavigationIntervalMs,
-      submitSettleDelayMs: config.timing.submitSettleDelayMs,
-      queueReturnDelayMs: config.timing.queueReturnDelayMs,
-      cpiIdentitySearchAttempts: config.limits.cpiIdentitySearchAttempts,
-      cpiAttachmentSearchAttempts: config.limits.cpiAttachmentSearchAttempts,
-      cpiResultSearchAttempts: config.limits.cpiResultSearchAttempts,
-      cpiResultStabilizationAttempts: config.limits.cpiResultStabilizationAttempts,
-      deskDataFormReadyAttempts: config.limits.deskDataFormReadyAttempts,
-      deskDataResultSearchAttempts: config.limits.deskDataResultSearchAttempts,
-      deskDataHistoryNavigationAttempts: config.limits.deskDataHistoryNavigationAttempts,
-      pdfOutputDirectory
-    }).run({
+    const result = await createPlaywrightContinuousResearchExecutionAdapter({
       context,
       cpiPage,
       deskDataPage,
-      signal: abortController.signal,
+      config: {
+        queueCheckIntervalMs: config.timing.queueCheckIntervalMs,
+        cpiSearchPollingIntervalMs: config.timing.cpiSearchPollingIntervalMs,
+        actionTimeoutMs: config.timing.actionTimeoutMs,
+        readTimeoutMs: config.timing.readTimeoutMs,
+        queueFilterSettleDelayMs: config.timing.queueFilterSettleDelayMs,
+        cpiFrameSearchAttempts: config.limits.cpiFrameSearchAttempts,
+        deskDataPeopleUrl: config.platform.deskDataPeopleUrl,
+        navigationTimeoutMs: config.timing.navigationTimeoutMs,
+        downloadStartTimeoutMs: config.timing.downloadStartTimeoutMs,
+        deskDataFormPollingIntervalMs: config.timing.deskDataFormPollingIntervalMs,
+        deskDataResultPollingIntervalMs: config.timing.deskDataResultPollingIntervalMs,
+        deskDataHistoryNavigationIntervalMs: config.timing.deskDataHistoryNavigationIntervalMs,
+        submitSettleDelayMs: config.timing.submitSettleDelayMs,
+        queueReturnDelayMs: config.timing.queueReturnDelayMs,
+        cpiIdentitySearchAttempts: config.limits.cpiIdentitySearchAttempts,
+        cpiAttachmentSearchAttempts: config.limits.cpiAttachmentSearchAttempts,
+        cpiResultSearchAttempts: config.limits.cpiResultSearchAttempts,
+        cpiResultStabilizationAttempts: config.limits.cpiResultStabilizationAttempts,
+        deskDataFormReadyAttempts: config.limits.deskDataFormReadyAttempts,
+        deskDataResultSearchAttempts: config.limits.deskDataResultSearchAttempts,
+        deskDataHistoryNavigationAttempts: config.limits.deskDataHistoryNavigationAttempts,
+        pdfOutputDirectory
+      }
+    }).execute({
+      token: control.token,
       onState: (state): void => {
         logRunnerState(logger, state)
       }

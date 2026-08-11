@@ -1,17 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import {
-  CONTINUOUS_RESEARCH_STAGES as APPLICATION_STAGES,
+  CONTINUOUS_RESEARCH_STAGES,
   ContinuousResearchStageError
 } from '@/application/agent/continuous-research-stage'
-import {
-  CONTINUOUS_RESEARCH_STAGES as LEGACY_STAGES,
-  ContinuousResearchStageError as LegacyContinuousResearchStageError
-} from '@/automation/flow/continuous-research-stage'
 import { CONTINUOUS_RESEARCH_STAGES as PUBLIC_STAGES } from '@/shared/types/agent-runtime-api'
 
 describe('ContinuousResearchStage', () => {
   it('preserva os valores internos e públicos na mesma ordem', () => {
-    expect(APPLICATION_STAGES).toEqual([
+    expect(CONTINUOUS_RESEARCH_STAGES).toEqual([
       'WAITING_QUEUE',
       'OPENING_CPI_RESEARCH',
       'READING_CPI_IDENTITY',
@@ -26,8 +22,7 @@ describe('ContinuousResearchStage', () => {
       'PREPARING_NEXT_SEARCH',
       'RETURNING_TO_QUEUE'
     ])
-    expect(PUBLIC_STAGES).toEqual(APPLICATION_STAGES)
-    expect(LEGACY_STAGES).toBe(APPLICATION_STAGES)
+    expect(PUBLIC_STAGES).toEqual(CONTINUOUS_RESEARCH_STAGES)
   })
 
   it('preserva a etapa e a referência exata da causa', () => {
@@ -47,16 +42,5 @@ describe('ContinuousResearchStage', () => {
     expect(error.stage).toBe('SAVING_CPI')
     expect(error.cause).toBe('Falha desconhecida')
     expect(error.message).toBe('Falha desconhecida')
-  })
-
-  it('mantém o caminho legado apontando para a mesma classe', () => {
-    expect(LegacyContinuousResearchStageError).toBe(ContinuousResearchStageError)
-
-    const error = new LegacyContinuousResearchStageError(
-      'PREPARING_NEXT_SEARCH',
-      new Error('Falha controlada')
-    )
-
-    expect(error).toBeInstanceOf(ContinuousResearchStageError)
   })
 })

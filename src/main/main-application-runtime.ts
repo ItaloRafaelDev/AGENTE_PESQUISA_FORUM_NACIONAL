@@ -1,15 +1,8 @@
 import { stat } from 'node:fs/promises'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
-import { BrowserManager } from '../automation/browser/browser-manager'
-import { BrowserWorkspaceService } from '../automation/browser/browser-workspace-service'
-import { PlatformPageManager } from '../automation/browser/platform-page-manager'
-import { PlaywrightBrowserLauncher } from '../automation/browser/playwright-browser-launcher'
-import { CpiQueueFilterController } from '../automation/cpi/cpi-queue-filter-controller'
-import { createContinuousResearchRunner } from '../automation/flow/continuous-research-runner'
-import { ResearchHistoryService } from '../automation/history/research-history-service'
-import { PlatformSessionService } from '../automation/session/platform-session-service'
-import { AgentPublicStateStore } from '../automation/workflow/agent-public-state-store'
-import { ContinuousAgentRuntimeService } from '../automation/workflow/continuous-agent-runtime-service'
+import { AgentStateMachine } from '../application/agent/agent-state-machine'
+import { ContinuousAgentCoordinator } from '../application/agent/continuous-agent-coordinator'
+import { ResearchHistoryService } from '../application/history/research-history-service'
 import { parseAppConfig } from '../infrastructure/config/app-config'
 import { ResearchHistoryRepository } from '../infrastructure/database/research-history-repository'
 import { resolvePdfOutputDirectory } from '../infrastructure/filesystem/pdf-output-directory-resolver'
@@ -17,6 +10,17 @@ import {
   ensureOperationalDirectories,
   resolveApplicationPaths
 } from '../infrastructure/filesystem/runtime-paths'
+import { BrowserManager } from '../infrastructure/automation/browser/browser-manager'
+import { BrowserWorkspaceService } from '../infrastructure/automation/browser/browser-workspace-service'
+import { PlatformPageManager } from '../infrastructure/automation/browser/platform-page-manager'
+import { PlaywrightBrowserLauncher } from '../infrastructure/automation/browser/playwright-browser-launcher'
+import { PlatformSessionService } from '../infrastructure/automation/session/platform-session-service'
+import { CpiQueueFilterController } from '../infrastructure/automation/cpi/cpi-queue-filter-controller'
+import { PlaywrightAgentWorkspaceAdapter } from '../infrastructure/automation/workflow/playwright-agent-workspace-adapter'
+import { SafeMessageSanitizerAdapter } from '../infrastructure/logging/safe-message-sanitizer'
+import { SystemClock } from '../infrastructure/runtime/system-clock'
+import { UuidGenerator } from '../infrastructure/runtime/uuid-generator'
+import { ContinuousAgentIpcAdapter } from './adapters/continuous-agent-ipc-adapter'
 import { registerBrowserIpcHandlers } from './ipc/register-browser-ipc-handlers'
 import { registerContinuousAgentIpcHandlers } from './ipc/register-continuous-agent-ipc-handlers'
 import { registerHistoryIpcHandlers } from './ipc/register-history-ipc-handlers'
@@ -37,7 +41,7 @@ const eventSender = {
 export class MainApplicationRuntime {
   private browserService: BrowserWorkspaceService | null = null
 
-  private agentRuntimeService: ContinuousAgentRuntimeService | null = null
+  private agentCoordinator: ContinuousAgentCoordinator | null = null
 
   private historyRepository: ResearchHistoryRepository | null = null
 
@@ -85,16 +89,20 @@ export class MainApplicationRuntime {
 
     this.historyRepository.markUnfinishedAsInterrupted(new Date().toISOString())
 
-    const historyService = new ResearchHistoryService(this.historyRepository)
+    const clock = new SystemClock()
+    const sanitizer = new SafeMessageSanitizerAdapter()
+    const historyService = new ResearchHistoryService({
+      repository: this.historyRepository,
+      clock,
+      idGenerator: new UuidGenerator(),
+      sanitizer
+    })
 
-    const stateStore = new AgentPublicStateStore()
-
-    this.agentRuntimeService = new ContinuousAgentRuntimeService({
-      stateStore,
-      browser: this.browserService,
-      sessions: sessionService,
-      filter: queueFilterController,
-      runner: createContinuousResearchRunner({
+    const workspace = new PlaywrightAgentWorkspaceAdapter(
+      this.browserService,
+      sessionService,
+      queueFilterController,
+      {
         queueCheckIntervalMs: config.timing.queueCheckIntervalMs,
         cpiSearchPollingIntervalMs: config.timing.cpiSearchPollingIntervalMs,
         actionTimeoutMs: config.timing.actionTimeoutMs,
@@ -117,8 +125,15 @@ export class MainApplicationRuntime {
         deskDataResultSearchAttempts: config.limits.deskDataResultSearchAttempts,
         deskDataHistoryNavigationAttempts: config.limits.deskDataHistoryNavigationAttempts,
         pdfOutputDirectory
-      }),
-      history: historyService
+      }
+    )
+
+    this.agentCoordinator = new ContinuousAgentCoordinator({
+      state: new AgentStateMachine(),
+      workspace,
+      history: historyService,
+      clock,
+      sanitizer
     })
 
     const pdfFileService = new PdfFileService(shell, {
@@ -131,7 +146,7 @@ export class MainApplicationRuntime {
 
     this.disposeAgentIpc = registerContinuousAgentIpcHandlers(
       ipcMain,
-      this.agentRuntimeService,
+      new ContinuousAgentIpcAdapter(this.agentCoordinator),
       eventSender
     )
 
@@ -142,7 +157,7 @@ export class MainApplicationRuntime {
 
   async shutdown(): Promise<void> {
     try {
-      await this.agentRuntimeService?.shutdown()
+      await this.agentCoordinator?.shutdown()
     } catch (error: unknown) {
       console.error('Falha ao encerrar o agente:', error)
     }
@@ -163,7 +178,7 @@ export class MainApplicationRuntime {
     this.disposeAgentIpc = null
     this.disposeHistoryIpc = null
     this.historyRepository = null
-    this.agentRuntimeService = null
+    this.agentCoordinator = null
     this.browserService = null
   }
 }

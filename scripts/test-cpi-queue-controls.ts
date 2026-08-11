@@ -1,8 +1,8 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Page } from 'playwright'
-import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
-import { CpiQueueFilterController } from '../src/automation/cpi/cpi-queue-filter-controller'
+import { PlatformPageManager } from '../src/infrastructure/automation/browser/platform-page-manager'
+import { CpiQueueFilterController } from '../src/infrastructure/automation/cpi/cpi-queue-filter-controller'
 import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 function findCpiPage(pages: Page[]): Page | undefined {

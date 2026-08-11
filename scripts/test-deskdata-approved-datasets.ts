@@ -1,11 +1,11 @@
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Page } from 'playwright'
-import { PlatformPageManager } from '../src/automation/browser/platform-page-manager'
+import { PlatformPageManager } from '../src/infrastructure/automation/browser/platform-page-manager'
 import {
   APPROVED_DESKDATA_DATASET_IDS,
   DeskDataDatasetController
-} from '../src/automation/deskdata/deskdata-dataset-controller'
+} from '../src/infrastructure/automation/deskdata/deskdata-dataset-controller'
 import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
 
 function findDeskDataPage(pages: Page[]): Page | undefined {

@@ -5,7 +5,13 @@ import { createSourceAliases } from './source-aliases'
 const sourceAliases = createSourceAliases(__dirname)
 
 export default defineConfig({
-  main: {},
+  main: {
+    resolve: {
+      alias: {
+        '@': sourceAliases['@']
+      }
+    }
+  },
   preload: {},
   renderer: {
     resolve: {

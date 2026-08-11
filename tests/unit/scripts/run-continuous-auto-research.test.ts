@@ -14,7 +14,7 @@ describe('comando operacional contínuo', () => {
 
     const source = readFileSync(scriptPath, 'utf8')
 
-    expect(source).toContain('ContinuousResearchRunner')
+    expect(source).toContain('createPlaywrightContinuousResearchExecutionAdapter')
 
     expect(source).toContain('SafeResearchLogger')
 
@@ -22,7 +22,7 @@ describe('comando operacional contínuo', () => {
 
     expect(source).toContain("process.once('SIGINT'")
 
-    expect(source).toContain('abortController.abort()')
+    expect(source).toContain('control.requestStop()')
 
     expect(source).not.toContain('GRAVAR')
 

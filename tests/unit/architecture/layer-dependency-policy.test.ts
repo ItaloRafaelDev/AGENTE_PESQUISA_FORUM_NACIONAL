@@ -15,11 +15,6 @@ const fixtures: readonly ExternalPolicyFixture[] = [
     forbidden: ['node:path', 'zod']
   },
   {
-    layer: 'automation',
-    allowed: ['node:fs/promises', 'node:sqlite', 'playwright', 'pdf-parse'],
-    forbidden: ['better-sqlite3', 'electron', 'react', 'sqlite', 'zod', 'zod-validation']
-  },
-  {
     layer: 'domain',
     allowed: [],
     forbidden: ['node:crypto', 'react']
@@ -87,7 +82,7 @@ describe('external dependency policy', () => {
   })
 
   it('mantém Zod somente na infraestrutura de configuração', () => {
-    expect(isExternalDependencyAllowed('automation', 'zod')).toBe(false)
+    expect(isExternalDependencyAllowed('application', 'zod')).toBe(false)
     expect(isExternalDependencyAllowed('infrastructure', 'zod')).toBe(true)
   })
 })

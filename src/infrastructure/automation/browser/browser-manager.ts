@@ -1,10 +1,16 @@
 import type { BrowserContext } from 'playwright'
 import type { BrowserLauncher, BrowserManagerSnapshot, BrowserManagerState } from './browser-types'
 
+const BROWSER_SHUTDOWN_MESSAGE = 'Navegador indisponível durante o encerramento seguro.'
+
 export class BrowserManager {
   private state: BrowserManagerState = 'STOPPED'
   private context: BrowserContext | null = null
   private startedAt: Date | null = null
+  private startOperation: Promise<BrowserManagerSnapshot> | null = null
+  private stopOperation: Promise<BrowserManagerSnapshot> | null = null
+  private shutdownOperation: Promise<void> | null = null
+  private shutdownRequested = false
 
   constructor(
     private readonly launcher: BrowserLauncher,
@@ -27,13 +33,22 @@ export class BrowserManager {
     return this.context
   }
 
-  async start(): Promise<BrowserManagerSnapshot> {
+  start(): Promise<BrowserManagerSnapshot> {
+    if (this.shutdownRequested) {
+      return Promise.reject(new Error(BROWSER_SHUTDOWN_MESSAGE))
+    }
+
     if (this.state !== 'STOPPED') {
-      throw new Error(`Navegador não pode iniciar no estado ${this.state}`)
+      return Promise.reject(new Error(`Navegador não pode iniciar no estado ${this.state}`))
     }
 
     this.state = 'STARTING'
+    this.startOperation = this.launchContext()
 
+    return this.startOperation
+  }
+
+  private async launchContext(): Promise<BrowserManagerSnapshot> {
     try {
       this.context = await this.launcher.launchPersistentContext(this.profilePath)
 
@@ -47,20 +62,27 @@ export class BrowserManager {
       this.state = 'STOPPED'
 
       throw error
+    } finally {
+      this.startOperation = null
     }
   }
 
-  async stop(): Promise<BrowserManagerSnapshot> {
+  stop(): Promise<BrowserManagerSnapshot> {
     if (this.state === 'STOPPED') {
-      return this.getSnapshot()
+      return Promise.resolve(this.getSnapshot())
     }
 
     if (this.state !== 'RUNNING') {
-      throw new Error(`Navegador não pode parar no estado ${this.state}`)
+      return Promise.reject(new Error(`Navegador não pode parar no estado ${this.state}`))
     }
 
     this.state = 'STOPPING'
+    this.stopOperation = this.closeContext()
 
+    return this.stopOperation
+  }
+
+  private async closeContext(): Promise<BrowserManagerSnapshot> {
     const context = this.context
 
     try {
@@ -69,8 +91,35 @@ export class BrowserManager {
       this.context = null
       this.startedAt = null
       this.state = 'STOPPED'
+      this.stopOperation = null
     }
 
     return this.getSnapshot()
+  }
+
+  shutdown(): Promise<void> {
+    if (!this.shutdownOperation) {
+      this.shutdownRequested = true
+      this.shutdownOperation = this.waitForQuiescence()
+    }
+
+    return this.shutdownOperation
+  }
+
+  private async waitForQuiescence(): Promise<void> {
+    try {
+      await this.startOperation
+    } catch {
+      // A failed launch has no browser context to close.
+    }
+
+    if (this.stopOperation) {
+      await this.stopOperation
+      return
+    }
+
+    if (this.state === 'RUNNING') {
+      await this.stop()
+    }
   }
 }

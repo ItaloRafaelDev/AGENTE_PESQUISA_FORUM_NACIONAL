@@ -33,6 +33,8 @@ describe('dashboard production guard', () => {
   })
 
   it('mantém isolamento e não expõe execução arbitrária', () => {
+    expect(mainSource).toMatch(/sandbox:\s*true/)
+
     expect(mainSource).toMatch(/contextIsolation:\s*true/)
 
     expect(mainSource).toMatch(/nodeIntegration:\s*false/)

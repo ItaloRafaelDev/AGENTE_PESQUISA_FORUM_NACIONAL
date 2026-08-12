@@ -17,6 +17,7 @@ const context = {
 class FakeBrowserManager implements BrowserRuntimeManager {
   public startCalls = 0
   public stopCalls = 0
+  public shutdownCalls = 0
 
   private state: BrowserManagerSnapshot['state']
 
@@ -36,6 +37,11 @@ class FakeBrowserManager implements BrowserRuntimeManager {
     this.state = 'STOPPED'
 
     return this.getSnapshot()
+  }
+
+  async shutdown(): Promise<void> {
+    this.shutdownCalls += 1
+    this.state = 'STOPPED'
   }
 
   getContext(): BrowserContext {
@@ -146,5 +152,16 @@ describe('BrowserWorkspaceService', () => {
 
     expect(snapshot.state).toBe('STOPPED')
     expect(browserManager.stopCalls).toBe(1)
+  })
+
+  it('delega o shutdown quiescente ao gerenciador do navegador', async () => {
+    const browserManager = new FakeBrowserManager('STARTING')
+    const pageManager = new FakePagesInitializer()
+    const service = new BrowserWorkspaceService(browserManager, pageManager)
+
+    await service.shutdown()
+
+    expect(browserManager.shutdownCalls).toBe(1)
+    expect(browserManager.getSnapshot().state).toBe('STOPPED')
   })
 })

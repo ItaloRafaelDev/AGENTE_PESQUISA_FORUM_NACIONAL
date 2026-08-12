@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
-import { electronAPI } from '@electron-toolkit/preload'
 import type { AgentPublicState } from '../shared/types/agent-runtime-api'
 import { AGENT_RUNTIME_IPC_CHANNELS } from '../shared/types/agent-runtime-api'
 import type { AgentApi } from '../shared/types/agent-api'
@@ -87,7 +86,5 @@ const agentApi: AgentApi = {
 if (!process.contextIsolated) {
   throw new Error('O Agente CPI exige contextIsolation habilitado.')
 }
-
-contextBridge.exposeInMainWorld('electron', electronAPI)
 
 contextBridge.exposeInMainWorld('agent', agentApi)

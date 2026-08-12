@@ -1,5 +1,5 @@
 import { stat } from 'node:fs/promises'
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, shell } from 'electron'
 import { AgentStateMachine } from '../application/agent/agent-state-machine'
 import { ContinuousAgentCoordinator } from '../application/agent/continuous-agent-coordinator'
 import { ResearchHistoryService } from '../application/history/research-history-service'
@@ -26,16 +26,15 @@ import { registerContinuousAgentIpcHandlers } from './ipc/register-continuous-ag
 import { registerHistoryIpcHandlers } from './ipc/register-history-ipc-handlers'
 import { registerPdfIpcHandlers } from './ipc/register-pdf-ipc-handlers'
 import { registerSessionIpcHandlers } from './ipc/register-session-ipc-handlers'
+import { ApplicationRuntimeLifecycle } from './lifecycle/application-runtime-lifecycle'
+import { ApplicationShutdown } from './lifecycle/application-shutdown'
+import type { MainWindowEventSender } from './security/main-window-event-sender'
+import type { SecureIpcMainRegistrar } from './security/secure-ipc-main-registrar'
 import { PdfFileService } from './services/pdf-file-service'
 
-const eventSender = {
-  send(channel: string, payload: unknown): void {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      if (!window.isDestroyed()) {
-        window.webContents.send(channel, payload)
-      }
-    })
-  }
+export interface MainApplicationRuntimeElectronBoundary {
+  ipcMain: SecureIpcMainRegistrar
+  eventSender: MainWindowEventSender
 }
 
 export class MainApplicationRuntime {
@@ -49,7 +48,56 @@ export class MainApplicationRuntime {
 
   private disposeHistoryIpc: (() => void) | null = null
 
-  async initialize(): Promise<void> {
+  private readonly applicationShutdown = new ApplicationShutdown(
+    () => [
+      {
+        component: 'AGENT',
+        execute: () => this.agentCoordinator?.shutdown()
+      },
+      {
+        component: 'BROWSER',
+        execute: () => this.browserService?.shutdown()
+      },
+      {
+        component: 'AGENT_IPC',
+        execute: () => this.disposeAgentIpc?.()
+      },
+      {
+        component: 'HISTORY_IPC',
+        execute: () => this.disposeHistoryIpc?.()
+      },
+      {
+        component: 'HISTORY_REPOSITORY',
+        execute: () => this.historyRepository?.close()
+      },
+      {
+        component: 'RUNTIME_REFERENCES',
+        execute: () => {
+          this.disposeAgentIpc = null
+          this.disposeHistoryIpc = null
+          this.historyRepository = null
+          this.agentCoordinator = null
+          this.browserService = null
+        }
+      }
+    ],
+    (component) => {
+      console.error(`Falha no encerramento seguro: ${component}`)
+    }
+  )
+
+  private readonly applicationLifecycle = new ApplicationRuntimeLifecycle(
+    () => this.initializeResources(),
+    () => this.applicationShutdown.run()
+  )
+
+  constructor(private readonly electronBoundary: MainApplicationRuntimeElectronBoundary) {}
+
+  initialize(): Promise<void> {
+    return this.applicationLifecycle.initialize()
+  }
+
+  private async initializeResources(): Promise<void> {
     const config = parseAppConfig()
     const runtimePaths = resolveApplicationPaths(
       {
@@ -140,45 +188,26 @@ export class MainApplicationRuntime {
       stat
     })
 
-    registerBrowserIpcHandlers(ipcMain, this.browserService)
+    registerBrowserIpcHandlers(this.electronBoundary.ipcMain, this.browserService)
 
-    registerSessionIpcHandlers(ipcMain, sessionService)
+    registerSessionIpcHandlers(this.electronBoundary.ipcMain, sessionService)
 
     this.disposeAgentIpc = registerContinuousAgentIpcHandlers(
-      ipcMain,
+      this.electronBoundary.ipcMain,
       new ContinuousAgentIpcAdapter(this.agentCoordinator),
-      eventSender
+      this.electronBoundary.eventSender
     )
 
-    this.disposeHistoryIpc = registerHistoryIpcHandlers(ipcMain, historyService, eventSender)
+    this.disposeHistoryIpc = registerHistoryIpcHandlers(
+      this.electronBoundary.ipcMain,
+      historyService,
+      this.electronBoundary.eventSender
+    )
 
-    registerPdfIpcHandlers(ipcMain, pdfFileService)
+    registerPdfIpcHandlers(this.electronBoundary.ipcMain, pdfFileService)
   }
 
-  async shutdown(): Promise<void> {
-    try {
-      await this.agentCoordinator?.shutdown()
-    } catch (error: unknown) {
-      console.error('Falha ao encerrar o agente:', error)
-    }
-
-    try {
-      if (this.browserService?.getSnapshot().state === 'RUNNING') {
-        await this.browserService.stop()
-      }
-    } catch (error: unknown) {
-      console.error('Falha ao encerrar o navegador:', error)
-    }
-
-    this.disposeAgentIpc?.()
-    this.disposeHistoryIpc?.()
-
-    this.historyRepository?.close()
-
-    this.disposeAgentIpc = null
-    this.disposeHistoryIpc = null
-    this.historyRepository = null
-    this.agentCoordinator = null
-    this.browserService = null
+  shutdown(): Promise<void> {
+    return this.applicationLifecycle.shutdown()
   }
 }

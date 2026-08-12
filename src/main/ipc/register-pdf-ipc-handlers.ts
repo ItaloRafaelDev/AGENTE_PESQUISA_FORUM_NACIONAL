@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { PDF_IPC_CHANNELS, type PdfActionResult } from '../../shared/types/pdf-api'
+import { parsePdfPathIpcArguments } from './ipc-argument-contracts'
 
 type IpcHandler = (event: unknown, ...args: unknown[]) => unknown | Promise<unknown>
 
@@ -15,8 +15,6 @@ export interface PdfActionService {
   reveal(path: string): Promise<PdfActionResult>
 }
 
-const pdfPathSchema = z.string().trim().min(1, 'Caminho de PDF não informado')
-
 export function registerPdfIpcHandlers(
   ipcMain: PdfIpcMainRegistrar,
   pdfService: PdfActionService
@@ -25,14 +23,14 @@ export function registerPdfIpcHandlers(
     ipcMain.removeHandler(channel)
   })
 
-  ipcMain.handle(PDF_IPC_CHANNELS.open, (_event, rawPath) => {
-    const path = pdfPathSchema.parse(rawPath)
+  ipcMain.handle(PDF_IPC_CHANNELS.open, (_event, ...rawArguments) => {
+    const path = parsePdfPathIpcArguments(rawArguments)
 
     return pdfService.open(path)
   })
 
-  ipcMain.handle(PDF_IPC_CHANNELS.reveal, (_event, rawPath) => {
-    const path = pdfPathSchema.parse(rawPath)
+  ipcMain.handle(PDF_IPC_CHANNELS.reveal, (_event, ...rawArguments) => {
+    const path = parsePdfPathIpcArguments(rawArguments)
 
     return pdfService.reveal(path)
   })

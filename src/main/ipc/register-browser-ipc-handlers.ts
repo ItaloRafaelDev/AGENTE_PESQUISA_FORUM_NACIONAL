@@ -1,4 +1,5 @@
 import { BROWSER_IPC_CHANNELS, type BrowserManagerSnapshot } from '../../shared/types/browser-api'
+import { parseNoIpcArguments } from './ipc-argument-contracts'
 
 type IpcHandler = (event: unknown, ...args: unknown[]) => unknown | Promise<unknown>
 
@@ -23,15 +24,21 @@ export function registerBrowserIpcHandlers(
     ipcMain.removeHandler(channel)
   })
 
-  ipcMain.handle(BROWSER_IPC_CHANNELS.start, async () => {
+  ipcMain.handle(BROWSER_IPC_CHANNELS.start, async (_event, ...rawArguments) => {
+    parseNoIpcArguments(rawArguments)
+
     return browserService.start()
   })
 
-  ipcMain.handle(BROWSER_IPC_CHANNELS.stop, async () => {
+  ipcMain.handle(BROWSER_IPC_CHANNELS.stop, async (_event, ...rawArguments) => {
+    parseNoIpcArguments(rawArguments)
+
     return browserService.stop()
   })
 
-  ipcMain.handle(BROWSER_IPC_CHANNELS.status, () => {
+  ipcMain.handle(BROWSER_IPC_CHANNELS.status, (_event, ...rawArguments) => {
+    parseNoIpcArguments(rawArguments)
+
     return browserService.getSnapshot()
   })
 }

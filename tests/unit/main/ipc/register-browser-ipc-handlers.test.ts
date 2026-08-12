@@ -4,6 +4,7 @@ import {
   type BrowserControlService,
   type IpcMainRegistrar
 } from '@/main/ipc/register-browser-ipc-handlers'
+import { INVALID_IPC_ARGUMENTS_MESSAGE } from '@/main/ipc/ipc-argument-contracts'
 import { BROWSER_IPC_CHANNELS, type BrowserManagerSnapshot } from '@/shared/types/browser-api'
 
 type IpcHandler = (event: unknown, ...args: unknown[]) => unknown | Promise<unknown>
@@ -112,6 +113,18 @@ describe('registerBrowserIpcHandlers', () => {
     )
 
     expect(service.statusCalls).toBe(1)
+  })
+
+  it('rejeita argumentos inesperados antes de iniciar o navegador', async () => {
+    const ipcMain = new FakeIpcMain()
+    const service = new FakeBrowserService()
+
+    registerBrowserIpcHandlers(ipcMain, service)
+
+    const listener = ipcMain.handlers.get(BROWSER_IPC_CHANNELS.start)
+
+    await expect(listener?.({}, 'unexpected')).rejects.toThrow(INVALID_IPC_ARGUMENTS_MESSAGE)
+    expect(service.startCalls).toBe(0)
   })
 
   it('deve remover handlers antigos antes de registrar novamente', () => {

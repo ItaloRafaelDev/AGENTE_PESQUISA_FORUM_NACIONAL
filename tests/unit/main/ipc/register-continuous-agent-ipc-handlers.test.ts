@@ -5,6 +5,7 @@ import {
   type ContinuousAgentEventSender,
   type ContinuousAgentIpcMainRegistrar
 } from '@/main/ipc/register-continuous-agent-ipc-handlers'
+import { INVALID_IPC_ARGUMENTS_MESSAGE } from '@/main/ipc/ipc-argument-contracts'
 import {
   AGENT_RUNTIME_IPC_CHANNELS,
   createInitialAgentPublicState,
@@ -186,6 +187,20 @@ describe('registerContinuousAgentIpcHandlers', () => {
     expect(service.resumeCalls).toBe(1)
     expect(service.stopCalls).toBe(1)
     expect(service.loginCalls).toBe(1)
+  })
+
+  it('rejeita argumentos inesperados antes de iniciar o agente', async () => {
+    const ipcMain = new FakeIpcMain()
+    const service = new FakeAgentService()
+
+    registerContinuousAgentIpcHandlers(ipcMain, service, new FakeEventSender())
+
+    const listener = ipcMain.handlers.get(AGENT_RUNTIME_IPC_CHANNELS.start)
+
+    await expect(Promise.resolve().then(() => listener?.({}, 'unexpected'))).rejects.toThrow(
+      INVALID_IPC_ARGUMENTS_MESSAGE
+    )
+    expect(service.startCalls).toBe(0)
   })
 
   it('emite agent:state-changed em tempo real', () => {

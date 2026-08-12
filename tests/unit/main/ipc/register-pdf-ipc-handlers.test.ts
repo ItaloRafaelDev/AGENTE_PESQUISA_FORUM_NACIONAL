@@ -4,6 +4,7 @@ import {
   type PdfActionService,
   type PdfIpcMainRegistrar
 } from '@/main/ipc/register-pdf-ipc-handlers'
+import { INVALID_IPC_ARGUMENTS_MESSAGE } from '@/main/ipc/ipc-argument-contracts'
 import { PDF_IPC_CHANNELS, type PdfActionResult } from '@/shared/types/pdf-api'
 
 type IpcHandler = (event: unknown, ...args: unknown[]) => unknown | Promise<unknown>
@@ -122,6 +123,20 @@ describe('registerPdfIpcHandlers', () => {
       })
     ).rejects.toThrow()
 
+    expect(service.openedPaths).toEqual([])
+  })
+
+  it('rejeita argumentos extras antes de abrir o PDF', async () => {
+    const ipcMain = new FakeIpcMain()
+    const service = new FakePdfService()
+
+    registerPdfIpcHandlers(ipcMain, service)
+
+    const listener = ipcMain.handlers.get(PDF_IPC_CHANNELS.open)
+
+    await expect(
+      Promise.resolve().then(() => listener?.({}, pdfPath, 'unexpected'))
+    ).rejects.toThrow(INVALID_IPC_ARGUMENTS_MESSAGE)
     expect(service.openedPaths).toEqual([])
   })
 })

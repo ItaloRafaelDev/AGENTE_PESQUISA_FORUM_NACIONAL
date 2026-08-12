@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import type {
   ResearchHistoryEvent,
   ResearchHistoryEventListener,
@@ -10,6 +9,7 @@ import {
   mapResearchHistoryPageToDto,
   mapResearchHistoryRecordToDto
 } from '../mappers/research-history-ipc-mapper'
+import { parseHistoryListIpcArguments, parseNoIpcArguments } from './ipc-argument-contracts'
 
 type IpcHandler = (event: unknown, ...args: unknown[]) => unknown | Promise<unknown>
 
@@ -30,14 +30,6 @@ export interface HistoryReadWriteService {
 
   subscribe(listener: ResearchHistoryEventListener): () => void
 }
-
-const listInputSchema = z
-  .object({
-    page: z.number().int().min(1),
-
-    pageSize: z.number().int().min(1).max(100)
-  })
-  .strict()
 
 function sendHistoryEvent(sender: HistoryEventSender, event: ResearchHistoryEvent): void {
   switch (event.type) {
@@ -65,13 +57,15 @@ export function registerHistoryIpcHandlers(
     ipcMain.removeHandler(channel)
   })
 
-  ipcMain.handle(HISTORY_IPC_CHANNELS.list, (_event, rawInput) => {
-    const input = listInputSchema.parse(rawInput)
+  ipcMain.handle(HISTORY_IPC_CHANNELS.list, (_event, ...rawArguments) => {
+    const input = parseHistoryListIpcArguments(rawArguments)
 
     return mapResearchHistoryPageToDto(historyService.list(input))
   })
 
-  ipcMain.handle(HISTORY_IPC_CHANNELS.clear, () => {
+  ipcMain.handle(HISTORY_IPC_CHANNELS.clear, (_event, ...rawArguments) => {
+    parseNoIpcArguments(rawArguments)
+
     historyService.clear()
   })
 

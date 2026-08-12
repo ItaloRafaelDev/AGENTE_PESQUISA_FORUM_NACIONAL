@@ -4,6 +4,7 @@ import {
   type SessionIpcMainRegistrar,
   type SessionReadService
 } from '@/main/ipc/register-session-ipc-handlers'
+import { INVALID_IPC_ARGUMENTS_MESSAGE } from '@/main/ipc/ipc-argument-contracts'
 import { SESSION_IPC_CHANNELS } from '@/shared/types/session-api'
 
 describe('registerSessionIpcHandlers', () => {
@@ -41,5 +42,27 @@ describe('registerSessionIpcHandlers', () => {
     const handler = handlers.get(SESSION_IPC_CHANNELS.status)
     await expect(handler?.({})).resolves.toEqual(snapshot)
     expect(sessionService.getSnapshot).toHaveBeenCalledOnce()
+  })
+
+  it('rejeita argumentos inesperados antes de consultar a sessão', async () => {
+    const handlers = new Map<string, (...args: unknown[]) => unknown>()
+    const ipcMain: SessionIpcMainRegistrar = {
+      removeHandler: vi.fn((channel) => {
+        handlers.delete(channel)
+      }),
+      handle: vi.fn((channel, listener) => {
+        handlers.set(channel, listener)
+      })
+    }
+    const sessionService: SessionReadService = {
+      getSnapshot: vi.fn()
+    }
+
+    registerSessionIpcHandlers(ipcMain, sessionService)
+
+    const listener = handlers.get(SESSION_IPC_CHANNELS.status)
+
+    await expect(listener?.({}, 'unexpected')).rejects.toThrow(INVALID_IPC_ARGUMENTS_MESSAGE)
+    expect(sessionService.getSnapshot).not.toHaveBeenCalled()
   })
 })

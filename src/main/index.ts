@@ -1,14 +1,36 @@
 import { join } from 'node:path'
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { MainApplicationRuntime } from './main-application-runtime'
+import { installWindowSecurity } from './security/install-window-security'
+import { MainWindowEventSender } from './security/main-window-event-sender'
+import { NavigationSecurityPolicy } from './security/navigation-security-policy'
+import { RendererIpcAuthorizer } from './security/renderer-ipc-authorizer'
+import { resolveApprovedRendererUrl } from './security/renderer-location'
+import { SecureIpcMainRegistrar } from './security/secure-ipc-main-registrar'
 
-const mainRuntime = new MainApplicationRuntime()
+const rendererHtmlPath = join(__dirname, '../renderer/index.html')
+const approvedRendererUrl = resolveApprovedRendererUrl({
+  developmentUrl: is.dev ? process.env.ELECTRON_RENDERER_URL : undefined,
+  productionHtmlPath: rendererHtmlPath
+})
+const navigationSecurityPolicy = new NavigationSecurityPolicy(approvedRendererUrl)
+
+let mainWindow: BrowserWindow | null = null
+
+const getMainWindow = (): BrowserWindow | null => mainWindow
+const rendererIpcAuthorizer = new RendererIpcAuthorizer(getMainWindow, approvedRendererUrl)
+const secureIpcMain = new SecureIpcMainRegistrar(ipcMain, rendererIpcAuthorizer)
+const eventSender = new MainWindowEventSender(getMainWindow)
+const mainRuntime = new MainApplicationRuntime({
+  ipcMain: secureIpcMain,
+  eventSender
+})
 
 let isQuitting = false
 
 function createWindow(): void {
-  const mainWindow = new BrowserWindow({
+  const createdWindow = new BrowserWindow({
     width: 1100,
     height: 760,
     minWidth: 900,
@@ -17,28 +39,23 @@ function createWindow(): void {
     autoHideMenuBar: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
+      sandbox: true,
       contextIsolation: true,
       nodeIntegration: false
     }
   })
+  mainWindow = createdWindow
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
+  installWindowSecurity(createdWindow, navigationSecurityPolicy, shell)
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    void shell.openExternal(details.url)
-
-    return {
-      action: 'deny'
-    }
+  createdWindow.on('ready-to-show', () => {
+    createdWindow.show()
   })
 
   if (is.dev && process.env.ELECTRON_RENDERER_URL) {
-    void mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
+    void createdWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
   } else {
-    void mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    void createdWindow.loadFile(rendererHtmlPath)
   }
 }
 
@@ -48,9 +65,7 @@ if (!singleInstanceLock) {
   app.quit()
 } else {
   app.on('second-instance', () => {
-    const mainWindow = BrowserWindow.getAllWindows()[0]
-
-    if (!mainWindow) {
+    if (!mainWindow || mainWindow.isDestroyed()) {
       return
     }
 
@@ -72,12 +87,18 @@ if (!singleInstanceLock) {
 
       await mainRuntime.initialize()
 
+      if (isQuitting) {
+        return
+      }
+
       createWindow()
     })
-    .catch((error: unknown) => {
-      console.error('Falha ao inicializar o Agente CPI:', error)
+    .catch(() => {
+      console.error('Falha ao inicializar o Agente CPI.')
 
-      app.quit()
+      if (!isQuitting) {
+        app.quit()
+      }
     })
 
   app.on('before-quit', (event) => {
@@ -88,11 +109,9 @@ if (!singleInstanceLock) {
     event.preventDefault()
     isQuitting = true
 
-    void (async () => {
-      await mainRuntime.shutdown()
-
+    void mainRuntime.shutdown().finally(() => {
       app.quit()
-    })()
+    })
   })
 
   app.on('window-all-closed', () => {

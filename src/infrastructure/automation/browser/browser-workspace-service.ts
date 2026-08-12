@@ -5,6 +5,7 @@ import type { ManagedBrowserContext, PlatformPageManager } from './platform-page
 export interface BrowserRuntimeManager {
   start(): Promise<BrowserManagerSnapshot>
   stop(): Promise<BrowserManagerSnapshot>
+  shutdown(): Promise<void>
   getSnapshot(): BrowserManagerSnapshot
   getContext(): BrowserContext
 }
@@ -45,6 +46,10 @@ export class BrowserWorkspaceService {
 
   async stop(): Promise<BrowserManagerSnapshot> {
     return this.browserManager.stop()
+  }
+
+  async shutdown(): Promise<void> {
+    await this.browserManager.shutdown()
   }
 
   getSnapshot(): BrowserManagerSnapshot {

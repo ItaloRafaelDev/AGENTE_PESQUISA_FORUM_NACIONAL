@@ -5,6 +5,7 @@ import {
   type HistoryIpcMainRegistrar,
   type HistoryReadWriteService
 } from '@/main/ipc/register-history-ipc-handlers'
+import { INVALID_IPC_ARGUMENTS_MESSAGE } from '@/main/ipc/ipc-argument-contracts'
 import type {
   ResearchHistoryEvent,
   ResearchHistoryPage,
@@ -195,6 +196,20 @@ describe('registerHistoryIpcHandlers', () => {
       })
     ).rejects.toThrow()
 
+    expect(service.listInputs).toEqual([])
+  })
+
+  it('rejeita argumentos extras antes de listar o histórico', async () => {
+    const ipcMain = new FakeIpcMain()
+    const service = new FakeHistoryService()
+
+    registerHistoryIpcHandlers(ipcMain, service, new FakeEventSender())
+
+    const listener = ipcMain.handlers.get(HISTORY_IPC_CHANNELS.list)
+
+    await expect(
+      Promise.resolve().then(() => listener?.({}, { page: 1, pageSize: 50 }, 'unexpected'))
+    ).rejects.toThrow(INVALID_IPC_ARGUMENTS_MESSAGE)
     expect(service.listInputs).toEqual([])
   })
 

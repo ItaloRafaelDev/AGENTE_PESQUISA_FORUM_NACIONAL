@@ -79,6 +79,29 @@ O usuário concluiu a validação manual no Windows e respondeu explicitamente
 `A — testado e funcionando`. A Etapa 6 está, portanto, registrada como
 `DONE_STAGE_6_MANUAL_ACCEPTED`. Nenhum commit ou push foi criado neste checkpoint.
 
+## Stage 7 manual acceptance
+
+Em 2026-08-12, a Etapa 7 concluiu a revisão whole-diff com `0 Critical`, `0 Important`
+e `4 Minor` adiados com justificativa no relatório da Task 8. O boundary Electron agora usa
+origem exata do renderer, autorização central de IPC, contratos estritos de argumentos, eventos
+direcionados apenas à janela principal, navegação restrita, permission checks e requests negados,
+preload limitado a `window.agent`, sandbox habilitado e shutdown idempotente com isolamento por
+etapa. A onda final coordena browser `STARTING`/`STOPPING`, bloqueia novos starts após o início do
+shutdown, aguarda quiescência e impede criação/carregamento da janela quando quit já começou.
+
+Na árvore final exata, o focused security gate passou com 17 arquivos/119 testes. `pnpm run
+validate` passou com 118 arquivos/701 testes, além de 3/3 type-tests sem erros; `pnpm run build`
+passou com 92 módulos main, 6 preload e 32 renderer; e `pnpm run test:coverage` passou com 88,39%
+statements, 81,36% branches, 91,23% functions e 88,63% lines. Lint, Prettier e os typechecks dos
+três projetos também passaram.
+
+Em 2026-08-12, o usuário concluiu a validação manual no Windows e respondeu explicitamente
+`A — testado e funcionando`, incluindo o checklist de dashboard, browser e sessões, fluxo
+CPI → DeskData → PDF → CPI, histórico e ações de PDF, pause/resume/stop, abertura externa HTTPS,
+ausência de prompts ou novas janelas Electron, fechamento durante inicialização/bootstrap,
+encerramento seguro em operação normal e reinício. A Etapa 7 está registrada como
+`DONE_STAGE_7_MANUAL_ACCEPTED`. Nenhum commit, push ou publicação foi criado neste checkpoint.
+
 ## Global checkpoints
 
 Every stage ends with:

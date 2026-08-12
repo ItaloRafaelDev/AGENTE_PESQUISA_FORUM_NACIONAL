@@ -2,6 +2,7 @@ import {
   AGENT_RUNTIME_IPC_CHANNELS,
   type AgentPublicState
 } from '../../shared/types/agent-runtime-api'
+import { parseNoIpcArguments } from './ipc-argument-contracts'
 
 type IpcHandler = (event: unknown, ...args: unknown[]) => unknown | Promise<unknown>
 
@@ -46,17 +47,41 @@ export function registerContinuousAgentIpcHandlers(
     ipcMain.removeHandler(channel)
   })
 
-  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.getState, () => agentService.getSnapshot())
+  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.getState, (_event, ...rawArguments) => {
+    parseNoIpcArguments(rawArguments)
 
-  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.start, () => agentService.start())
+    return agentService.getSnapshot()
+  })
 
-  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.pause, () => agentService.pause())
+  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.start, (_event, ...rawArguments) => {
+    parseNoIpcArguments(rawArguments)
 
-  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.resume, () => agentService.resume())
+    return agentService.start()
+  })
 
-  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.stop, () => agentService.stop())
+  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.pause, (_event, ...rawArguments) => {
+    parseNoIpcArguments(rawArguments)
 
-  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.loginCompleted, () => agentService.loginCompleted())
+    return agentService.pause()
+  })
+
+  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.resume, (_event, ...rawArguments) => {
+    parseNoIpcArguments(rawArguments)
+
+    return agentService.resume()
+  })
+
+  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.stop, (_event, ...rawArguments) => {
+    parseNoIpcArguments(rawArguments)
+
+    return agentService.stop()
+  })
+
+  ipcMain.handle(AGENT_RUNTIME_IPC_CHANNELS.loginCompleted, (_event, ...rawArguments) => {
+    parseNoIpcArguments(rawArguments)
+
+    return agentService.loginCompleted()
+  })
 
   const unsubscribe = agentService.subscribe((state) => {
     eventSender.send(AGENT_RUNTIME_IPC_CHANNELS.stateChanged, state)

@@ -112,6 +112,7 @@ describe('preload agent API', () => {
     expect(results).toEqual(sentinels)
     expect(electron.invoke.mock.calls).toEqual(expectedCalls)
 
+    expect(electron.exposeInMainWorld.mock.calls.map(([name]) => name)).toEqual(['agent'])
     expect(Object.keys(api)).toEqual(['browser', 'control', 'sessions', 'history', 'pdf'])
     expect(Object.keys(api.browser)).toEqual(['start', 'stop', 'getStatus'])
     expect(Object.keys(api.control)).toEqual([

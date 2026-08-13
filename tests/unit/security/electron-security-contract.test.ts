@@ -5,18 +5,30 @@ import { describe, expect, it } from 'vitest'
 
 const productionSourcePattern = /\.(?:html|ts|tsx)$/
 
-function readSourceTree(directory: string): string {
+interface SourceFile {
+  path: string
+  source: string
+}
+
+function readSourceFiles(directory: string): readonly SourceFile[] {
   return readdirSync(directory, { withFileTypes: true })
     .sort((left, right) => left.name.localeCompare(right.name))
-    .map((entry) => {
+    .flatMap((entry) => {
       const entryPath = join(directory, entry.name)
 
       if (entry.isDirectory()) {
-        return readSourceTree(entryPath)
+        return readSourceFiles(entryPath)
       }
 
-      return productionSourcePattern.test(entry.name) ? readFileSync(entryPath, 'utf8') : ''
+      return productionSourcePattern.test(entry.name)
+        ? [{ path: entryPath.replaceAll('\\', '/'), source: readFileSync(entryPath, 'utf8') }]
+        : []
     })
+}
+
+function readSourceTree(directory: string): string {
+  return readSourceFiles(directory)
+    .map(({ source }) => source)
     .join('\n')
 }
 
@@ -125,6 +137,7 @@ const preloadDeclarationSource = readFileSync('src/preload/index.d.ts', 'utf8')
 const mainSource = readFileSync('src/main/index.ts', 'utf8')
 const productionSource = readSourceTree('src')
 const rendererHtmlSource = readFileSync('src/renderer/index.html', 'utf8')
+const rendererSourceFiles = readSourceFiles('src/renderer/src')
 const rendererSource = readSourceTree('src/renderer')
 
 describe('contrato de segurança do Electron', () => {
@@ -142,6 +155,12 @@ describe('contrato de segurança do Electron', () => {
 
   it('impede acesso do renderer a IPC bruto ou arbitrário', () => {
     expectRestrictedRendererApi(rendererSource)
+
+    expect(
+      rendererSourceFiles
+        .filter(({ source }) => /\bwindow\.agent\b/.test(source))
+        .map(({ path }) => path)
+    ).toEqual(['src/renderer/src/api/agent-api.ts'])
   })
 
   it('rejeita o identificador electronAPI no renderer', () => {

@@ -102,6 +102,37 @@ ausência de prompts ou novas janelas Electron, fechamento durante inicializaç�
 encerramento seguro em operação normal e reinício. A Etapa 7 está registrada como
 `DONE_STAGE_7_MANUAL_ACCEPTED`. Nenhum commit, push ou publicação foi criado neste checkpoint.
 
+## Stage 8 manual acceptance
+
+Status: `DONE_STAGE_8_MANUAL_ACCEPTED`.
+
+Em 2026-08-13, a Etapa 8 separou o renderer em gateway tipado, modelos puros, hooks de lifecycle e
+comandos, e componentes de apresentação. O único acesso a `window.agent` ficou em
+`src/renderer/src/api/agent-api.ts`; guardas recursivas rejeitam IPC Electron bruto, API genérica,
+estado/effects e acesso de ambiente nos componentes de apresentação. O dashboard mantém uma trava
+global de ações e o histórico mantém sua própria trava global, hidratação reconciliada, três
+subscriptions e cleanup por geração.
+
+A revisão final do diff registrou `0 Critical`, `1 Important` corrigido e `1 Minor` preservado por
+compatibilidade. O finding Important separou o programa TypeScript de scripts do renderer depois
+que os novos módulos `.ts` expuseram a inclusão cruzada; `typecheck:scripts` observou RED e passou
+após o `exclude` mínimo. Datas válidas do histórico continuam formatadas no fuso local do processo
+Windows, como antes da refatoração. Os minors de guarda adiados nas Tasks 4 e 6 foram resolvidos
+pela descoberta recursiva de componentes e pelas verificações de ownership de log, hooks e modelos.
+
+Na árvore de implementação final, o focused renderer/preload/security gate passou com 14 arquivos
+e 454 testes. `pnpm run validate` passou com 126 arquivos e 1114 testes, além de 3 type-test files;
+`pnpm run build` passou com 92 módulos main, 6 preload e 50 renderer; e
+`pnpm run test:coverage` passou com 89,28% statements, 83,21% branches, 91,83% functions e 89,53%
+lines. O CSS preservou o SHA-256
+`949A46122B4B9CB8BB2B576879DE779C1AF16E99D50241C0CB8F692E4E6C22E6`.
+
+Em 2026-08-13, o usuário concluiu a aceitação manual no Windows e respondeu explicitamente
+`A — Testado e funcionando`. O aceite cobre aparência e comportamento do dashboard, botões,
+hidratação e eventos, countdown/log, sessões, E1, histórico/PDF, fluxo operacional, fechamento e
+reinício. Nenhum commit, merge, push ou publicação foi criado neste checkpoint; a integração Git
+continua sendo uma decisão separada do usuário.
+
 ## Global checkpoints
 
 Every stage ends with:

@@ -133,6 +133,61 @@ hidratação e eventos, countdown/log, sessões, E1, histórico/PDF, fluxo opera
 reinício. Nenhum commit, merge, push ou publicação foi criado neste checkpoint; a integração Git
 continua sendo uma decisão separada do usuário.
 
+## Stage 9 automated-only checkpoint
+
+Status: `DONE_AUTOMATED_GATE_ONLY_WITH_E2E_WAIVERS`.
+
+Em 2026-08-17, as Tasks 1–8 implementaram identidade canônica, isolamento de startup/smoke,
+helper fixo do Chromium, instalador NSIS assistido, pipeline fail-fast, setup Windows e documentação
+operacional. Os contratos automatizados e gates estáticos próprios de cada task ficaram verdes, sem
+commit, stage, push, publicação, execução de portal ou aceite manual da Etapa 9.
+
+A única evidência real de instalador usada neste status vem da Task 5: o NSIS x64 final compilou
+com a configuração e o include então finais como `Agente-CPI-1.0.0-Setup-x64.exe`, com
+120.188.888 bytes. Ele foi inspecionado, mas nunca executado. Esse arquivo anterior não é evidência
+de um pipeline Task 6 completo e nenhum hash final é reivindicado.
+
+Waivers E2E escolhidos pelo usuário (opção B):
+
+- **Task 6 — `DONE_AUTOMATED_GATE_ONLY`:** pipeline final, smoke empacotado, ZIP e hashes finais
+  permanecem não verificados. A primeira e única execução real parou nos checks de ambiente por uma
+  incompatibilidade PowerShell 5.1 depois corrigida e não houve rerun.
+- **Task 7 — `DONE_AUTOMATED_GATE_ONLY_WITH_E2E_WAIVER`:** a primeira execução real do setup parou
+  na descoberta do Corepack antes da instalação, falha depois corrigida sob TDD. As duas execuções
+  convergentes não ocorreram; a idempotência de duas execuções permanece não verificada.
+
+A aceitação manual Windows permanece pendente. Ela deve cobrir hash do instalador/ZIP, instalação
+assistida e rollback de Chromium, atalhos e ausência de abertura pós-instalação, operação real após
+login manual, preservação do banco/histórico, update-over-install, desinstalação com limpeza
+desmarcada e marcada, preservação de PDFs/cache global, execução do ZIP e orientação SmartScreen.
+Até esse aceite, não há autorização para commit, merge, push ou publicação da Etapa 9.
+
+- **Task 9 — `DONE_AUTOMATED_GATE_ONLY_WITH_E2E_WAIVERS`:** em 2026-08-31, a revisão do delta
+  completo corrigiu três findings Important sob gates focados: o lint global do config CommonJS, a
+  aresta arquitetural exata do catálogo JSON e a distinção explícita entre x64 e ARM64 no preflight
+  da pipeline. O gate focado final passou com 14 arquivos/145 testes; `validate` passou com 138
+  arquivos/1.232 testes; o build transformou 98 módulos main, 6 preload e 50 renderer; e a cobertura
+  ficou em 90,32% statements, 83,93% branches, 92,10% functions e 90,58% lines. Esses resultados não
+  removem os waivers E2E acima: pipeline final, packaged smoke, ZIP, manifesto/hash final, setup
+  idempotente e toda aceitação manual continuam pendentes.
+
+Em 2026-09-01, a revisão independente final encontrou três findings Important adicionais: a
+limpeza NSIS não auditava reparse points antes de `RMDir /r`; a raiz smoke tinha somente contenção
+lexical; e `package.json` ainda expunha metadados template/URL pública. Uma única fix wave adicionou
+auditoria recursiva fail-closed das duas árvores antes de qualquer exclusão, contenção filesystem
+canônica revalidada contra reparse/conteúdo preexistente/workspace/AppData e removeu `description`,
+`author` e `homepage` sem alterar versão, dependências ou lockfile. O RED inicial teve 8 falhas em
+4 arquivos/28 testes; o RED de proteção explícita do AppData teve 2 falhas em 2 arquivos/22 testes;
+o GREEN focado passou com 4 arquivos/31 testes. O gate focado Stage 9 completo passou depois com 14
+arquivos/156 testes. No rerun global pós-fix, `validate` passou com 138 arquivos/1.243 testes e 3/3
+type-tests; o build transformou 98 módulos main, 6 preload e 50 renderer; e a cobertura ficou em
+90,24% statements, 83,98% branches, 91,90% functions e 90,49% lines. Os waivers E2E e o status
+máximo permanecem inalterados. A única re-revisão independente aprovou as três correções sem
+finding Critical ou Important aberto. Em 2026-09-01, após manter os waivers pela opção B, o usuário
+aceitou o comportamento visual/funcional disponível, histórico/PDF, navegador/login e o fluxo
+autorizado CPI → DeskData → PDF → CPI. Instalador, rollback, atalhos, update, uninstall, ZIP, hashes
+e idempotência do setup permanecem explicitamente não verificados.
+
 ## Global checkpoints
 
 Every stage ends with:

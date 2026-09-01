@@ -1,5 +1,11 @@
 # Design — README e instalação reproduzível do Agente CPI
 
+> **Status: SUPERSEDED.** Substituído pela
+> [especificação aprovada da Etapa 9](2026-08-13-refactoring-stage-9-distribution-design.md).
+> As premissas cross-platform experimentais deste documento histórico não são mais válidas; o
+> suporte aprovado é exclusivamente Windows 10/11 x64. O conteúdo abaixo foi preservado como
+> registro da decisão anterior e não deve orientar a distribuição atual.
+
 **Data:** 2026-07-15  
 **Projeto:** Agente CPI  
 **Plataforma validada:** Windows 10/11 x64  

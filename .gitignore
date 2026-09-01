@@ -8,6 +8,8 @@ out
 # Dados operacionais locais do Agente CPI
 /data/runtime/
 /coverage/
+/release/
+/agente-cpi-smoke-*/
 
 # Generated agent backups
 .agent-backups/

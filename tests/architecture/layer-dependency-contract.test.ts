@@ -5,7 +5,10 @@ import {
   type SourceDependency,
   type SourceLayer
 } from '../support/architecture/source-import-graph'
-import { isExternalDependencyAllowed } from '../support/architecture/layer-dependency-policy'
+import {
+  isApprovedStaticDataResourceDependency,
+  isExternalDependencyAllowed
+} from '../support/architecture/layer-dependency-policy'
 
 const sourceRoot = resolve('src')
 const dependencies = collectSourceDependencies(sourceRoot)
@@ -34,7 +37,9 @@ describe('progressive architecture boundaries', () => {
       .filter(
         (dependency) =>
           dependency.sourceLayer === 'unknown' ||
-          (dependency.kind === 'internal' && dependency.targetFile === null)
+          (dependency.kind === 'internal' &&
+            dependency.targetFile === null &&
+            !isApprovedStaticDataResourceDependency(dependency))
       )
       .map((dependency) =>
         formatViolation(dependency, 'source layer and internal imports must resolve')
@@ -47,6 +52,10 @@ describe('progressive architecture boundaries', () => {
   it('respeita a direção aprovada e mantém o núcleo sem pacotes externos', () => {
     const violations = dependencies
       .filter((dependency) => {
+        if (isApprovedStaticDataResourceDependency(dependency)) {
+          return false
+        }
+
         if (dependency.kind === 'external') {
           return !isExternalDependencyAllowed(dependency.sourceLayer, dependency.moduleSpecifier)
         }

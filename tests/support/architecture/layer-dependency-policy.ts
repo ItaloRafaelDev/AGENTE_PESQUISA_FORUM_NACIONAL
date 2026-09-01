@@ -1,5 +1,5 @@
 import { isBuiltin } from 'node:module'
-import type { SourceLayer } from './source-import-graph'
+import type { SourceDependency, SourceLayer } from './source-import-graph'
 
 const LAYERS_WITH_NODE_ACCESS = new Set<SourceLayer>(['infrastructure', 'main'])
 
@@ -22,6 +22,17 @@ function packageName(moduleSpecifier: string): string {
 
 function isNodeBuiltin(moduleSpecifier: string): boolean {
   return isBuiltin(moduleSpecifier)
+}
+
+export function isApprovedStaticDataResourceDependency(dependency: SourceDependency): boolean {
+  return (
+    dependency.sourceFile === 'shared/config/application-identity.ts' &&
+    dependency.sourceLayer === 'shared' &&
+    dependency.moduleSpecifier === '../../../build/application-identity.json' &&
+    dependency.kind === 'internal' &&
+    dependency.targetFile === null &&
+    dependency.targetLayer === null
+  )
 }
 
 export function isExternalDependencyAllowed(

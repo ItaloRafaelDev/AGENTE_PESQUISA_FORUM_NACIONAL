@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { SourceLayer } from '../../support/architecture/source-import-graph'
-import { isExternalDependencyAllowed } from '../../support/architecture/layer-dependency-policy'
+import {
+  isApprovedStaticDataResourceDependency,
+  isExternalDependencyAllowed
+} from '../../support/architecture/layer-dependency-policy'
 
 interface ExternalPolicyFixture {
   layer: SourceLayer
@@ -84,5 +87,38 @@ describe('external dependency policy', () => {
   it('mantém Zod somente na infraestrutura de configuração', () => {
     expect(isExternalDependencyAllowed('application', 'zod')).toBe(false)
     expect(isExternalDependencyAllowed('infrastructure', 'zod')).toBe(true)
+  })
+})
+
+describe('static data resource dependency policy', () => {
+  const canonicalIdentityResource = {
+    sourceFile: 'shared/config/application-identity.ts',
+    sourceLayer: 'shared',
+    moduleSpecifier: '../../../build/application-identity.json',
+    kind: 'internal',
+    targetFile: null,
+    targetLayer: null
+  } as const
+
+  it('permite apenas o catálogo canônico de identidade consumido pelo adaptador compartilhado', () => {
+    expect(isApprovedStaticDataResourceDependency(canonicalIdentityResource)).toBe(true)
+  })
+
+  it('rejeita outra origem compartilhada para o mesmo recurso em build', () => {
+    expect(
+      isApprovedStaticDataResourceDependency({
+        ...canonicalIdentityResource,
+        sourceFile: 'shared/config/duplicated-application-identity.ts'
+      })
+    ).toBe(false)
+  })
+
+  it('rejeita qualquer outro alvo em build para o adaptador compartilhado', () => {
+    expect(
+      isApprovedStaticDataResourceDependency({
+        ...canonicalIdentityResource,
+        moduleSpecifier: '../../../build/other-config.json'
+      })
+    ).toBe(false)
   })
 })

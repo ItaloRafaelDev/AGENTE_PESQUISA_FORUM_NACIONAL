@@ -1,0 +1,7 @@
+{
+  "appId": "com.agentecpi.desktop",
+  "productName": "Agente CPI",
+  "executableName": "AgenteCPI",
+  "artifactBaseName": "Agente-CPI",
+  "legacyUserDataDirectoryName": "agente-cpi"
+}

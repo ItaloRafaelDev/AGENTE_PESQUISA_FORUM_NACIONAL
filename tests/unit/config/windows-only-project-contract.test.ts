@@ -1,11 +1,15 @@
 import { existsSync, readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { describe, expect, it } from 'vitest'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as {
   scripts: Record<string, string>
   dependencies: Record<string, string>
 }
-const builderConfig = readFileSync('electron-builder.yml', 'utf8')
+const requireFromTest = createRequire(import.meta.url)
+const builderConfig = requireFromTest('../../../electron-builder.config.cjs') as {
+  win: unknown
+}
 const mainSource = readFileSync('src/main/index.ts', 'utf8')
 
 describe('Windows-only project contract', () => {
@@ -17,8 +21,12 @@ describe('Windows-only project contract', () => {
   })
 
   it('mantém somente configuração e assets de empacotamento Windows', () => {
-    expect(builderConfig).toMatch(/^win:/m)
-    expect(builderConfig).not.toMatch(/^(mac|dmg|linux|appImage|publish):/m)
+    expect(builderConfig).toHaveProperty('win')
+    expect(builderConfig).not.toHaveProperty('mac')
+    expect(builderConfig).not.toHaveProperty('dmg')
+    expect(builderConfig).not.toHaveProperty('linux')
+    expect(builderConfig).not.toHaveProperty('appImage')
+    expect(builderConfig).not.toHaveProperty('publish')
     expect(existsSync('build/entitlements.mac.plist')).toBe(false)
     expect(existsSync('build/icon.icns')).toBe(false)
     expect(existsSync('dev-app-update.yml')).toBe(false)

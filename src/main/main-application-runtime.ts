@@ -3,7 +3,7 @@ import { app, shell } from 'electron'
 import { AgentStateMachine } from '../application/agent/agent-state-machine'
 import { ContinuousAgentCoordinator } from '../application/agent/continuous-agent-coordinator'
 import { ResearchHistoryService } from '../application/history/research-history-service'
-import { parseAppConfig } from '../infrastructure/config/app-config'
+import { parseAppConfig, type AppConfig } from '../infrastructure/config/app-config'
 import { ResearchHistoryRepository } from '../infrastructure/database/research-history-repository'
 import { resolvePdfOutputDirectory } from '../infrastructure/filesystem/pdf-output-directory-resolver'
 import {
@@ -91,20 +91,22 @@ export class MainApplicationRuntime {
     () => this.applicationShutdown.run()
   )
 
-  constructor(private readonly electronBoundary: MainApplicationRuntimeElectronBoundary) {}
+  constructor(
+    private readonly electronBoundary: MainApplicationRuntimeElectronBoundary,
+    private readonly config: AppConfig = parseAppConfig()
+  ) {}
 
   initialize(): Promise<void> {
     return this.applicationLifecycle.initialize()
   }
 
   private async initializeResources(): Promise<void> {
-    const config = parseAppConfig()
     const runtimePaths = resolveApplicationPaths(
       {
         appDataDir: app.getPath('appData'),
         userDataDir: app.getPath('userData')
       },
-      config.paths
+      this.config.paths
     )
 
     await ensureOperationalDirectories(runtimePaths)
@@ -121,16 +123,19 @@ export class MainApplicationRuntime {
 
     this.browserService = new BrowserWorkspaceService(
       browserManager,
-      new PlatformPageManager(config.platform, config.timing.platformPageNavigationTimeoutMs)
+      new PlatformPageManager(
+        this.config.platform,
+        this.config.timing.platformPageNavigationTimeoutMs
+      )
     )
 
     const sessionService = new PlatformSessionService(browserManager)
 
     const queueFilterController = new CpiQueueFilterController({
-      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
-      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
-      actionTimeoutMs: config.timing.actionTimeoutMs,
-      settleDelayMs: config.timing.queueFilterSettleDelayMs
+      frameSearchAttempts: this.config.limits.cpiFrameSearchAttempts,
+      frameSearchIntervalMs: this.config.timing.cpiSearchPollingIntervalMs,
+      actionTimeoutMs: this.config.timing.actionTimeoutMs,
+      settleDelayMs: this.config.timing.queueFilterSettleDelayMs
     })
 
     this.historyRepository = ResearchHistoryRepository.open(runtimePaths.databaseFile)
@@ -151,27 +156,27 @@ export class MainApplicationRuntime {
       sessionService,
       queueFilterController,
       {
-        queueCheckIntervalMs: config.timing.queueCheckIntervalMs,
-        cpiSearchPollingIntervalMs: config.timing.cpiSearchPollingIntervalMs,
-        actionTimeoutMs: config.timing.actionTimeoutMs,
-        readTimeoutMs: config.timing.readTimeoutMs,
-        queueFilterSettleDelayMs: config.timing.queueFilterSettleDelayMs,
-        cpiFrameSearchAttempts: config.limits.cpiFrameSearchAttempts,
-        deskDataPeopleUrl: config.platform.deskDataPeopleUrl,
-        navigationTimeoutMs: config.timing.navigationTimeoutMs,
-        downloadStartTimeoutMs: config.timing.downloadStartTimeoutMs,
-        deskDataFormPollingIntervalMs: config.timing.deskDataFormPollingIntervalMs,
-        deskDataResultPollingIntervalMs: config.timing.deskDataResultPollingIntervalMs,
-        deskDataHistoryNavigationIntervalMs: config.timing.deskDataHistoryNavigationIntervalMs,
-        submitSettleDelayMs: config.timing.submitSettleDelayMs,
-        queueReturnDelayMs: config.timing.queueReturnDelayMs,
-        cpiIdentitySearchAttempts: config.limits.cpiIdentitySearchAttempts,
-        cpiAttachmentSearchAttempts: config.limits.cpiAttachmentSearchAttempts,
-        cpiResultSearchAttempts: config.limits.cpiResultSearchAttempts,
-        cpiResultStabilizationAttempts: config.limits.cpiResultStabilizationAttempts,
-        deskDataFormReadyAttempts: config.limits.deskDataFormReadyAttempts,
-        deskDataResultSearchAttempts: config.limits.deskDataResultSearchAttempts,
-        deskDataHistoryNavigationAttempts: config.limits.deskDataHistoryNavigationAttempts,
+        queueCheckIntervalMs: this.config.timing.queueCheckIntervalMs,
+        cpiSearchPollingIntervalMs: this.config.timing.cpiSearchPollingIntervalMs,
+        actionTimeoutMs: this.config.timing.actionTimeoutMs,
+        readTimeoutMs: this.config.timing.readTimeoutMs,
+        queueFilterSettleDelayMs: this.config.timing.queueFilterSettleDelayMs,
+        cpiFrameSearchAttempts: this.config.limits.cpiFrameSearchAttempts,
+        deskDataPeopleUrl: this.config.platform.deskDataPeopleUrl,
+        navigationTimeoutMs: this.config.timing.navigationTimeoutMs,
+        downloadStartTimeoutMs: this.config.timing.downloadStartTimeoutMs,
+        deskDataFormPollingIntervalMs: this.config.timing.deskDataFormPollingIntervalMs,
+        deskDataResultPollingIntervalMs: this.config.timing.deskDataResultPollingIntervalMs,
+        deskDataHistoryNavigationIntervalMs: this.config.timing.deskDataHistoryNavigationIntervalMs,
+        submitSettleDelayMs: this.config.timing.submitSettleDelayMs,
+        queueReturnDelayMs: this.config.timing.queueReturnDelayMs,
+        cpiIdentitySearchAttempts: this.config.limits.cpiIdentitySearchAttempts,
+        cpiAttachmentSearchAttempts: this.config.limits.cpiAttachmentSearchAttempts,
+        cpiResultSearchAttempts: this.config.limits.cpiResultSearchAttempts,
+        cpiResultStabilizationAttempts: this.config.limits.cpiResultStabilizationAttempts,
+        deskDataFormReadyAttempts: this.config.limits.deskDataFormReadyAttempts,
+        deskDataResultSearchAttempts: this.config.limits.deskDataResultSearchAttempts,
+        deskDataHistoryNavigationAttempts: this.config.limits.deskDataHistoryNavigationAttempts,
         pdfOutputDirectory
       }
     )

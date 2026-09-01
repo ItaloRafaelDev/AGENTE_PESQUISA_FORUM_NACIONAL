@@ -1,6 +1,8 @@
 import { join } from 'node:path'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { parseAppConfig } from '../infrastructure/config/app-config'
+import { APPLICATION_IDENTITY } from '../shared/config/application-identity'
 import { MainApplicationRuntime } from './main-application-runtime'
 import { installWindowSecurity } from './security/install-window-security'
 import { MainWindowEventSender } from './security/main-window-event-sender'
@@ -8,6 +10,16 @@ import { NavigationSecurityPolicy } from './security/navigation-security-policy'
 import { RendererIpcAuthorizer } from './security/renderer-ipc-authorizer'
 import { resolveApprovedRendererUrl } from './security/renderer-location'
 import { SecureIpcMainRegistrar } from './security/secure-ipc-main-registrar'
+import { parseApplicationStartupOptions } from './startup/application-startup-options'
+import { configureApplicationPaths } from './startup/configure-application-paths'
+
+const startupOptions = parseApplicationStartupOptions(process.argv.slice(1))
+const configuredStartup = configureApplicationPaths(app, startupOptions)
+const applicationConfig = configuredStartup.preferredPdfDirectory
+  ? parseAppConfig({
+      paths: { preferredPdfDirectory: configuredStartup.preferredPdfDirectory }
+    })
+  : parseAppConfig()
 
 const rendererHtmlPath = join(__dirname, '../renderer/index.html')
 const approvedRendererUrl = resolveApprovedRendererUrl({
@@ -22,10 +34,13 @@ const getMainWindow = (): BrowserWindow | null => mainWindow
 const rendererIpcAuthorizer = new RendererIpcAuthorizer(getMainWindow, approvedRendererUrl)
 const secureIpcMain = new SecureIpcMainRegistrar(ipcMain, rendererIpcAuthorizer)
 const eventSender = new MainWindowEventSender(getMainWindow)
-const mainRuntime = new MainApplicationRuntime({
-  ipcMain: secureIpcMain,
-  eventSender
-})
+const mainRuntime = new MainApplicationRuntime(
+  {
+    ipcMain: secureIpcMain,
+    eventSender
+  },
+  applicationConfig
+)
 
 let isQuitting = false
 
@@ -79,7 +94,7 @@ if (!singleInstanceLock) {
   app
     .whenReady()
     .then(async () => {
-      electronApp.setAppUserModelId('com.cpicentral.agent')
+      electronApp.setAppUserModelId(APPLICATION_IDENTITY.appId)
 
       app.on('browser-window-created', (_, window) => {
         optimizer.watchWindowShortcuts(window)

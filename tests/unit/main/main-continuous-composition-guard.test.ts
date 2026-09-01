@@ -7,6 +7,8 @@ const runtimeSource = readFileSync('src/main/main-application-runtime.ts', 'utf8
 
 const viteConfigSource = readFileSync('electron.vite.config.ts', 'utf8')
 
+const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as { readonly main?: unknown }
+
 const productionMainSource = `${mainSource}\n${runtimeSource}`
 const oldAutomationImport = ['from ', "'../", 'automation/'].join('')
 const shutdownComponents = [
@@ -21,12 +23,40 @@ const shutdownComponents = [
 describe('composição contínua do processo principal', () => {
   it('injeta a configuração central de plataforma e intervalo da fila', () => {
     expect(runtimeSource).toContain('parseAppConfig()')
+    expect(runtimeSource).toContain('private readonly config: AppConfig = parseAppConfig()')
     expect(runtimeSource).toContain('config.platform')
     expect(runtimeSource).toContain('config.timing.queueCheckIntervalMs')
+    expect(runtimeSource).not.toContain('const config = parseAppConfig()')
+    expect(runtimeSource).toMatch(
+      /resolveApplicationPaths\(\s*\{\s*appDataDir: app\.getPath\('appData'\),\s*userDataDir: app\.getPath\('userData'\)\s*\},\s*this\.config\.paths\s*\)/s
+    )
+  })
+
+  it('configura os paths de startup antes do lock e da prontidão do Electron', () => {
+    const parsePosition = mainSource.indexOf('parseApplicationStartupOptions(')
+    const configurePosition = mainSource.indexOf('configureApplicationPaths(')
+    const lockPosition = mainSource.indexOf('app.requestSingleInstanceLock()')
+    const readyPosition = mainSource.indexOf('.whenReady()')
+
+    expect(mainSource).toContain("from './startup/application-startup-options'")
+    expect(mainSource).toContain("from './startup/configure-application-paths'")
+    expect(parsePosition).toBeGreaterThan(-1)
+    expect(configurePosition).toBeGreaterThan(parsePosition)
+    expect(lockPosition).toBeGreaterThan(configurePosition)
+    expect(readyPosition).toBeGreaterThan(lockPosition)
+  })
+
+  it('injeta uma única configuração com diretório de PDF isolado no modo smoke', () => {
+    expect(mainSource).toMatch(
+      /configuredStartup\.preferredPdfDirectory\s*\? parseAppConfig\(\{\s*paths: \{\s*preferredPdfDirectory: configuredStartup\.preferredPdfDirectory\s*\}\s*\}\)\s*: parseAppConfig\(\)/s
+    )
+    expect(mainSource).toMatch(
+      /new MainApplicationRuntime\(\s*\{\s*ipcMain: secureIpcMain,\s*eventSender\s*\},\s*applicationConfig\s*\)/s
+    )
   })
 
   it('mantém o ciclo de vida Electron separado da composição da aplicação', () => {
-    expect(mainSource).toContain('new MainApplicationRuntime({')
+    expect(mainSource).toContain('new MainApplicationRuntime(')
 
     expect(mainSource).toContain('mainRuntime.initialize()')
 
@@ -109,20 +139,25 @@ describe('composição contínua do processo principal', () => {
     expect(mainSource).toContain('new SecureIpcMainRegistrar(ipcMain, rendererIpcAuthorizer)')
     expect(mainSource).toContain('new MainWindowEventSender(getMainWindow)')
     expect(mainSource).toMatch(
-      /new MainApplicationRuntime\(\{\s*ipcMain: secureIpcMain,\s*eventSender\s*\}\)/s
+      /new MainApplicationRuntime\(\s*\{\s*ipcMain: secureIpcMain,\s*eventSender\s*\},\s*applicationConfig\s*\)/s
     )
     expect(mainSource).toContain('if (!mainWindow || mainWindow.isDestroyed())')
 
-    expect(runtimeSource).toContain(
-      'constructor(private readonly electronBoundary: MainApplicationRuntimeElectronBoundary) {}'
-    )
+    expect(runtimeSource).toContain('private readonly config: AppConfig = parseAppConfig()')
     expect(runtimeSource).not.toContain('BrowserWindow.getAllWindows().forEach')
   })
 
   it('configura o alias de runtime do processo principal a partir do catálogo canônico', () => {
     expect(viteConfigSource).toMatch(
-      /main:\s*\{\s*resolve:\s*\{\s*alias:\s*\{\s*'@':\s*sourceAliases\['@'\]\s*\}\s*\}\s*\}/s
+      /main:\s*\{[\s\S]*?resolve:\s*\{\s*alias:\s*\{\s*'@':\s*sourceAliases\['@'\]\s*\}\s*\}/s
     )
+  })
+
+  it('empacota somente o processo principal normal e o instalador fixo do Chromium', () => {
+    expect(viteConfigSource).toMatch(
+      /main:\s*\{\s*build:\s*\{\s*rollupOptions:\s*\{\s*input:\s*\{\s*index:\s*resolve\(__dirname, 'src\/main\/index\.ts'\),\s*'install-playwright-chromium':\s*resolve\(\s*__dirname,\s*'src\/main\/install-playwright-chromium\.ts'\s*\)\s*\}\s*\}\s*\},\s*resolve:/s
+    )
+    expect(packageJson.main).toBe('./out/main/index.js')
   })
 
   it('usa o banco SQLite dentro de userData', () => {

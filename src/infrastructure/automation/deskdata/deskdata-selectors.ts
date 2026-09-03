@@ -32,3 +32,8 @@ export const DESKDATA_SIMILAR_QUERY_SELECTORS = {
 
 export const DESKDATA_PDF_EXPORT_SELECTOR =
   'form[method="POST"] input[type="submit"][name="export"][value="Exportar"][formtarget="_blank"]'
+
+export const DESKDATA_PROCESSES_SECTION_SELECTOR = '#processes'
+
+export const DESKDATA_PROCESSES_UPDATED_SELECTOR =
+  '.toast-message:has-text("A consulta ao conjunto de dados Processos foi atualizada."):visible'

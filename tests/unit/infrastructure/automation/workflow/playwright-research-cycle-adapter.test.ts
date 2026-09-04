@@ -188,7 +188,12 @@ describe('PlaywrightResearchCycleAdapter', () => {
       isClosed: vi.fn(() => false),
       close: vi.fn(async () => undefined)
     } as never
-    state.setResolvedResult({ resultPage: historicalPage, closeResultPageAfterSave: true })
+    state.setResolvedResult({
+      resultPage: historicalPage,
+      closeResultPageAfterSave: true,
+      expectedProcessCount: 0,
+      expectedProcessNumbers: []
+    })
     const deskData = new PlaywrightDeskDataCycleAdapter(
       mainPage,
       { prepare: { prepare: vi.fn(async () => void calls.push('next')) } },
@@ -222,7 +227,12 @@ describe('PlaywrightResearchCycleAdapter', () => {
       isClosed: vi.fn(() => false),
       close: vi.fn().mockRejectedValue(cleanupFailure)
     } as never
-    state.setResolvedResult({ resultPage: historicalPage, closeResultPageAfterSave: true })
+    state.setResolvedResult({
+      resultPage: historicalPage,
+      closeResultPageAfterSave: true,
+      expectedProcessCount: 0,
+      expectedProcessNumbers: []
+    })
     const deskData = new PlaywrightDeskDataCycleAdapter(
       { isClosed: vi.fn(() => false), close: vi.fn() } as never,
       { prepare: { prepare: vi.fn(async () => undefined) } },
@@ -497,7 +507,9 @@ describe('PlaywrightCpiResearchCycleAdapter', () => {
           execute: async () => {
             preparationState.setResolvedResult({
               resultPage: historicalPage,
-              closeResultPageAfterSave: true
+              closeResultPageAfterSave: true,
+              expectedProcessCount: 0,
+              expectedProcessNumbers: []
             })
             return preparedResearch
           }

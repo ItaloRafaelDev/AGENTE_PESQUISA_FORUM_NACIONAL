@@ -1,19 +1,74 @@
+import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import { chromium, type Page } from 'playwright'
 import { PlatformPageManager } from '../src/infrastructure/automation/browser/platform-page-manager'
-import { CpiQueueAvailabilityReader } from '../src/infrastructure/automation/cpi/cpi-queue-availability'
-import { CpiFirstResearchOpener } from '../src/infrastructure/automation/cpi/cpi-first-research-opener'
-import { CpiQueueFilterController } from '../src/infrastructure/automation/cpi/cpi-queue-filter-controller'
-import {
-  CpiQueueMonitor,
-  NodeQueueDelay
-} from '../src/infrastructure/automation/cpi/cpi-queue-monitor'
 import { CpiResearchIdentityReader } from '../src/infrastructure/automation/cpi/cpi-research-identity-reader'
 import { DeskDataCpfFormController } from '../src/infrastructure/automation/deskdata/deskdata-cpf-form-controller'
 import { DeskDataDatasetController } from '../src/infrastructure/automation/deskdata/deskdata-dataset-controller'
+import {
+  DeskDataResultReadyWaiter,
+  type DeskDataResultReadyPage
+} from '../src/infrastructure/automation/deskdata/deskdata-result-ready-waiter'
 import { DeskDataSearchSubmitController } from '../src/infrastructure/automation/deskdata/deskdata-search-submit-controller'
 import { resolveWindowsOperationalConfig } from './support/windows-operational-config'
+
+const diagnosticLines: string[] = []
+
+function recordDiagnostic(label: string, value: unknown): void {
+  const line = new Date().toISOString() + ' ' + label + ' ' + JSON.stringify(value)
+
+  diagnosticLines.push(line)
+  console.log(label, JSON.stringify(value))
+}
+
+function serializeError(error: unknown, depth = 0): unknown {
+  if (depth >= 5) {
+    return '[CAUSE_LIMIT]'
+  }
+
+  if (!(error instanceof Error)) {
+    return sanitizeDiagnosticText(String(error))
+  }
+
+  const errorWithCause = error as Error & {
+    cause?: unknown
+  }
+
+  return {
+    name: error.name,
+    message: sanitizeDiagnosticText(error.message),
+    stack: sanitizeDiagnosticText(error.stack ?? ''),
+    cause:
+      errorWithCause.cause === undefined
+        ? undefined
+        : serializeError(errorWithCause.cause, depth + 1)
+  }
+}
+
+async function saveDiagnosticReport(error: unknown): Promise<string> {
+  const outputDirectory = join(process.cwd(), 'data', 'runtime', 'logs')
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+  const filePath = join(outputDirectory, 'deskdata-readiness-' + timestamp + '.txt')
+  const report = [
+    'Diagnóstico sanitizado da espera da DeskData',
+    'Gerado em: ' + new Date().toISOString(),
+    'Resultado: ' + (error === undefined ? 'READY' : 'ERROR'),
+    '',
+    ...diagnosticLines,
+    '',
+    'Erro técnico:',
+    JSON.stringify(serializeError(error), null, 2)
+  ].join('\r\n')
+
+  await mkdir(outputDirectory, {
+    recursive: true
+  })
+  await writeFile(filePath, report, 'utf8')
+
+  return filePath
+}
 
 function findPage(pages: Page[], hostname: string): Page | undefined {
   return pages.find((page) => {
@@ -47,6 +102,182 @@ function isDeskDataPeoplePage(page: Page): boolean {
   }
 }
 
+function safePath(value: string): string {
+  try {
+    const url = new URL(value)
+
+    return url.origin + url.pathname
+  } catch {
+    return '[URL_INVALIDA]'
+  }
+}
+
+function sanitizeDiagnosticText(value: string): string {
+  return value.replace(/\d/g, '#').replace(/\s+/g, ' ').trim().slice(0, 500)
+}
+
+function attachDeskDataDiagnostics(page: Page): void {
+  const startedAt = Date.now()
+  const elapsed = (): number => Date.now() - startedAt
+
+  page.on('close', () => {
+    recordDiagnostic('[DeskData evento]', { elapsedMs: elapsed(), type: 'page-close' })
+  })
+  page.on('crash', () => {
+    recordDiagnostic('[DeskData evento]', { elapsedMs: elapsed(), type: 'page-crash' })
+  })
+  page.on('pageerror', (error) => {
+    recordDiagnostic('[DeskData evento]', {
+      elapsedMs: elapsed(),
+      type: 'page-error',
+      message: sanitizeDiagnosticText(error.message)
+    })
+  })
+  page.on('framenavigated', (frame) => {
+    if (frame === page.mainFrame()) {
+      recordDiagnostic('[DeskData evento]', {
+        elapsedMs: elapsed(),
+        type: 'navigation',
+        path: safePath(frame.url())
+      })
+    }
+  })
+  page.on('requestfailed', (request) => {
+    recordDiagnostic('[DeskData evento]', {
+      elapsedMs: elapsed(),
+      type: 'request-failed',
+      method: request.method(),
+      path: safePath(request.url()),
+      failure: sanitizeDiagnosticText(request.failure()?.errorText ?? '')
+    })
+  })
+}
+
+function createDiagnosticResultPage(page: Page): {
+  resultPage: DeskDataResultReadyPage
+  capture(): Promise<void>
+} {
+  let previousSnapshot = ''
+
+  const capture = async (): Promise<void> => {
+    if (page.isClosed()) {
+      const closedSnapshot = JSON.stringify({ state: 'CLOSED' })
+
+      if (closedSnapshot !== previousSnapshot) {
+        previousSnapshot = closedSnapshot
+        recordDiagnostic('[DeskData DOM]', { state: 'CLOSED' })
+      }
+
+      return
+    }
+
+    const processes = page.locator('#processes')
+    const processesCount = await processes.count().catch(() => -1)
+    const processElements = await processes
+      .evaluateAll((elements) =>
+        elements.map((element) => {
+          const bounds = element.getBoundingClientRect()
+          const style = window.getComputedStyle(element)
+
+          return {
+            text: element.textContent ?? '',
+            innerText: element instanceof HTMLElement ? element.innerText : '',
+            visible:
+              bounds.width > 0 &&
+              bounds.height > 0 &&
+              style.display !== 'none' &&
+              style.visibility !== 'hidden',
+            display: style.display,
+            visibility: style.visibility,
+            ariaHidden: element.getAttribute('aria-hidden') ?? '',
+            width: Math.round(bounds.width),
+            height: Math.round(bounds.height),
+            childCount: element.children.length,
+            html: element.outerHTML.slice(0, 1500)
+          }
+        })
+      )
+      .catch(() => [])
+    const processesText =
+      processesCount === 1 ? ((await processes.textContent().catch(() => null)) ?? '') : ''
+    const processesInnerText =
+      processesCount === 1 ? ((await processes.innerText().catch(() => null)) ?? '') : ''
+    const processNumbers = processesText.match(/\b\d{4,7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}\b/g) ?? []
+    const processStructure =
+      processesCount === 1
+        ? await processes
+            .evaluate((element) =>
+              [...element.children].map((child) => ({
+                tag: child.tagName.toLowerCase(),
+                id: child.id,
+                className: child.className,
+                children: child.children.length
+              }))
+            )
+            .catch(() => [])
+        : []
+    const toasts = await page
+      .locator('.toast-message')
+      .evaluateAll((elements) =>
+        elements.map((element) => ({
+          text: element.textContent ?? '',
+          visible: element.getClientRects().length > 0,
+          className: element.className
+        }))
+      )
+      .catch(() => [])
+    const exportCount = await page
+      .locator(
+        'form[method="POST"] input[type="submit"][name="export"][value="Exportar"][formtarget="_blank"]'
+      )
+      .count()
+      .catch(() => -1)
+    const marker = await page
+      .locator('html[data-agent-cpi-processes-updated="true"]')
+      .count()
+      .catch(() => -1)
+
+    const snapshot = {
+      path: safePath(page.url()),
+      exportCount,
+      processesCount,
+      processElements: processElements.map((element) => ({
+        ...element,
+        text: sanitizeDiagnosticText(element.text),
+        innerText: sanitizeDiagnosticText(element.innerText),
+        html: sanitizeDiagnosticText(element.html)
+      })),
+      processNumberCount: new Set(processNumbers).size,
+      processesText: sanitizeDiagnosticText(processesText),
+      processesInnerText: sanitizeDiagnosticText(processesInnerText),
+      processStructure,
+      marker,
+      toasts: toasts.map((toast) => ({
+        ...toast,
+        text: sanitizeDiagnosticText(toast.text)
+      }))
+    }
+    const serialized = JSON.stringify(snapshot)
+
+    if (serialized !== previousSnapshot) {
+      previousSnapshot = serialized
+      recordDiagnostic('[DeskData DOM]', snapshot)
+    }
+  }
+
+  return {
+    capture,
+    resultPage: {
+      url: () => page.url(),
+      locator: (selector) => page.locator(selector),
+      waitForTimeout: async (milliseconds) => {
+        await capture()
+        await page.waitForTimeout(milliseconds)
+      }
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const { config, paths } = resolveWindowsOperationalConfig()
   const profilePath = paths.browserProfileDir
@@ -55,6 +286,7 @@ async function main(): Promise<void> {
     input: stdin,
     output: stdout
   })
+  let terminalError: unknown
 
   const context = await chromium.launchPersistentContext(profilePath, {
     headless: false,
@@ -106,39 +338,10 @@ async function main(): Promise<void> {
       throw new Error('A página Consultar pessoas da DeskData não foi confirmada.')
     }
 
-    const queueFilterController = new CpiQueueFilterController({
-      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
-      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
-      actionTimeoutMs: config.timing.actionTimeoutMs,
-      settleDelayMs: config.timing.queueFilterSettleDelayMs
-    })
-
     await cpiPage.bringToFront()
-
-    console.log('Aplicando filtro 29 na CPI...')
-
-    await queueFilterController.applyCriminalForumFilter(cpiPage)
-
-    const monitor = new CpiQueueMonitor(
-      queueFilterController,
-      new CpiQueueAvailabilityReader(config.timing.readTimeoutMs),
-      new NodeQueueDelay(),
-      config.timing.queueCheckIntervalMs
+    await terminal.question(
+      'Confirme que a pesquisa desejada está aberta na CPI e pressione ENTER...'
     )
-
-    console.log('Aguardando pesquisa disponível...')
-
-    const queueResult = await monitor.waitForResearch(cpiPage)
-
-    if (queueResult.status !== 'RESEARCH_AVAILABLE') {
-      throw new Error('Nenhuma pesquisa disponível foi confirmada.')
-    }
-
-    await new CpiFirstResearchOpener({
-      frameSearchAttempts: config.limits.cpiFrameSearchAttempts,
-      frameSearchIntervalMs: config.timing.cpiSearchPollingIntervalMs,
-      actionTimeoutMs: config.timing.actionTimeoutMs
-    }).openFirst(cpiPage)
 
     const identity = await new CpiResearchIdentityReader({
       searchAttempts: config.limits.cpiIdentitySearchAttempts,
@@ -181,6 +384,8 @@ async function main(): Promise<void> {
       submitSettleDelayMs: config.timing.submitSettleDelayMs
     })
 
+    attachDeskDataDiagnostics(deskDataPage)
+
     const submitResult = await submitController.submitOnce(deskDataPage)
 
     console.log('Consulta enviada uma única vez.')
@@ -191,10 +396,28 @@ async function main(): Promise<void> {
 
     console.log('O controlador bloqueou qualquer segundo envio.')
 
+    const diagnosticResult = createDiagnosticResultPage(deskDataPage)
+
+    await diagnosticResult.capture()
+
+    const readyResult = await new DeskDataResultReadyWaiter({
+      searchAttempts: config.limits.deskDataResultSearchAttempts,
+      searchIntervalMs: config.timing.deskDataResultPollingIntervalMs
+    }).waitUntilReady(diagnosticResult.resultPage)
+
+    await diagnosticResult.capture()
+
+    recordDiagnostic('[DeskData pronto]', {
+      resultPath: readyResult.resultPath,
+      expectedProcessCount: readyResult.expectedProcessCount
+    })
+
     await terminal.question(
-      'Aguarde o resultado carregar, confira visualmente e pressione ENTER para fechar...'
+      'Captura concluída sem exportar PDF. Confira visualmente e pressione ENTER para fechar...'
     )
   } catch (error: unknown) {
+    terminalError = error
+    recordDiagnostic('[DeskData erro]', serializeError(error))
     console.error('Falha no envio supervisionado à DeskData:', error)
 
     await terminal.question(
@@ -206,6 +429,9 @@ async function main(): Promise<void> {
     terminal.close()
     await context.close()
 
+    const diagnosticFile = await saveDiagnosticReport(terminalError)
+
+    console.log('Diagnóstico salvo em: ' + diagnosticFile)
     console.log('Navegador encerrado com segurança.')
   }
 }

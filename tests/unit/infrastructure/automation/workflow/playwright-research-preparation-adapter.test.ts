@@ -100,9 +100,19 @@ vi.mock('@/infrastructure/automation/deskdata/deskdata-result-ready-waiter', () 
       factoryFakes.constructorOptions.ready = options
     }
 
-    async waitUntilReady(page: { id: string }): Promise<{ status: 'READY'; resultPath: string }> {
+    async waitUntilReady(page: { id: string }): Promise<{
+      status: 'READY'
+      resultPath: string
+      expectedProcessCount: number
+      expectedProcessNumbers: readonly string[]
+    }> {
       factoryFakes.calls.push(`ready:${page.id}`)
-      return { status: 'READY' as const, resultPath: '/pessoas/resultado' }
+      return {
+        status: 'READY' as const,
+        resultPath: '/pessoas/resultado',
+        expectedProcessCount: 0,
+        expectedProcessNumbers: []
+      }
     }
   }
 }))
@@ -293,16 +303,22 @@ describe('PlaywrightResearchPreparationState', () => {
 
     state.setResolvedResult({
       resultPage: initialPage,
-      closeResultPageAfterSave: false
+      closeResultPageAfterSave: false,
+      expectedProcessCount: 1,
+      expectedProcessNumbers: ['1000878-26.2017.5.02.0067']
     })
     state.setResolvedResult({
       resultPage: replacementPage,
-      closeResultPageAfterSave: true
+      closeResultPageAfterSave: true,
+      expectedProcessCount: 2,
+      expectedProcessNumbers: ['1000878-26.2017.5.02.0067', '0010652-30.2020.8.26.0502']
     })
 
     expect(state.requireResolvedResult()).toEqual({
       resultPage: replacementPage,
-      closeResultPageAfterSave: true
+      closeResultPageAfterSave: true,
+      expectedProcessCount: 2,
+      expectedProcessNumbers: ['1000878-26.2017.5.02.0067', '0010652-30.2020.8.26.0502']
     })
 
     state.clearResolvedResult()
@@ -342,7 +358,12 @@ describe('PlaywrightDeskDataResearchAdapter', () => {
     })
     const waitUntilReady = vi.fn(async (page: Page) => {
       calls.push(`ready:${(page as unknown as { id: string }).id}`)
-      return { status: 'READY' as const, resultPath: '/historico/detalhes' }
+      return {
+        status: 'READY' as const,
+        resultPath: '/historico/detalhes',
+        expectedProcessCount: 2,
+        expectedProcessNumbers: ['1000878-26.2017.5.02.0067', '0010652-30.2020.8.26.0502']
+      }
     })
     const adapter = new PlaywrightDeskDataResearchAdapter(
       deskDataPage,
@@ -370,7 +391,9 @@ describe('PlaywrightDeskDataResearchAdapter', () => {
     ])
     expect(state.requireResolvedResult()).toEqual({
       resultPage,
-      closeResultPageAfterSave: true
+      closeResultPageAfterSave: true,
+      expectedProcessCount: 2,
+      expectedProcessNumbers: ['1000878-26.2017.5.02.0067', '0010652-30.2020.8.26.0502']
     })
   })
 
@@ -450,7 +473,9 @@ describe('PlaywrightDeskDataResearchAdapter', () => {
     const state = new PlaywrightResearchPreparationState()
     state.setResolvedResult({
       resultPage: { id: 'stale' } as never,
-      closeResultPageAfterSave: true
+      closeResultPageAfterSave: true,
+      expectedProcessCount: 0,
+      expectedProcessNumbers: []
     })
     const resolveFailure = new Error('synthetic resolver failure')
     const adapter = new PlaywrightDeskDataResearchAdapter(

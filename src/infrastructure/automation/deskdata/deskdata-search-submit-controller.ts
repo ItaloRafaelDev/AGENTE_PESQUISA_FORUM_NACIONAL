@@ -1,4 +1,45 @@
-import { DESKDATA_SUBMIT_SELECTORS } from './deskdata-selectors'
+import {
+  DESKDATA_PROCESSES_UPDATED_MARKER_ATTRIBUTE,
+  DESKDATA_PROCESSES_UPDATED_MESSAGE,
+  DESKDATA_SUBMIT_SELECTORS
+} from './deskdata-selectors'
+
+interface DeskDataInitScriptRegistration {
+  dispose(): Promise<void>
+}
+
+const DESKDATA_PROCESSES_UPDATE_OBSERVER_SCRIPT = `
+(() => {
+  const markerAttribute = ${JSON.stringify(DESKDATA_PROCESSES_UPDATED_MARKER_ATTRIBUTE)}
+  const completionMessage = ${JSON.stringify(DESKDATA_PROCESSES_UPDATED_MESSAGE)}
+  const normalize = (value) => value
+    .normalize('NFD')
+    .replace(/[\\u0300-\\u036f]/g, '')
+    .replace(/\\s+/g, ' ')
+    .trim()
+    .toLowerCase()
+  const expectedMessage = normalize(completionMessage)
+  let intervalId = 0
+  const checkNotice = () => {
+    const notice = [...document.querySelectorAll('.toast-message')].find(
+      (element) =>
+        element.getClientRects().length > 0 &&
+        normalize(element.textContent ?? '') === expectedMessage
+    )
+
+    if (!notice || !document.documentElement) {
+      return
+    }
+
+    document.documentElement.setAttribute(markerAttribute, 'true')
+    window.clearInterval(intervalId)
+  }
+
+  intervalId = window.setInterval(checkNotice, 50)
+  window.addEventListener('pagehide', () => window.clearInterval(intervalId), { once: true })
+  checkNotice()
+})()
+`
 
 export interface DeskDataSubmitLocator {
   count(): Promise<number>
@@ -10,6 +51,8 @@ export interface DeskDataSubmitLocator {
 export interface DeskDataSubmitPage {
   locator(selector: string): DeskDataSubmitLocator
   url(): string
+
+  addInitScript(script: { content: string }): Promise<DeskDataInitScriptRegistration>
 
   waitForLoadState(
     state: 'domcontentloaded',
@@ -43,7 +86,7 @@ export class DeskDataSearchSubmitController {
   constructor(options: DeskDataSearchSubmitControllerOptions = {}) {
     this.actionTimeoutMs = options.actionTimeoutMs ?? 10_000
     this.navigationTimeoutMs = options.navigationTimeoutMs ?? 30_000
-    this.submitSettleDelayMs = options.submitSettleDelayMs ?? 1_000
+    this.submitSettleDelayMs = options.submitSettleDelayMs ?? 15_000
   }
 
   async submitOnce(page: DeskDataSubmitPage): Promise<DeskDataSubmitSnapshot> {
@@ -62,8 +105,13 @@ export class DeskDataSearchSubmitController {
     }
 
     this.state = 'SUBMITTING'
+    let observerRegistration: DeskDataInitScriptRegistration | undefined
 
     try {
+      observerRegistration = await page.addInitScript({
+        content: DESKDATA_PROCESSES_UPDATE_OBSERVER_SCRIPT
+      })
+
       await searchButton.click({
         timeout: this.actionTimeoutMs
       })
@@ -85,6 +133,8 @@ export class DeskDataSearchSubmitController {
     } catch (error) {
       this.state = 'IDLE'
       throw error
+    } finally {
+      await observerRegistration?.dispose().catch(() => undefined)
     }
   }
 

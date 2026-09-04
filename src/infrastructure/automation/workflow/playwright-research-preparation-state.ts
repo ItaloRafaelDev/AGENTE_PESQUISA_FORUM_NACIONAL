@@ -3,6 +3,8 @@ import type { Page } from 'playwright'
 export interface PlaywrightResolvedDeskDataResult {
   resultPage: Page
   closeResultPageAfterSave: boolean
+  expectedProcessCount: number
+  expectedProcessNumbers: readonly string[]
 }
 
 export interface PlaywrightResolvedDeskDataResultState {

@@ -182,6 +182,32 @@ describe('DeskDataPdfDownloadController', () => {
     expect(source.click).toHaveBeenCalledTimes(1)
   })
 
+  it('descarta somente o PDF concluído e libera uma nova tentativa controlada', async () => {
+    const outputDirectory = await createTemporaryDirectory()
+    const source = createTestPage()
+    const browser = createTestBrowserContext([source.page])
+    const controller = new DeskDataPdfDownloadController({
+      outputDirectory,
+      downloadTimeoutMs: 1_000
+    })
+
+    source.click.mockImplementation(async () => {
+      source.emitDownload(createDownload('%PDF-1.7\narquivo'))
+    })
+
+    const first = await controller.downloadOnce(browser.context, source.page)
+    const discard = (
+      controller as unknown as { discard(filePath: string): Promise<void> }
+    ).discard?.bind(controller)
+
+    expect(discard).toBeTypeOf('function')
+    await discard?.(first.filePath)
+    await expect(access(first.filePath)).rejects.toThrow()
+    await expect(controller.downloadOnce(browser.context, source.page)).resolves.toMatchObject({
+      sizeBytes: expect.any(Number)
+    })
+  })
+
   it('deve rejeitar quando o botão Exportar não for único', async () => {
     const outputDirectory = await createTemporaryDirectory()
     const source = createTestPage(0)

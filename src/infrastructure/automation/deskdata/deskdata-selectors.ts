@@ -35,5 +35,11 @@ export const DESKDATA_PDF_EXPORT_SELECTOR =
 
 export const DESKDATA_PROCESSES_SECTION_SELECTOR = '#processes'
 
-export const DESKDATA_PROCESSES_UPDATED_SELECTOR =
-  '.toast-message:has-text("A consulta ao conjunto de dados Processos foi atualizada."):visible'
+export const DESKDATA_PROCESSES_UPDATED_MESSAGE =
+  'A consulta ao conjunto de dados Processos foi atualizada.'
+
+export const DESKDATA_PROCESSES_UPDATED_SELECTOR = `.toast-message:text-is("${DESKDATA_PROCESSES_UPDATED_MESSAGE}"):visible`
+
+export const DESKDATA_PROCESSES_UPDATED_MARKER_ATTRIBUTE = 'data-agent-cpi-processes-updated'
+
+export const DESKDATA_PROCESSES_UPDATED_MARKER_SELECTOR = `html[${DESKDATA_PROCESSES_UPDATED_MARKER_ATTRIBUTE}="true"]`

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { JSDOM } from 'jsdom'
 import { DESKDATA_SUBMIT_SELECTORS } from '@/infrastructure/automation/deskdata/deskdata-selectors'
+import { DESKDATA_PROCESSES_UPDATED_MARKER_ATTRIBUTE } from '@/infrastructure/automation/deskdata/deskdata-selectors'
 import {
   DeskDataSearchSubmitController,
   type DeskDataSubmitLocator,
@@ -38,13 +40,37 @@ class FakeLocator implements DeskDataSubmitLocator {
 class FakePage implements DeskDataSubmitPage {
   public loadStateCalls = 0
   public timeoutCalls = 0
+  public initScriptCalls = 0
+  public initScriptDisposeCalls = 0
+  public initScriptKind = ''
+  public initScriptContent = ''
   public loadTimeoutMs: number | undefined
   public settleDelayMs: number | undefined
 
   constructor(
     private readonly state: MutablePageState,
-    private readonly searchButton: DeskDataSubmitLocator
+    private readonly searchButton: DeskDataSubmitLocator,
+    private readonly onInitScript?: () => void
   ) {}
+
+  async addInitScript(script: unknown): Promise<{ dispose(): Promise<void> }> {
+    this.initScriptCalls += 1
+    this.initScriptKind =
+      typeof script === 'object' && script !== null && 'content' in script
+        ? 'self-contained-content'
+        : typeof script
+    this.initScriptContent =
+      typeof script === 'object' && script !== null && 'content' in script
+        ? String(script.content)
+        : ''
+    this.onInitScript?.()
+
+    return {
+      dispose: async () => {
+        this.initScriptDisposeCalls += 1
+      }
+    }
+  }
 
   locator(selector: string): DeskDataSubmitLocator {
     if (selector === DESKDATA_SUBMIT_SELECTORS.searchButton) {
@@ -75,6 +101,70 @@ class FakePage implements DeskDataSubmitPage {
 }
 
 describe('DeskDataSearchSubmitController', () => {
+  it('aguarda quinze segundos após clicar em Consultar', async () => {
+    const state: MutablePageState = {
+      url: 'https://app.deskdata.com.br/pessoas/'
+    }
+    const page = new FakePage(
+      state,
+      new FakeLocator(1, true, () => {
+        state.url = 'https://app.deskdata.com.br/pessoas/resultado/'
+      })
+    )
+
+    await new DeskDataSearchSubmitController().submitOnce(page)
+
+    expect(page.settleDelayMs).toBe(15_000)
+  })
+
+  it('não confirma um toast que apenas contém a mensagem esperada', async () => {
+    const page = new FakePage(
+      { url: 'https://app.deskdata.com.br/pessoas/' },
+      new FakeLocator(1, true)
+    )
+
+    await new DeskDataSearchSubmitController({ submitSettleDelayMs: 1 }).submitOnce(page)
+
+    const dom = new JSDOM(
+      '<div class="toast-message">A consulta ao conjunto de dados Processos foi atualizada. Conteúdo divergente.</div>',
+      { runScripts: 'outside-only' }
+    )
+    dom.window.Element.prototype.getClientRects = () => ({ length: 1 }) as DOMRectList
+    dom.window.setInterval = ((handler: TimerHandler) => {
+      if (typeof handler === 'function') {
+        handler()
+      }
+
+      return 1
+    }) as typeof dom.window.setInterval
+
+    dom.window.eval(page.initScriptContent)
+
+    expect(
+      dom.window.document.documentElement.getAttribute(DESKDATA_PROCESSES_UPDATED_MARKER_ATTRIBUTE)
+    ).toBeNull()
+    dom.window.close()
+  })
+
+  it('arma a confirmação persistente de Processos antes de enviar a consulta', async () => {
+    const events: string[] = []
+    const state: MutablePageState = {
+      url: 'https://app.deskdata.com.br/pessoas/'
+    }
+    const button = new FakeLocator(1, true, () => {
+      events.push('submit')
+      state.url = 'https://app.deskdata.com.br/pessoas/resultado/'
+    })
+    const page = new FakePage(state, button, () => events.push('arm-readiness'))
+
+    await new DeskDataSearchSubmitController({ submitSettleDelayMs: 1 }).submitOnce(page)
+
+    expect(events).toEqual(['arm-readiness', 'submit'])
+    expect(page.initScriptCalls).toBe(1)
+    expect(page.initScriptDisposeCalls).toBe(1)
+    expect(page.initScriptKind).toBe('self-contained-content')
+  })
+
   it('deve enviar a consulta exatamente uma vez', async () => {
     const state: MutablePageState = {
       url: 'https://app.deskdata.com.br/pessoas/'

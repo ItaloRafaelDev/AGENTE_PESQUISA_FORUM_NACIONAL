@@ -78,11 +78,13 @@ export class PlaywrightDeskDataResearchAdapter implements DeskDataResearchPort {
     try {
       resolvedResult = await resolveResult()
 
-      await this.dependencies.resultReady.waitUntilReady(resolvedResult.page)
+      const readyResult = await this.dependencies.resultReady.waitUntilReady(resolvedResult.page)
 
       this.state.setResolvedResult({
         resultPage: resolvedResult.page,
-        closeResultPageAfterSave: resolvedResult.closeAfterConfirmedSave
+        closeResultPageAfterSave: resolvedResult.closeAfterConfirmedSave,
+        expectedProcessCount: readyResult.expectedProcessCount,
+        expectedProcessNumbers: readyResult.expectedProcessNumbers
       })
       completed = true
     } catch (error: unknown) {

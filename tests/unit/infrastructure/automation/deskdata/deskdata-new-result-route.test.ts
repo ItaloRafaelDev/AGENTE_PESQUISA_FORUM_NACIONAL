@@ -117,7 +117,9 @@ describe('DeskData new-result route regression', () => {
       }).waitUntilReady(page as DeskDataResultReadyPage)
     ).resolves.toEqual({
       status: 'READY',
-      resultPath: '/pessoas/resultado/'
+      resultPath: '/pessoas/resultado/',
+      expectedProcessCount: 0,
+      expectedProcessNumbers: []
     })
   })
 })

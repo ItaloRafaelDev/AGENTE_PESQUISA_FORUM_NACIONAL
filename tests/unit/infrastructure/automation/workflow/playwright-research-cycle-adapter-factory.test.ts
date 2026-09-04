@@ -139,6 +139,8 @@ vi.mock('@/infrastructure/automation/workflow/playwright-research-preparation-ad
       setResolvedResult(value: {
         resultPage: { isClosed(): boolean; close(options: unknown): Promise<void> }
         closeResultPageAfterSave: boolean
+        expectedProcessCount: number
+        expectedProcessNumbers: readonly string[]
       }): void
     }
   }) => {
@@ -151,7 +153,12 @@ vi.mock('@/infrastructure/automation/workflow/playwright-research-preparation-ad
 
     return {
       execute: async () => {
-        input.state.setResolvedResult({ resultPage, closeResultPageAfterSave: true })
+        input.state.setResolvedResult({
+          resultPage,
+          closeResultPageAfterSave: true,
+          expectedProcessCount: 0,
+          expectedProcessNumbers: []
+        })
         return {
           maskedCpf: '***.***.***-00',
           selectedDatasetCount: 1,

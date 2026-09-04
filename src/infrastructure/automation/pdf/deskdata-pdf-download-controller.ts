@@ -24,6 +24,7 @@ export class DeskDataPdfDownloadController {
   private readonly downloadTimeoutMs: number
   private readonly actionTimeoutMs: number
   private state: DownloadState = 'IDLE'
+  private downloadedFilePath: string | null = null
 
   constructor(options: DeskDataPdfDownloadControllerOptions = {}) {
     this.outputDirectory = options.outputDirectory ?? DEFAULT_OUTPUT_DIRECTORY
@@ -129,6 +130,7 @@ export class DeskDataPdfDownloadController {
       const sizeBytes = await this.validatePdf(savedFilePath)
 
       this.state = 'DOWNLOADED'
+      this.downloadedFilePath = savedFilePath
 
       return {
         filePath: savedFilePath,
@@ -136,6 +138,7 @@ export class DeskDataPdfDownloadController {
       }
     } catch (error: unknown) {
       this.state = 'IDLE'
+      this.downloadedFilePath = null
 
       if (savedFilePath) {
         await rm(savedFilePath, {
@@ -155,6 +158,19 @@ export class DeskDataPdfDownloadController {
         page.off('download', onDownload)
       })
     }
+  }
+
+  async discard(filePath: string): Promise<void> {
+    if (this.state !== 'DOWNLOADED' || this.downloadedFilePath !== filePath) {
+      throw new Error('Somente o PDF concluído nesta execução pode ser descartado.')
+    }
+
+    await rm(this.downloadedFilePath, {
+      force: true
+    })
+
+    this.downloadedFilePath = null
+    this.state = 'IDLE'
   }
 
   private createTechnicalFileName(): string {

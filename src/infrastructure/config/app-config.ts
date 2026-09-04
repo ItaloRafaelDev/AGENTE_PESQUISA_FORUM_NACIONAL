@@ -28,7 +28,7 @@ export const APP_CONFIG_DEFAULTS = {
     deskDataResultPollingIntervalMs: 500,
     deskDataHistoryNavigationIntervalMs: 250,
     queueFilterSettleDelayMs: 700,
-    submitSettleDelayMs: 1_000,
+    submitSettleDelayMs: 15_000,
     queueReturnDelayMs: 3_000
   },
   limits: {

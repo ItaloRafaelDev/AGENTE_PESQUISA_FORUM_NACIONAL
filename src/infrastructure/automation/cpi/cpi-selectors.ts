@@ -59,3 +59,9 @@ export const CPI_RESEARCH_RESULT_OPTIONS = {
     label: 'Há Informações'
   }
 } as const satisfies Record<ResearchClassification, { selector: string; label: string }>
+export const CPI_RESEARCH_PERSONAL_DETAILS_SELECTORS = {
+  fullName:
+    'xpath=//div[contains(concat(" ", normalize-space(@class), " "), " cell ") and contains(concat(" ", normalize-space(@class), " "), " txt ") and normalize-space(.)="Nome do Pesquisado:"]/following-sibling::div[contains(concat(" ", normalize-space(@class), " "), " field ")][1]',
+  birthDate:
+    'xpath=//div[contains(concat(" ", normalize-space(@class), " "), " cell ") and contains(concat(" ", normalize-space(@class), " "), " txt ") and normalize-space(.)="Nascimento:"]/following-sibling::div[contains(concat(" ", normalize-space(@class), " "), " field ")][1]'
+} as const

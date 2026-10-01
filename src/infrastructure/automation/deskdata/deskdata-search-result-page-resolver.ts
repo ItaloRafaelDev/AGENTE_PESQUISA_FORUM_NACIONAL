@@ -25,6 +25,13 @@ export interface DeskDataSimilarQueryLocator {
 export interface DeskDataSimilarQueryPage {
   url(): string
   locator(selector: string): DeskDataSimilarQueryLocator
+  getByRole(
+    role: 'button',
+    options: {
+      name: string
+      exact?: boolean
+    }
+  ): DeskDataSimilarQueryLocator
   waitForTimeout(milliseconds: number): Promise<void>
   waitForEvent(
     event: 'popup',
@@ -50,6 +57,7 @@ export interface DeskDataSearchResultPageResolverOptions {
   historyNavigationAttempts?: number
   historyNavigationIntervalMs?: number
   actionTimeoutMs?: number
+  confirmationSettleDelayMs?: number
 }
 
 export type DeskDataResolvedResultSource = 'DIRECT_RESULT' | 'SIMILAR_QUERY'
@@ -149,6 +157,7 @@ export class DeskDataSearchResultPageResolver {
   private readonly historyNavigationAttempts: number
   private readonly historyNavigationIntervalMs: number
   private readonly actionTimeoutMs: number
+  private readonly confirmationSettleDelayMs: number
 
   constructor(options: DeskDataSearchResultPageResolverOptions = {}) {
     this.searchAttempts = options.searchAttempts ?? 180
@@ -157,13 +166,15 @@ export class DeskDataSearchResultPageResolver {
     this.historyNavigationAttempts = options.historyNavigationAttempts ?? 120
     this.historyNavigationIntervalMs = options.historyNavigationIntervalMs ?? 250
     this.actionTimeoutMs = options.actionTimeoutMs ?? 10_000
+    this.confirmationSettleDelayMs = options.confirmationSettleDelayMs ?? 15_000
 
     if (
       this.searchAttempts < 1 ||
       this.searchIntervalMs < 0 ||
       this.navigationTimeoutMs < 1 ||
       this.historyNavigationAttempts < 1 ||
-      this.historyNavigationIntervalMs < 0
+      this.historyNavigationIntervalMs < 0 ||
+      this.confirmationSettleDelayMs < 0
     ) {
       throw new Error('As configuracoes de espera do resolvedor sao invalidas.')
     }
@@ -176,7 +187,11 @@ export class DeskDataSearchResultPageResolver {
       throw new Error('O CPF informado ao resolvedor da DeskData e invalido.')
     }
 
-    for (let attempt = 0; attempt < this.searchAttempts; attempt += 1) {
+    let confirmationSent = false
+    let attemptsRemaining = this.searchAttempts
+
+    while (attemptsRemaining > 0) {
+      attemptsRemaining -= 1
       const exportCount = await page
         .locator(DESKDATA_PDF_EXPORT_SELECTOR)
         .count()
@@ -201,10 +216,26 @@ export class DeskDataSearchResultPageResolver {
       const rowCount = await rows.count().catch(() => 0)
 
       if (rowCount > 0) {
-        return this.openLatestMatchingQuery(page, rows, rowCount, normalizedCpf)
+        const matchingQuery = await this.openLatestMatchingQuery(
+          page,
+          rows,
+          rowCount,
+          normalizedCpf
+        )
+
+        if (matchingQuery) {
+          return matchingQuery
+        }
+
+        if (!confirmationSent) {
+          confirmationSent = true
+          await this.confirmNewQuery(page)
+          attemptsRemaining = this.searchAttempts
+          continue
+        }
       }
 
-      if (attempt < this.searchAttempts - 1) {
+      if (attemptsRemaining > 0) {
         await page.waitForTimeout(this.searchIntervalMs)
       }
     }
@@ -245,7 +276,7 @@ export class DeskDataSearchResultPageResolver {
     rows: DeskDataSimilarQueryLocator,
     rowCount: number,
     normalizedCpf: string
-  ): Promise<DeskDataResolvedResultPage> {
+  ): Promise<DeskDataResolvedResultPage | null> {
     const candidates: SimilarQueryCandidate[] = []
 
     for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
@@ -297,9 +328,7 @@ export class DeskDataSearchResultPageResolver {
     })[0]
 
     if (!selected) {
-      throw new Error(
-        'Nenhuma consulta semelhante compativel com o CPF e os seis conjuntos foi encontrada.'
-      )
+      return null
     }
 
     const selectedRow = rows.nth(selected.rowIndex)
@@ -329,5 +358,31 @@ export class DeskDataSearchResultPageResolver {
       resultPath: extractPath(popup.url()),
       closeAfterConfirmedSave: true
     }
+  }
+
+  private async confirmNewQuery(page: DeskDataSimilarQueryPage): Promise<void> {
+    const confirmButton = page.getByRole('button', {
+      name: 'Confirmar',
+      exact: true
+    })
+    const confirmButtonCount = await confirmButton.count().catch(() => 0)
+
+    if (confirmButtonCount !== 1) {
+      throw new Error(
+        'O botao Confirmar da nova consulta DeskData nao foi encontrado de forma unica.'
+      )
+    }
+
+    await confirmButton.click({
+      timeout: this.actionTimeoutMs
+    })
+
+    await page
+      .waitForLoadState('domcontentloaded', {
+        timeout: this.navigationTimeoutMs
+      })
+      .catch(() => undefined)
+
+    await page.waitForTimeout(this.confirmationSettleDelayMs)
   }
 }

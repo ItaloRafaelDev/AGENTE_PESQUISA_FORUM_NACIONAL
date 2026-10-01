@@ -2,6 +2,7 @@ import type { DeskDataResearchPort } from '@/application/ports/research-preparat
 import type { Page } from 'playwright'
 import type { DeskDataCpfFormController } from '../deskdata/deskdata-cpf-form-controller'
 import type { DeskDataDatasetController } from '../deskdata/deskdata-dataset-controller'
+import type { DeskDataMinorSearchController } from '../deskdata/deskdata-minor-search-controller'
 import type { DeskDataResultReadyWaiter } from '../deskdata/deskdata-result-ready-waiter'
 import type { DeskDataSearchResultPageResolver } from '../deskdata/deskdata-search-result-page-resolver'
 import type { DeskDataSearchSubmitController } from '../deskdata/deskdata-search-submit-controller'
@@ -13,9 +14,11 @@ export interface PlaywrightDeskDataResearchDependencies {
   submit: Pick<DeskDataSearchSubmitController, 'submitOnce'>
   resultPageResolver: Pick<DeskDataSearchResultPageResolver, 'resolve'>
   resultReady: Pick<DeskDataResultReadyWaiter, 'waitUntilReady'>
+  minorSearch?: Pick<DeskDataMinorSearchController, 'retryIfRequired' | 'assertAvailable'>
 }
 
 export class PlaywrightDeskDataResearchAdapter implements DeskDataResearchPort {
+  private activeCpf: string | null = null
   private resolveActiveResult:
     (() => ReturnType<DeskDataSearchResultPageResolver['resolve']>) | null = null
 
@@ -30,6 +33,7 @@ export class PlaywrightDeskDataResearchAdapter implements DeskDataResearchPort {
 
     try {
       await this.dependencies.cpfForm.fillCpf(this.deskDataPage, cpf)
+      this.activeCpf = cpf
 
       this.resolveActiveResult = () =>
         this.dependencies.resultPageResolver.resolve(this.deskDataPage, cpf)
@@ -63,8 +67,9 @@ export class PlaywrightDeskDataResearchAdapter implements DeskDataResearchPort {
 
   async waitUntilResultReady(): Promise<void> {
     const resolveResult = this.resolveActiveResult
+    const cpf = this.activeCpf
 
-    if (!resolveResult) {
+    if (!resolveResult || !cpf) {
       this.invalidateActivePreparation()
       throw new Error('O resultado da DeskData não foi resolvido para gerar o relatório.')
     }
@@ -77,6 +82,20 @@ export class PlaywrightDeskDataResearchAdapter implements DeskDataResearchPort {
 
     try {
       resolvedResult = await resolveResult()
+
+      const minorSearch = this.dependencies.minorSearch
+      if (minorSearch && (await minorSearch.retryIfRequired(resolvedResult.page, cpf))) {
+        const retriedResult = await this.dependencies.resultPageResolver.resolve(
+          resolvedResult.page,
+          cpf
+        )
+        resolvedResult = {
+          ...retriedResult,
+          closeAfterConfirmedSave:
+            resolvedResult.closeAfterConfirmedSave || retriedResult.closeAfterConfirmedSave
+        }
+        await minorSearch.assertAvailable(resolvedResult.page)
+      }
 
       const readyResult = await this.dependencies.resultReady.waitUntilReady(resolvedResult.page)
 
@@ -92,6 +111,7 @@ export class PlaywrightDeskDataResearchAdapter implements DeskDataResearchPort {
       throw error
     } finally {
       this.resolveActiveResult = null
+      this.activeCpf = null
 
       if (!completed) {
         this.state.clearResolvedResult()
@@ -101,6 +121,7 @@ export class PlaywrightDeskDataResearchAdapter implements DeskDataResearchPort {
 
   private invalidateActivePreparation(): void {
     this.resolveActiveResult = null
+    this.activeCpf = null
     this.state.clearResolvedResult()
   }
 

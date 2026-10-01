@@ -15,6 +15,13 @@ export interface DeskDataNextSearchLocator {
   inputValue?(options?: { timeout?: number }): Promise<string>
 
   click?(options?: { timeout?: number }): Promise<void>
+
+  selectOption?(
+    value: string,
+    options?: {
+      timeout?: number
+    }
+  ): Promise<string[]>
 }
 
 export interface DeskDataNextSearchPage {
@@ -50,6 +57,7 @@ export interface DeskDataNextSearchControllerOptions {
 }
 
 interface DeskDataSearchFormControls {
+  primaryKey: DeskDataNextSearchLocator
   cpfInput: DeskDataNextSearchLocator
   searchButton: DeskDataNextSearchLocator
   available: boolean
@@ -102,8 +110,25 @@ export class DeskDataNextSearchController {
       throw new Error('O formulario Consultar pessoas da DeskData nao ficou disponivel.')
     }
 
-    if (!form.cpfInput.fill || !form.cpfInput.inputValue) {
-      throw new Error('O campo CPF da DeskData nao permite limpeza e validacao.')
+    if (
+      !form.primaryKey.selectOption ||
+      !form.primaryKey.inputValue ||
+      !form.cpfInput.fill ||
+      !form.cpfInput.inputValue
+    ) {
+      throw new Error('O formulario CPF da DeskData nao permite preparacao e validacao.')
+    }
+
+    await form.primaryKey.selectOption('cpf', {
+      timeout: this.actionTimeoutMs
+    })
+
+    const persistedPrimaryKey = await form.primaryKey.inputValue({
+      timeout: this.readTimeoutMs
+    })
+
+    if (persistedPrimaryKey !== 'cpf') {
+      throw new Error('A DeskData nao restaurou a chave CPF para a proxima consulta.')
     }
 
     await form.cpfInput.fill('', {
@@ -173,19 +198,22 @@ export class DeskDataNextSearchController {
   private async inspectSearchForm(
     page: DeskDataNextSearchPage
   ): Promise<DeskDataSearchFormControls> {
+    const primaryKey = page.locator(DESKDATA_NEXT_SEARCH_SELECTORS.primaryKey)
     const cpfInput = page.locator(DESKDATA_NEXT_SEARCH_SELECTORS.cpfInput)
 
     const searchButton = page.locator(DESKDATA_NEXT_SEARCH_SELECTORS.searchButton)
 
-    const [cpfInputCount, searchButtonCount] = await Promise.all([
+    const [primaryKeyCount, cpfInputCount, searchButtonCount] = await Promise.all([
+      primaryKey.count().catch(() => 0),
       cpfInput.count().catch(() => 0),
       searchButton.count().catch(() => 0)
     ])
 
     return {
+      primaryKey,
       cpfInput,
       searchButton,
-      available: cpfInputCount === 1 && searchButtonCount === 1
+      available: primaryKeyCount === 1 && cpfInputCount === 1 && searchButtonCount === 1
     }
   }
 

@@ -13,6 +13,7 @@ export const DESKDATA_DATASET_SELECTORS = {
 } as const
 
 export const DESKDATA_NEXT_SEARCH_SELECTORS = {
+  primaryKey: 'form#form select#key-select[name="key-select"]',
   cpfInput: 'form#form input#cpf[name="cpf"][type="text"]',
   searchButton: 'form#form input#search[name="submit"][type="submit"]',
   similarQueriesHeading: 'h5:has-text("Consultas semelhantes encontradas")',
@@ -43,3 +44,11 @@ export const DESKDATA_PROCESSES_UPDATED_SELECTOR = `.toast-message:text-is("${DE
 export const DESKDATA_PROCESSES_UPDATED_MARKER_ATTRIBUTE = 'data-agent-cpi-processes-updated'
 
 export const DESKDATA_PROCESSES_UPDATED_MARKER_SELECTOR = `html[${DESKDATA_PROCESSES_UPDATED_MARKER_ATTRIBUTE}="true"]`
+export const DESKDATA_MINOR_SEARCH_SELECTORS = {
+  notice: 'p:has-text("pessoa menor de 18 anos de idade"):visible',
+  back: 'button[type="submit"]:text-is("Voltar"):visible',
+  primaryKey: 'form#form select#key-select[name="key-select"]',
+  secondaryKey: 'form#form select#key-extra-select[name="key-extra-select"]',
+  fullName: 'form#form input#fullname[name="fullname"][type="text"]',
+  birthDate: 'form#form input#birthdate[name="birthdate"][type="text"]'
+} as const

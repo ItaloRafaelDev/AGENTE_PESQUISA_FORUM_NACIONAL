@@ -14,6 +14,7 @@ class FakeLocator implements DeskDataNextSearchLocator {
       fill?: (value: string, options?: { timeout?: number }) => void
       inputValue?: (options?: { timeout?: number }) => string
       click?: (options?: { timeout?: number }) => void
+      selectOption?: (value: string, options?: { timeout?: number }) => void
     } = {}
   ) {}
 
@@ -44,6 +45,15 @@ class FakeLocator implements DeskDataNextSearchLocator {
 
     this.actions.click(options)
   }
+
+  async selectOption(value: string, options?: { timeout?: number }): Promise<string[]> {
+    if (!this.actions.selectOption) {
+      throw new Error('SelectOption nao configurado')
+    }
+
+    this.actions.selectOption(value, options)
+    return [value]
+  }
 }
 
 interface PageOptions {
@@ -53,6 +63,7 @@ interface PageOptions {
   consultPeopleLinkAvailable?: boolean
   gotoRestoresForm?: boolean
   formAvailableAfterWaits?: number
+  initialPrimaryKey?: 'cpf' | 'fullname'
 }
 
 function createPage(options: PageOptions): {
@@ -64,6 +75,7 @@ function createPage(options: PageOptions): {
   cpfInputValue: ReturnType<typeof vi.fn>
   waitForTimeout: ReturnType<typeof vi.fn>
   getCpfValue(): string
+  getPrimaryKey(): string
   isFormAvailable(): boolean
   isSimilarQueriesVisible(): boolean
 } {
@@ -71,6 +83,7 @@ function createPage(options: PageOptions): {
   let formAvailable = options.formAvailable
   let similarQueriesVisible = options.similarQueriesVisible ?? false
   let cpfValue = '12345678900'
+  let primaryKey = options.initialPrimaryKey ?? 'cpf'
   let waitCalls = 0
 
   const goto = vi.fn(async (url: string) => {
@@ -118,6 +131,15 @@ function createPage(options: PageOptions): {
         })
       }
 
+      if (selector === DESKDATA_NEXT_SEARCH_SELECTORS.primaryKey) {
+        return new FakeLocator(() => (formAvailable ? 1 : 0), {
+          selectOption: (value) => {
+            primaryKey = value
+          },
+          inputValue: () => primaryKey
+        })
+      }
+
       if (selector === DESKDATA_NEXT_SEARCH_SELECTORS.searchButton) {
         return new FakeLocator(() => (formAvailable ? 1 : 0))
       }
@@ -145,6 +167,7 @@ function createPage(options: PageOptions): {
     cpfInputValue,
     waitForTimeout,
     getCpfValue: () => cpfValue,
+    getPrimaryKey: () => primaryKey,
     isFormAvailable: () => formAvailable,
     isSimilarQueriesVisible: () => similarQueriesVisible
   }
@@ -185,6 +208,19 @@ describe('DeskDataNextSearchController', () => {
 
     expect(context.consultPeopleClick).not.toHaveBeenCalled()
     expect(context.goto).not.toHaveBeenCalled()
+    expect(context.getCpfValue()).toBe('')
+  })
+
+  it('restores CPF key when the previous consultation used name', async () => {
+    const context = createPage({
+      initialUrl: DESKDATA_PEOPLE_URL,
+      formAvailable: true,
+      initialPrimaryKey: 'fullname'
+    })
+
+    await new DeskDataNextSearchController().prepare(context.page)
+
+    expect(context.getPrimaryKey()).toBe('cpf')
     expect(context.getCpfValue()).toBe('')
   })
 

@@ -23,6 +23,7 @@ const expectedCatalogExports = [
 
 const selectorLiterals = [
   'form#form',
+  'form#form select#key-select[name="key-select"]',
   'form#form button[title="CPF"]',
   'form#form input#cpf[name="cpf"][type="text"]',
   'form#form input#search[name="submit"][type="submit"]',
@@ -67,6 +68,7 @@ describe('ownership dos seletores DeskData', () => {
       ['allCheckboxes', 'form#form input[type="checkbox"]']
     ])
     expect(Object.entries(DESKDATA_NEXT_SEARCH_SELECTORS)).toEqual([
+      ['primaryKey', 'form#form select#key-select[name="key-select"]'],
       ['cpfInput', 'form#form input#cpf[name="cpf"][type="text"]'],
       ['searchButton', 'form#form input#search[name="submit"][type="submit"]'],
       ['similarQueriesHeading', 'h5:has-text("Consultas semelhantes encontradas")'],

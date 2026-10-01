@@ -31,6 +31,17 @@ const factoryFakes = vi.hoisted(() => {
   }
 })
 
+vi.mock('@/infrastructure/automation/deskdata/deskdata-minor-search-controller', () => ({
+  DeskDataMinorSearchController: class {
+    async retryIfRequired(): Promise<boolean> {
+      return false
+    }
+    async assertAvailable(): Promise<void> {
+      return undefined
+    }
+  }
+}))
+
 vi.mock('@/infrastructure/automation/deskdata/deskdata-cpf-form-controller', () => ({
   DeskDataCpfFormController: class {
     constructor(options: unknown) {
@@ -693,7 +704,8 @@ describe('createPlaywrightResearchPreparationAdapter', () => {
         navigationTimeoutMs: 17,
         historyNavigationAttempts: 30,
         historyNavigationIntervalMs: 21,
-        actionTimeoutMs: 13
+        actionTimeoutMs: 13,
+        confirmationSettleDelayMs: 22
       },
       ready: { searchAttempts: 29, searchIntervalMs: 20 },
       downloader: {

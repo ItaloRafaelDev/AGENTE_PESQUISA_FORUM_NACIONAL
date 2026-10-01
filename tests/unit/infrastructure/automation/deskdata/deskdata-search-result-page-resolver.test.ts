@@ -16,7 +16,7 @@ class FakeLocator implements DeskDataSimilarQueryLocator {
 
   constructor(
     private readonly options: {
-      count?: number
+      count?: number | (() => number)
       children?: FakeLocator[]
       texts?: string[]
       href?: string | null
@@ -26,7 +26,12 @@ class FakeLocator implements DeskDataSimilarQueryLocator {
   ) {}
 
   count(): Promise<number> {
-    return Promise.resolve(this.options.count ?? this.options.children?.length ?? 0)
+    const configuredCount = this.options.count
+    return Promise.resolve(
+      typeof configuredCount === 'function'
+        ? configuredCount()
+        : (configuredCount ?? this.options.children?.length ?? 0)
+    )
   }
 
   nth(index: number): DeskDataSimilarQueryLocator {
@@ -77,6 +82,20 @@ class FakePage implements DeskDataSimilarQueryPage {
 
   locator(selector: string): DeskDataSimilarQueryLocator {
     return this.locators[selector] ?? new FakeLocator()
+  }
+
+  getByRole(
+    role: 'button',
+    options: {
+      name: string
+      exact?: boolean
+    }
+  ): DeskDataSimilarQueryLocator {
+    if (role !== 'button' || options.name !== 'Confirmar' || options.exact !== true) {
+      return new FakeLocator()
+    }
+
+    return this.locators.confirmButton ?? new FakeLocator()
   }
 
   async waitForTimeout(milliseconds: number): Promise<void> {
@@ -286,7 +305,7 @@ describe('DeskDataSearchResultPageResolver', () => {
     expect(popupWaits).toBe(2)
   })
 
-  it('rejects another CPF or incomplete datasets', async () => {
+  it('rejects incompatible history when confirmation is unavailable', async () => {
     const rows = new FakeLocator({
       children: [
         row(
@@ -314,6 +333,82 @@ describe('DeskDataSearchResultPageResolver', () => {
         searchAttempts: 1,
         searchIntervalMs: 0
       }).resolve(page as unknown as Page, '12345678901')
-    ).rejects.toThrow('Nenhuma consulta semelhante compativel')
+    ).rejects.toThrow('O botao Confirmar')
+  })
+
+  it('confirms a new query when the previous result does not contain all six datasets', async () => {
+    const confirm = new FakeLocator({
+      count: 1,
+      onClick: () => page.setUrl('https://app.deskdata.com.br/pessoas/resultado/nova')
+    })
+    const rows = new FakeLocator({
+      children: [
+        row(
+          '08/09/2026 16:57',
+          '123.456.789-01',
+          'Dados basicos\nEmprego\nProcessos',
+          'https://deskdata.com.br/historico/detalhes?q=Q-INCOMPLETA'
+        )
+      ]
+    })
+    const exportControl = new FakeLocator({
+      count: () => (page.url().includes('/pessoas/resultado/') ? 1 : 0)
+    })
+
+    const page = new FakePage('https://app.deskdata.com.br/pessoas/', {
+      [DESKDATA_PDF_EXPORT_SELECTOR]: exportControl,
+      [DESKDATA_SIMILAR_QUERY_SELECTORS.rows]: rows,
+      confirmButton: confirm
+    })
+
+    await expect(
+      new DeskDataSearchResultPageResolver({
+        searchAttempts: 1,
+        searchIntervalMs: 0,
+        confirmationSettleDelayMs: 15_000,
+        navigationTimeoutMs: 31_234,
+        actionTimeoutMs: 12_345
+      }).resolve(page, '12345678901')
+    ).resolves.toEqual({
+      source: 'DIRECT_RESULT',
+      page,
+      resultPath: '/pessoas/resultado/nova',
+      closeAfterConfirmedSave: false
+    })
+
+    expect(confirm.clickCalls).toBe(1)
+    expect(confirm.clickTimeoutMs).toBe(12_345)
+    expect(page.loadTimeoutMs).toBe(31_234)
+    expect(page.waitDurations).toContain(15_000)
+  })
+
+  it('never confirms the same pending query more than once', async () => {
+    const confirm = new FakeLocator({ count: 1 })
+    const rows = new FakeLocator({
+      children: [
+        row(
+          '08/09/2026 16:57',
+          '123.456.789-01',
+          'Dados basicos\nEmprego\nProcessos',
+          'https://deskdata.com.br/historico/detalhes?q=Q-INCOMPLETA'
+        )
+      ]
+    })
+    const page = new FakePage('https://app.deskdata.com.br/pessoas/', {
+      [DESKDATA_PDF_EXPORT_SELECTOR]: new FakeLocator({ count: 0 }),
+      [DESKDATA_SIMILAR_QUERY_SELECTORS.rows]: rows,
+      confirmButton: confirm
+    })
+
+    await expect(
+      new DeskDataSearchResultPageResolver({
+        searchAttempts: 3,
+        searchIntervalMs: 7,
+        confirmationSettleDelayMs: 15_000
+      }).resolve(page, '12345678901')
+    ).rejects.toThrow('nao apresentou resultado normal')
+
+    expect(confirm.clickCalls).toBe(1)
+    expect(page.waitDurations.filter((duration) => duration === 15_000)).toHaveLength(1)
   })
 })

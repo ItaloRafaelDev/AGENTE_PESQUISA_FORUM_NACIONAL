@@ -14,6 +14,8 @@ import {
 } from '../cpi/cpi-research-pdf-preparation-workflow'
 import { CpiResearchPdfAttachmentController } from '../cpi/cpi-research-pdf-attachment-controller'
 import { CpiResearchResultController } from '../cpi/cpi-research-result-controller'
+import { CpiResearchPersonalDetailsReader } from '../cpi/cpi-research-personal-details-reader'
+import { DeskDataMinorSearchController } from '../deskdata/deskdata-minor-search-controller'
 import { DeskDataCpfFormController } from '../deskdata/deskdata-cpf-form-controller'
 import { DeskDataDatasetController } from '../deskdata/deskdata-dataset-controller'
 import { DeskDataResultReadyWaiter } from '../deskdata/deskdata-result-ready-waiter'
@@ -78,6 +80,22 @@ export function createPlaywrightResearchPreparationAdapterWithState(
         readTimeoutMs: input.config.readTimeoutMs
       }),
       dataset: new DeskDataDatasetController(),
+      minorSearch: new DeskDataMinorSearchController(
+        {
+          readDetails: (cpf) =>
+            new CpiResearchPersonalDetailsReader(input.config.readTimeoutMs).read(
+              input.detailFrame,
+              cpf
+            ),
+          dataset: new DeskDataDatasetController(),
+          submit: new DeskDataSearchSubmitController({
+            actionTimeoutMs: input.config.actionTimeoutMs,
+            navigationTimeoutMs: input.config.navigationTimeoutMs,
+            submitSettleDelayMs: input.config.submitSettleDelayMs
+          })
+        },
+        input.config.actionTimeoutMs
+      ),
       submit: new DeskDataSearchSubmitController({
         actionTimeoutMs: input.config.actionTimeoutMs,
         navigationTimeoutMs: input.config.navigationTimeoutMs,
@@ -89,7 +107,8 @@ export function createPlaywrightResearchPreparationAdapterWithState(
         navigationTimeoutMs: input.config.navigationTimeoutMs,
         historyNavigationAttempts: input.config.deskDataHistoryNavigationAttempts,
         historyNavigationIntervalMs: input.config.deskDataHistoryNavigationIntervalMs,
-        actionTimeoutMs: input.config.actionTimeoutMs
+        actionTimeoutMs: input.config.actionTimeoutMs,
+        confirmationSettleDelayMs: input.config.submitSettleDelayMs
       }),
       resultReady: new DeskDataResultReadyWaiter({
         searchAttempts: input.config.deskDataResultSearchAttempts,

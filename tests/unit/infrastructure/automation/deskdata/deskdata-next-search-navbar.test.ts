@@ -17,6 +17,7 @@ class FakeLocator implements DeskDataNextSearchLocator {
       fill?: (value: string) => void
       inputValue?: () => string
       click?: () => void
+      selectOption?: (value: string) => void
     } = {}
   ) {}
 
@@ -35,6 +36,11 @@ class FakeLocator implements DeskDataNextSearchLocator {
   async click(): Promise<void> {
     this.actions.click?.()
   }
+
+  async selectOption(value: string): Promise<string[]> {
+    this.actions.selectOption?.(value)
+    return [value]
+  }
 }
 
 describe('DeskDataNextSearchController navbar app', () => {
@@ -46,6 +52,7 @@ describe('DeskDataNextSearchController navbar app', () => {
     let formAvailable = false
     let similarQueriesVisible = true
     let cpfValue = '23559839840'
+    let primaryKey = 'cpf'
 
     const clickNavbar = vi.fn(() => {
       formAvailable = true
@@ -60,6 +67,15 @@ describe('DeskDataNextSearchController navbar app', () => {
       waitForTimeout: vi.fn(async () => undefined),
 
       locator: vi.fn((selector: string) => {
+        if (selector === DESKDATA_NEXT_SEARCH_SELECTORS.primaryKey) {
+          return new FakeLocator(() => (formAvailable ? 1 : 0), {
+            selectOption: (value) => {
+              primaryKey = value
+            },
+            inputValue: () => primaryKey
+          })
+        }
+
         if (selector === DESKDATA_NEXT_SEARCH_SELECTORS.cpfInput) {
           return new FakeLocator(() => (formAvailable ? 1 : 0), {
             fill: (value) => {
